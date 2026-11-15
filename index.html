@@ -518,6 +518,11 @@ const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelecto
 const Q=new URLSearchParams(location.search),root=document.documentElement,STILL=Q.has('still');
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v)),lerp=(a,b,t)=>a+(b-a)*t,ease=t=>1-Math.pow(1-t,3);
 
+/* always open at the top: a reload must not drop you where you were last time */
+if('scrollRestoration' in history)history.scrollRestoration='manual';
+const toTop=()=>{if(!location.hash&&!Q.has('y'))scrollTo(0,0)};
+toTop();addEventListener('load',toTop);addEventListener('pageshow',toTop);
+
 /* the page is drawn 1440 wide and scaled to the window, so it keeps the reference's proportions on any desktop */
 let Z=1;
 const fit=()=>{const w=window.visualViewport?visualViewport.width:innerWidth;Z=clamp(w/1440,.5,2.4);root.style.zoom=Z};
