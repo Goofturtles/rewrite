@@ -47,17 +47,20 @@ h2 em{display:block;color:#444}
 .brand{display:flex;align-items:center;gap:11px;font:600 29px/1.2 var(--ui);letter-spacing:-.04em;color:var(--ink);transform-origin:left center;will-change:transform}
 .brand svg{width:38px;height:38px}
 .links{position:absolute;left:50%;top:31px;transform:translateX(-50%);display:flex;height:55px;padding:0 11px;align-items:center;border-radius:99px;background:#fff;box-shadow:0 10px 30px -14px rgba(18,18,18,.22)}
-.links a{padding:7px 14px;border-radius:99px;font-size:18px;line-height:1.3;color:var(--ink);transition:background .25s}
-.links a:hover{background:var(--grey)}
+.links a{position:relative;z-index:1;padding:7px 14px;border-radius:99px;font-size:18px;line-height:1.3;color:var(--ink)}
+/* one grey pill that slides to whichever link the pointer is on */
+.links .ind{position:absolute;left:0;top:50%;width:0;height:41px;margin-top:-20.5px;border-radius:99px;background:var(--grey);opacity:0;pointer-events:none;transition:transform .55s var(--ease),width .55s var(--ease),opacity .25s}
 .acts{display:flex;align-items:center;gap:14px;height:55px;padding:0 4px 0 23px;border-radius:99px;background:#fff;box-shadow:0 10px 30px -14px rgba(18,18,18,.22)}
 .acts>a:first-child{font-size:18px;color:var(--ink)}
 .acts .btn{height:47px;padding:0 22px}
 
 /* hero */
-.hero{position:relative;height:1500px;overflow:hidden;background:
-  radial-gradient(58% 46% at 0% 0%,rgba(150,190,235,.17),transparent 72%),
-  linear-gradient(90deg,rgba(140,135,115,.17) 0%,rgba(140,135,115,0) 42%,rgba(255,255,240,0) 46%,rgba(255,255,240,.4) 100%),
-  linear-gradient(180deg,#E6EAEB 0,#EFEEE9 280px,#F2EEE5 510px,#F1EDE4 640px,#F6F4EF 940px,#fff 1200px)}
+.hero{position:relative;height:1500px;overflow:hidden;background:linear-gradient(180deg,#E6EAEB 0,#EFEEE9 280px,#F2EEE5 510px,#F1EDE4 640px,#F9F7F3 880px,#fff 1080px)}
+/* the cool and warm tints of the sky sit in their own layer and fade out, so the hero ends in plain white with no edge */
+.hero::before{content:"";position:absolute;left:0;right:0;top:0;height:1080px;pointer-events:none;background:
+  radial-gradient(58% 64% at 0% 0%,rgba(150,190,235,.17),transparent 72%),
+  linear-gradient(90deg,rgba(140,135,115,.17) 0%,rgba(140,135,115,0) 42%,rgba(255,255,240,0) 46%,rgba(255,255,240,.4) 100%);
+  mask-image:linear-gradient(#000 50%,transparent 100%)}
 .hills{position:absolute;left:50%;top:286px;width:1720px;margin-left:-860px;transform:translate3d(0,var(--hy,0px),0);pointer-events:none;will-change:transform;mask-image:linear-gradient(#000 62%,transparent 94%)}
 .hills img{width:100%}
 .hero-c{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:144px;transform:translate3d(0,var(--cy,0px),0);opacity:var(--co,1);will-change:transform,opacity}
@@ -76,7 +79,7 @@ h1 mark{display:inline-block;background:#fff;color:var(--leaf);line-height:.97;p
 h1 em{color:#2F2F2F}
 .sub{margin-top:22px;font-size:18.5px;line-height:31px;color:#333}
 .hero .btn{margin-top:32px}
-.shot{position:absolute;z-index:3;left:144px;top:680px;width:1152px;border-radius:26px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.75),0 40px 90px -44px rgba(30,50,10,.5);transform:translate3d(0,var(--sy,0px),0) scale(var(--ss,1));transform-origin:50% 0;will-change:transform;mask-image:linear-gradient(#000 74%,transparent 98%)}
+.shot{position:absolute;z-index:3;left:144px;top:680px;width:1152px;border-radius:26px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.75);transform:translate3d(0,var(--sy,0px),0) scale(var(--ss,1));transform-origin:50% 0;will-change:transform;mask-image:linear-gradient(#000 50%,transparent 86%)}
 .shot img{width:100%}
 
 /* intro: the wordmark alone over the hills, then everything arrives */
@@ -264,8 +267,31 @@ h1 .ln>span{transform:translateY(120%);transition:transform 1.2s var(--ease);tra
 .w.m:hover .pl{transform:scale(1.14)}
 .w.m .pl::after{content:"";border-left:14px solid #121212;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px}
 
+/* three ways to run it: the reference's pricing block, with no prices in it */
+.plans{padding:100px 0 110px;text-align:center}
+.free{display:inline-flex;align-items:center;gap:13px;height:25px;font-size:17px;line-height:25px;color:var(--ink)}
+.free i{width:45px;height:25px;border-radius:99px;background:linear-gradient(180deg,#5E9306,#487600);position:relative}
+.free i::after{content:"";position:absolute;right:3px;top:3px;width:19px;height:19px;border-radius:50%;background:#fff}
+.plans h2{margin-top:23px}
+.plans .lead{margin-top:24px;line-height:29px}
+.p-grid{display:grid;grid-template-columns:repeat(3,441px);justify-content:center;gap:21px;margin-top:71px;text-align:left}
+.plan{height:742px;border-radius:35px;padding:55px 3px 3px;background:#E9ECEB}
+.plan.hi{background:linear-gradient(90deg,#14172B 0%,#3A2530 22%,#D9722C 60%,#F0A54E 100%) 0 0/100% 90px no-repeat,linear-gradient(200deg,#E9E5E0 0%,#E9E5E0 38%,#1A1F36 60%,#1A1F36 76%,#D9772F 100%)}
+.plan .in{position:relative;height:100%;border-radius:31px;background:#fff;padding:51px 28px 0;overflow:hidden}
+.plan .in::before{content:"";position:absolute;right:0;top:0;width:250px;height:120px;background:radial-gradient(#C9CDCC 1px,transparent 1.6px) 0 0/9px 9px;mask-image:radial-gradient(70% 90% at 62% 0%,#000,transparent 72%);opacity:.8}
+.plan h3{position:relative;font-weight:700;font-size:21px;line-height:26px;letter-spacing:-.02em}
+.plan .pr{display:flex;align-items:baseline;gap:7px;height:54px;margin-top:22px;font-weight:700;font-size:45px;line-height:54px;letter-spacing:-.04em;color:var(--ink)}
+.plan .pr small{font-weight:400;font-size:16px;letter-spacing:-.01em;color:#555}
+.plan .in>p{margin-top:8px;font-size:17.5px;line-height:28px;color:#333;height:56px}
+.plan .btn{width:100%;height:62px;margin-top:17px;font-size:20px;font-weight:400;box-shadow:0 22px 28px -18px rgba(0,0,0,.55)}
+.plan h4{display:flex;align-items:center;gap:14px;margin:38px 0 0;font:400 12px/20px var(--ui);letter-spacing:.02em;text-transform:uppercase;color:#6B6B6B;white-space:nowrap}
+.plan h4::before,.plan h4::after{content:"";flex:1;height:1px;background:#DCDCDC}
+.plan ul{margin:13px 0 0;padding:0;list-style:none}
+.plan li{display:grid;grid-template-columns:22px 1fr;gap:14px;align-items:center;height:42px;font-size:17.5px;line-height:1.3;color:#222}
+.plan li::before{content:"";width:22px;height:22px;border-radius:50%;background:#121212 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") 50%/13px no-repeat}
+
 /* questions */
-.faq-bg{background:#EBECEB}
+.faq-bg{background:#fff}
 .faq{background:#000;color:#fff;border-radius:45px 45px 0 0;padding:110px 0 250px;text-align:center}
 .faq .pill{display:inline-grid;place-items:center;width:57px;height:30px;border-radius:99px;background:#232323;color:#9A9A9A;font-size:12px;letter-spacing:.05em}
 .faq h2{color:#fff;margin-top:var(--fqh,2px)}
@@ -315,7 +341,7 @@ footer a:hover{color:#fff}
 <body>
 <header class="nav" id="nav">
   <a class="brand" id="brand" href="#top"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="10" fill="#121212"/><path d="M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></svg><span>Rewrite</span></a>
-  <nav class="links pre" style="--d:250" aria-label="Sections"><a href="#features">Features</a><a href="#steps">Steps</a><a href="#words">Notes</a><a href="#faq">FAQ</a></nav>
+  <nav class="links pre" style="--d:250" aria-label="Sections"><i class="ind" aria-hidden="true"></i><a href="#features">Features</a><a href="#steps">Steps</a><a href="#words">Notes</a><a href="#faq">FAQ</a></nav>
   <div class="acts pre" style="--d:330"><a href="app.html">Open app</a><a class="btn g" href="app.html">Start a session</a></div>
 </header>
 
@@ -328,7 +354,7 @@ footer a:hover{color:#fff}
       <p class="sub pre" style="--d:760">Rewrite watches your screen while you work or study<br>and writes the notes. Quick glances don't count.</p>
       <a class="btn g pre" style="--d:860" href="app.html?sample=1"><span class="play"></span>Watch Demo</a>
     </div>
-    <div class="shot" id="shot"><img src="assets/app-home.webp" alt="The Rewrite home screen: today's focus, a start button, the latest notes and a week of focus time." width="2200" height="1544"></div>
+    <div class="shot" id="shot"><img src="assets/app-recap.webp" alt="The Rewrite recap screen: focus time, notes written and glances ignored for the week, a chart of focus time by day, and the latest sessions." width="2200" height="1772"></div>
   </section>
 
   <section class="say" id="say">
@@ -405,6 +431,19 @@ footer a:hover{color:#fff}
     </div>
   </section>
 
+  <section class="plans" id="ways">
+    <div class="wrap">
+      <span class="free rv" aria-hidden="true">With a key<i></i>Without</span>
+      <h2 class="tight rv">Three simple ways<em>to run it</em></h2>
+      <p class="lead rv">Start with the sample. Switch<br>whenever you like.</p>
+      <div class="p-grid">
+        <div class="plan rv"><div class="in"><h3>Sample</h3><div class="pr">50 s <small>demo</small></div><p>See it work before you set anything up.</p><a class="btn k" href="app.html?sample=1">Play the sample</a><h4>What you get</h4><ul><li>A 50 second session</li><li>The real glance filter</li><li>Scripted example notes</li><li>Takeaways and a quiz</li><li>No screen sharing needed</li><li>Nothing to set up</li></ul></div></div>
+        <div class="plan hi rv" style="--d:100"><div class="in"><h3>Claude</h3><div class="pr">Best <small>notes</small></div><p>Uses your own Claude key from Anthropic.</p><a class="btn k" href="app.html">Start a session</a><h4>What you get</h4><ul><li>The most accurate notes</li><li>Takeaways and a quiz</li><li>Topics filed for you</li><li>Your pick of Claude model</li><li>Key stays in your browser</li><li>Still frames go to Anthropic</li><li>Test your key in Settings</li></ul></div></div>
+        <div class="plan rv" style="--d:200"><div class="in"><h3>On this laptop</h3><div class="pr">Private <small>no key</small></div><p>Your screen never leaves the laptop. No key needed.</p><a class="btn k" href="app.html">Start a session</a><h4>What you get</h4><ul><li>Reads the text on your screen</li><li>Pulls out the key lines</li><li>Your screen is never sent</li><li>No key and no account</li><li>Rougher notes, no quiz</li><li>Works on any page</li></ul></div></div>
+      </div>
+    </div>
+  </section>
+
   <div class="faq-bg"><section class="faq" id="faq">
     <span class="pill rv">FAQ</span>
     <h2 class="rv">Common <span>Questions</span></h2>
@@ -452,6 +491,13 @@ function intro(){
   setTimeout(()=>{brand.style.opacity=1;root.classList.remove('boot')},60);
   setTimeout(()=>{brand.style.transition='transform 1.25s cubic-bezier(.7,0,.2,1)';brand.style.transform='none';root.classList.add('ready')},1300);
 }
+
+/* ---- nav: one pill slides to the link under the pointer ---- */
+const links=$('.links'),ind=$('.ind',links);
+function slideTo(a){const fresh=ind.style.opacity!=='1';if(fresh)ind.style.transition='opacity .25s';ind.style.width=a.offsetWidth+'px';ind.style.transform=`translateX(${a.offsetLeft}px)`;ind.style.opacity=1;if(fresh)requestAnimationFrame(()=>requestAnimationFrame(()=>{ind.style.transition=''}))}
+$$('a',links).forEach(a=>{a.addEventListener('pointerenter',()=>slideTo(a));a.addEventListener('focus',()=>slideTo(a))});
+links.addEventListener('pointerleave',()=>{ind.style.opacity=0});
+links.addEventListener('focusout',e=>{if(!links.contains(e.relatedTarget))ind.style.opacity=0});
 
 /* ---- links inside the page: the browser does the scrolling ---- */
 document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;const el=$(a.getAttribute('href'));if(!el)return;e.preventDefault();el.scrollIntoView({behavior:STILL?'auto':'smooth',block:'start'})});
