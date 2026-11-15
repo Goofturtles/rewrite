@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1280">
-<meta name="build" content="1794769591">
+<meta name="build" content="1794771194">
 <title>Rewrite</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%23528200'/%3E%3Cpath d='M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18' fill='none' stroke='%23fff' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://api.fontshare.com">
@@ -87,6 +87,10 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 .pl-t.type.slide{animation:pl-type .9s steps(24) both,pl-slide var(--dur,4s) linear 1.2s both}
 @keyframes pl-type{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
 @keyframes pl-slide{to{transform:translateX(var(--dx,0px))}}
+/* a citation stays on the line and drifts end to end when it is longer than the window */
+.pl-t.loop{animation:pl-slide var(--dur,6s) ease-in-out 1s infinite alternate}
+.fl .pill-btn.cite-b{display:none!important}
+.fl:hover .pill.has-cite:not(.mini) .pill-btn.cite-b{display:grid!important}
 /* it is never still: a ring leaves the dot while it watches, and three small dots walk after the word */
 .fl .led{position:relative}
 .fl .pill[data-state="noting"] .led::before,.fl .pill[data-state="writing"] .led::before{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 1.5px var(--hot-hi);animation:pl-ring 2.4s cubic-bezier(.22,1,.36,1) infinite}
@@ -418,6 +422,19 @@ kbd{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 
 [data-theme="light"] .legend i{background:var(--blue)}
 .legend .lg,[data-theme="light"] .legend .lg{background:repeating-linear-gradient(90deg,var(--ink) 0 1.5px,transparent 1.5px 4.5px)}
 .legend .lb{opacity:.3}
+/* a long session's notes are filed under headings: the page or source they came from */
+.toc{display:flex;flex-wrap:wrap;gap:6px}
+.toc button,.cite-row button{display:flex;align-items:center;gap:7px;font-size:13px;line-height:1.5;padding:4px 12px;border-radius:99px;box-shadow:inset 0 0 0 1px var(--line);color:var(--ink2);transition:color .2s,box-shadow .2s}
+.toc button:hover,.cite-row button:hover{color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink3)}
+.toc em,.grp-h em{font:500 12px/1.5 var(--ui);font-style:normal;color:var(--ink3)}
+.grp{display:grid;gap:12px;scroll-margin-top:18px}
+.grp-h{display:flex;align-items:baseline;gap:10px;font:500 20px/1.3 var(--ui);letter-spacing:-.03em;margin:12px 4px 0}
+.cite-row button{flex:none}
+.cite-row button svg{width:13px;height:13px}
+.cite-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line2)}
+.cite-row:first-child{border-top:0;padding-top:0}
+.cite-row b{display:block;font:500 14px/1.4 var(--ui)}
+.cite-row small{display:block;font-size:12px;line-height:1.45;color:var(--ink3);word-break:break-word}
 .out{display:flex;flex-wrap:wrap;align-items:center;gap:3px 12px;margin-top:14px;font-size:12.5px;line-height:1.5;color:var(--ink3)}
 .out:empty{display:none}
 .out b{font-weight:500;color:var(--ink2)}
@@ -596,6 +613,7 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
           <div class="card rise" style="--i:2" id="c-see" data-el="preview"><h2 class="cap">What Rewrite sees</h2><div class="see" id="see"><canvas id="pv" width="640" height="360"></canvas><div class="see-tag">Glance. Not saved.</div></div><p class="now" id="now"></p><pre class="diag" id="diag" hidden></pre></div>
           <div class="card cream rise" style="--i:2" id="c-sum" data-el="takeaways"><h2 class="cap">What you learned</h2><ul class="take" id="take"></ul></div>
           <div class="card peri2 rise" style="--i:3" id="c-quiz" data-el="quiz"><h2 class="cap">Check yourself</h2><div id="quiz"></div></div>
+          <div class="card rise" style="--i:4" id="c-src" data-el="sources"><h2 class="cap">Sources you can cite</h2><div id="srcs"></div></div>
           <div class="card rise" style="--i:4" id="c-facts" data-el="session-data"><h2 class="cap">Session data</h2><dl class="facts" id="facts"></dl></div>
         </div>
       </div>
@@ -683,10 +701,12 @@ const ICON={
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/>',
   moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
   search:'<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.3-4.3"/>',
+  quote:'<path d="M10 7H6.500A1.500 1.500 0 0 0 5 8.500V12h4v3.500A1.500 1.500 0 0 1 7.500 17H7M19 7h-3.500A1.500 1.500 0 0 0 14 8.500V12h4v3.500A1.500 1.500 0 0 1 16.500 17H16"/>',
   ask:'<path d="M5 6.5A2.500 2.500 0 0 1 7.500 4h9A2.500 2.500 0 0 1 19 6.500v6a2.500 2.500 0 0 1-2.500 2.500H11l-4 3.500V15a2.500 2.500 0 0 1-2-2.500z"/>'
 };
 const SAMPLE={
   subject:'Biology',
+  sources:[{app:'Class notes',title:'Unit 3 notes: Cell biology',url:'docs.school.example/unit-3-notes'},{app:'Lecture video',title:'Biology 101, Lecture 7',url:'video.school.example/biology-101/7'}],
   script:[['doc1',13000],['chat',3500],['doc2',12000],['music',3000],['doc2',5000],['talk',12000]],
   docs:{
     doc1:{tab:'Unit 3 notes: Cell biology',h:'Unit 3: The cell membrane',p:['The cell membrane is a phospholipid bilayer. The hydrophilic heads face the water on each side and the hydrophobic tails face inward.','The membrane is selectively permeable. Small nonpolar molecules such as oxygen and carbon dioxide cross freely by simple diffusion.','Larger or charged molecules need membrane proteins. Channel and carrier proteins allow facilitated diffusion, and pumps use ATP for active transport against the gradient.']},
@@ -828,12 +848,20 @@ function renderRecap(){
 /* ================= RENDER: SESSION ================= */
 const PEN='<svg class="pen" viewBox="0 0 64 20" aria-hidden="true"><path class="ghost" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/><path class="trace" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/></svg>';
 // In the page: dot, pen line, state, focus time, pause, float. In the floating window: dot and one line, no clock.
-const pillHTML=float=>float?`<span class="led"></span>${PEN}<span class="pill-label"><span class="pl-t"></span><span class="pl-d" aria-hidden="true"><i></i><i></i><i></i></span></span><button class="pill-btn" data-act="pause" aria-label="Pause or resume"></button><button class="pill-btn" data-act="finish" aria-label="Finish">${ic('stop')}</button><button class="pill-btn" data-act="mini" aria-label="Shrink to a dot">${ic('mini')}</button>`:`<span class="led"></span>${PEN}<button class="pill-label" data-act="show" aria-label="Show the live session"></button><span class="pill-time"></span><button class="pill-btn" data-act="pause" aria-label="Pause or resume"></button><button class="pill-btn" data-act="float" aria-label="Float on top of other windows">${ic('float')}</button>`;
+const pillHTML=float=>float?`<span class="led"></span>${PEN}<span class="pill-label"><span class="pl-t"></span><span class="pl-d" aria-hidden="true"><i></i><i></i><i></i></span></span><button class="pill-btn" data-act="pause" aria-label="Pause or resume"></button><button class="pill-btn" data-act="finish" aria-label="Finish">${ic('stop')}</button><button class="pill-btn cite-b" data-act="cite" aria-label="Copy the citation">${ic('quote')}</button><button class="pill-btn" data-act="mini" aria-label="Shrink to a dot">${ic('mini')}</button>`:`<span class="led"></span>${PEN}<button class="pill-label" data-act="show" aria-label="Show the live session"></button><span class="pill-time"></span><button class="pill-btn" data-act="pause" aria-label="Pause or resume"></button><button class="pill-btn" data-act="float" aria-label="Float on top of other windows">${ic('float')}</button>`;
 function ribbon(el,segs,end){while(el.children.length>segs.length)el.lastChild.remove();segs.forEach((s,i)=>{let n=el.children[i];if(!n){n=document.createElement('i');n.className='seg';el.append(n);n.offsetWidth}const b=s.b??end;n.className='seg '+s.k+(s.b==null&&s.k==='focus'?' live':'');n.style.flexGrow=Math.max(.4,(b-s.a)/1000);n.title=SEG[s.k]+(s.app?' · '+s.app:'')+' · '+dur(b-s.a)})}
 const outHTML=segs=>{const g=segs.filter(s=>s.k==='glance'&&s.b!=null);return g.length?'<b>Left out</b>'+g.map(x=>`<s>${glTxt(x)}</s>`).join(''):''};
-const noteHTML=(n,sub)=>`<article class="card note" data-el="note"><div class="meta"><span class="tok" style="--c:${colorOf(sub)}"></span>${clock(n.t)} · ${esc(n.src||'Screen')}</div><h3>${esc(n.title)}</h3><ul>${n.bullets.map((b,i)=>`<li style="--i:${i}">${markup(b,n.terms)}</li>`).join('')}</ul></article>`;
+const groupOf=n=>n.group||n.src||'Notes';
+// The notes of a session. Three or more notes from more than one place are filed under headings, with a jump list on top.
+// Live, the newest comes first and only it animates in.
+function streamHTML(notes,sub,live){const g=new Map();notes.forEach(n=>{const k=groupOf(n);g.has(k)||g.set(k,[]);g.get(k).push(n)});
+  const newest=notes[notes.length-1],one=n=>noteHTML(n,sub,live&&n!==newest);
+  if(g.size<2||notes.length<3)return(live?[...notes].reverse():notes).map(one).join('');
+  const secs=[...g.entries()];if(live)secs.reverse();
+  return `<nav class="toc" aria-label="Sections">${secs.map(([k,v],i)=>`<button data-sec="${i}">${esc(k)}<em>${v.length}</em></button>`).join('')}</nav>`+secs.map(([k,v],i)=>`<section class="grp" id="sec-${i}"><h2 class="grp-h">${esc(k)}<em>${plural(v.length,'note')}</em></h2>${(live?[...v].reverse():v).map(one).join('')}</section>`).join('')}
+const noteHTML=(n,sub,quiet)=>`<article class="card note"${quiet?' style="animation:none"':''} data-el="note"><div class="meta"><span class="tok" style="--c:${colorOf(sub)}"></span>${clock(n.t)} · ${esc(n.src||'Screen')}</div><h3>${esc(n.title)}</h3><ul>${n.bullets.map((b,i)=>`<li style="--i:${i}">${markup(b,n.terms)}</li>`).join('')}</ul></article>`;
 function sessionShell(live,r){
-  $('#stream').setAttribute('aria-live',live?'polite':'off');$('#c-see').hidden=!live;$('#c-sum').hidden=live||!r.takeaways.length;$('#c-quiz').hidden=live||!r.quiz.length;$('#c-facts').hidden=live;
+  $('#stream').setAttribute('aria-live',live?'polite':'off');$('#c-see').hidden=!live;$('#c-sum').hidden=live||!r.takeaways.length;$('#c-quiz').hidden=live||!r.quiz.length;$('#c-facts').hidden=live;$('#c-src').hidden=live||!(r&&r.sources&&r.sources.length);
   $('#s-eyebrow').innerHTML=live?`<span class="tok"></span>${S.demo?'Sample session':'Live session'}`:`<span class="tok" style="--c:${colorOf(r.subject||'General')}"></span>${esc(r.subject||'General')} · ${when(r.at)}${r.sample?' · Sample':''}`;
   $('#s-title').textContent=live?'Taking notes now':r.title;
   $('#s-actions').innerHTML=live?`<button class="btn line sm" data-act="pause" id="hd-pause">${ic('pause')}Pause</button><button class="btn dark sm" data-act="finish">${ic('stop')}Finish</button>`:`<button class="btn line sm" data-go="home">${ic('home')}Your field</button><button class="btn line sm" data-act="copy">${ic('copy')}Copy notes</button><button class="btn dark sm" data-act="download">${ic('down')}Download</button>`;
@@ -843,13 +871,14 @@ let opened=null;
 function openSession(r){opened=r;go('session');sessionShell(false,r);
   ribbon($('#ribbon'),r.segs,r.dur);$('#axis-end').textContent=clock(r.dur);$('#s-out').innerHTML=outHTML(r.segs);
   $('#k-focus').textContent=clock(r.focusMs);$('#k-notes').textContent=r.notes.length;$('#k-gl').textContent=r.glances;
-  $('#stream').innerHTML=r.notes.length?r.notes.map(n=>noteHTML(n,r.subject||'General')).join(''):`<div class="card wait">No notes were written in this session.</div>`;
+  $('#stream').innerHTML=r.notes.length?streamHTML(r.notes,r.subject||'General'):`<div class="card wait">No notes were written in this session.</div>`;
   $('#take').innerHTML=r.takeaways.map((t,i)=>`<li style="--i:${i}">${ic('check')}<span>${esc(t)}</span></li>`).join('');
   $('#quiz').innerHTML=r.quiz.map(q=>`<div class="q"><button aria-expanded="false">${esc(q.q)}${ic('plus')}</button><div class="a"><div><p>${esc(q.a)}</p></div></div></div>`).join('');
   const who={claude:'Claude',device:'This laptop',sample:'Scripted sample',none:'Nobody'}[r.engine]||'Claude';
   $('#facts').innerHTML=[['Started',new Date(r.at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})],['Length',dur(r.dur)],['Written by',who]].map(([a,b])=>`<div><dt>${a}</dt><dd>${esc(b)}</dd></div>`).join('');
+  $('#srcs').innerHTML=arr(r.sources).map((x,i)=>`<div class="cite-row"><span><b>${esc(x.title||x.app||'Page')}</b><small>${esc([x.app,x.url].filter(Boolean).join(' · '))}</small></span><button data-cite="${i}">${ic('copy')}Copy</button></div>`).join('');
 }
-function toMD(r){const L=[`# ${r.title}`,'',`${new Date(r.at).toLocaleString()} · ${dur(r.focusMs)} of focus · ${plural(r.glances,'glance')} left out`,''];if(r.takeaways.length)L.push('## What you learned','',...r.takeaways.map(t=>'- '+t),'');L.push('## Notes','');r.notes.forEach(n=>L.push(`### ${n.title}`,...n.bullets.map(b=>'- '+b),''));if(r.quiz.length){L.push('## Check yourself','');r.quiz.forEach((q,i)=>L.push(`${i+1}. ${q.q}`,`   - ${q.a}`))}return L.join('\n')}
+function toMD(r){const L=[`# ${r.title}`,'',`${new Date(r.at).toLocaleString()} · ${dur(r.focusMs)} of focus · ${plural(r.glances,'glance')} left out`,''];if(r.takeaways.length)L.push('## What you learned','',...r.takeaways.map(t=>'- '+t),'');L.push('## Notes','');let sec='';const many=new Set(r.notes.map(groupOf)).size>1&&r.notes.length>2;r.notes.forEach(n=>{if(many&&groupOf(n)!==sec)L.push(`### ${sec=groupOf(n)}`,'');L.push(`${many?'####':'###'} ${n.title}`,...n.bullets.map(b=>'- '+b),'')});if(arr(r.sources).length)L.push('## Sources','',...r.sources.map(x=>'- '+citeText(x)),'');if(r.quiz.length){L.push('## Check yourself','');r.quiz.forEach((q,i)=>L.push(`${i+1}. ${q.q}`,`   - ${q.a}`))}return L.join('\n')}
 
 /* ================= ENGINE ================= */
 const S={running:false,float:null};
@@ -874,7 +903,7 @@ function openSeg(k,t,st){closeSeg(t);S.segs.push({k,a:t,b:null,st})}
 const focusMs=end=>S.segs.reduce((a,s)=>a+(s.k==='focus'?(s.b??end)-s.a:0),0);
 const glanceN=()=>S.segs.filter(s=>s.k==='glance').length;
 
-function reset(demo){Object.assign(S,{running:true,paused:false,finishing:false,shot:false,demo,t0:Date.now(),end:0,segs:[],notes:[],main:null,detour:null,prev:null,sig:null,off:null,queue:[],pending:[],busy:false,seen:new Set(),sid:0,selfAt:0,cool:0,motion:0,flashing:false,stream:null,reader:null,scene:null,errMsg:''})}
+function reset(demo){Object.assign(S,{running:true,paused:false,finishing:false,shot:false,demo,t0:Date.now(),end:0,segs:[],notes:[],main:null,detour:null,prev:null,sig:null,off:null,queue:[],pending:[],busy:false,seen:new Set(),sid:0,selfAt:0,cool:0,motion:0,flashing:false,cite:null,pages:new Map(),stream:null,reader:null,scene:null,errMsg:''})}
 function touch(st,g,now,dl){if(dl>TH.move)st.lastChange=now;st.dirty=!st.keyFine||mad(g.fine,st.keyFine)/255>TH.key}
 function step(g,now){
   const dl=S.prev?mad(g.fine,S.prev.fine)/255:0;S.motion=S.motion*.8+(dl>TH.move*2?.2:0);
@@ -960,11 +989,16 @@ async function claudeNotes(frames){
 Notes already taken this session:
 ${known}
 
+Pages read so far this session:
+${[...S.pages.values()].map((p,i)=>`${i+1}. ${p.title} (${p.url})`).join('\n')||'(none yet)'}
+
 Write the next notes. Reply with one JSON object and nothing else:
-{"on_task": true, "app": "", "topic": "", "notes": [""], "terms": [""]}
+{"on_task": true, "app": "", "url": "", "topic": "", "notes": [""], "terms": [""], "cite": null}
 
 - on_task: false when the screen is chat, music, social media, games, shopping or entertainment, not something they are learning from.
 - app: the app or site in view, 1 to 3 words.
+- url: the address shown in the browser's address bar, without https://, or "" when none is visible.
+- cite: when the screen is a document the person is writing (Google Docs, Word, Notion) and what they wrote restates information from one of the pages listed above, the number of that page. Otherwise null.
 - topic: what the person is doing on this screen, as a label they would recognise later, 7 words at most. For example "Google search: what's 9+10", "Reading: causes of the First World War", "Writing: lab report introduction".
 - notes: 2 to 5 short bullets a careful note taker would write down from this screen: facts, definitions, decisions, steps, figures. State the content itself. Never describe the screen or the app. Leave out anything already in the notes above. Use [] when off task or when nothing is new.
 - terms: up to 4 key terms copied exactly from your bullets.`}]))}
@@ -1011,12 +1045,31 @@ function cleanLine(line){const t=line.split(/\s+/).filter(Boolean);
   if(!math&&!/^["“(]?[A-Z]/.test(out)&&!(/^\d/.test(out)&&(/^[A-Z]/.test(t[1]||'')||/[.!]$/.test(out))))return'';   // starts in the middle of something
   if(bad&&!/[.!:;)”"]$/.test(out))return'';                   // a scrap inside and no ending
   return/\?$/.test(out)||chatty.test(out)?'':out}
+/* ---- citations ----
+   Every page read in a session is remembered: where it was, and the words of its sentences. When you are writing
+   (Google Docs, Word, Notion) the sentences on your page are compared with those. A source is offered only when your text
+   clearly restates it: several of the same content words in the same sentence. No close match, no suggestion. */
+const WRITING=/Google Docs|\bWord\b|Notion/,NOCITE=/search$|Claude|ChatGPT|Gmail|Google (Slides|Sheets|Classroom)|PowerPoint|Excel|Visual Studio Code/i;
+const STOPW=new Set('the a an of to in on for and or is are was were be been it its this that these those with as by at from which who whom whose can could will would may might has have had not no but if then than so such into over under about between through during each other some any more most much many very also only just there their them they he she we you your our his her one two when where what how why all both does did do'.split(' '));
+const wordsOf=x=>new Set((x.toLowerCase().match(/[a-z][a-z'’-]{2,}|\d+(?:\.\d+)?/g)||[]).filter(w=>!STOPW.has(w)));
+const pageUrl=top=>{const u=top.replace(/\s+/g,' ').match(/\b((?:[a-z0-9-]+\.)+(?:com|org|net|edu|gov|io|ai|ca|co|uk|so|app|dev|me|tv))(\/\S*)?/i);return u?(u[1].toLowerCase().replace(/^www\./,'')+(u[2]||'')).replace(/[)\].,;]+$/,''):''};
+function remember(key,info,lines){if(!key||!S.pages)return;let p=S.pages.get(key);if(!p){if(S.pages.size>=40)return;p={...info,at:Date.now(),sets:[]};S.pages.set(key,p)}
+  for(const l of lines){if(p.sets.length>=90)break;const w=wordsOf(l);if(w.size>=4)p.sets.push(w)}}
+function bestSource(lines){if(!S.pages)return null;const D=lines.map(wordsOf).filter(w=>w.size>=4);let best=null;
+  for(const p of S.pages.values()){let score=0,hits=0;
+    for(const d of D){let m=0;for(const x of p.sets){let n=0;for(const w of d)if(x.has(w))n++;const r=n/Math.min(d.size,x.size);if(n>=4&&r>=.6&&r>m)m=r}if(m){score+=m;hits++}}
+    if(hits&&(!best||score>best.score))best={score,hits,p}}
+  return best&&(best.hits>=2||best.score>=.8)?{app:best.p.app,title:best.p.title,url:best.p.url,at:best.p.at}:null}
+const citeText=c=>[c.title,c.app,c.url,'Accessed '+new Date(c.at||Date.now()).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})].filter(Boolean).join('. ')+'.';
+function setCite(c){S.cite=c||null;paint()}
+function copyCite(c,win){if(!c)return;const t=citeText(c),done=()=>toast('Citation copied. Check it against your style guide.');
+  ((win&&win.navigator.clipboard)||navigator.clipboard).writeText(t).then(done,()=>navigator.clipboard.writeText(t).then(done,()=>toast('Copy did not work here.')))}
 async function deviceNotes(frames,st={}){
   const w=await withTimeout(loadTess(),60000,'The on-device reader took too long to load.'),top=frames[frames.length-1].c;
   // the top strip on its own, at twice the size: its text is small
   let here={app:'',topic:''};
   try{const W=top.width,hh=Math.round(top.height*.125),s=document.createElement('canvas');s.width=W*2;s.height=hh*2;const x=s.getContext('2d',{willReadFrequently:true});x.imageSmoothingQuality='high';x.drawImage(top,0,0,W,hh,0,0,s.width,s.height);lightUp(x,s);
-    here=whereAmI(String((await withTimeout(w.recognize(s),30000,'top strip')).data.text||''))}catch{}
+    const tt=String((await withTimeout(w.recognize(s),30000,'top strip')).data.text||'');here=whereAmI(tt);here.url=pageUrl(tt)}catch{}
   const own=new RegExp(location.hostname.split('.').filter(p=>p.length>2).join('\\W*')||'^$','i');   // this page's own name, as the browser's sharing bar shows it
   // The newest frame, and the one before it when the page changed twice since the last note, so nothing that came and went is missed.
   const sents=[];let head=null;
@@ -1045,7 +1098,10 @@ async function deviceNotes(frames,st={}){
   const lead=notes[0]?notes[0].split(/\s+/).slice(0,7).join(' ').replace(/[.,;:]+$/,'')+(notes[0].split(/\s+/).length>7?'…':''):'';
   let topic=here.topic||(head?head.t.replace(/[^\w\s:'’+=?.,-]/g,'').trim():'')||(here.app?'On '+here.app:lead||'Screen notes');
   if(st.lastTopic===topic&&lead)topic=lead;else st.lastTopic=topic;
-  return{...blank,topic,notes,terms}}
+  // writing: is this restating a page read earlier? reading: remember the page for later
+  const all=sents.map(o=>o.s),base=st.lastTopic;
+  if(WRITING.test(here.app))blank.cite=bestSource(all);else if(!NOCITE.test(here.app))remember(here.url||base,{app:here.app||(here.url||'').split('/')[0],title:(head?head.t:base).replace(/^(Reading|Watching|Writing|Slides): /,''),url:here.url||''},all);
+  return{...blank,url:here.url||'',group:base,topic,notes,terms}}
 async function sampleNotes(frames){await sleep(900);const tag=frames[frames.length-1].tag,n=SAMPLE.notes[tag];if(!n||S.seen.has(tag))return{on_task:true,notes:[]};S.seen.add(tag);return{on_task:true,...n}}
 // The sample is scripted from start to finish, so it plays the same with no key and no connection. The test run reads its made-up screen for real.
 const writer=()=>S.sim?'device':S.demo?'sample':engine();
@@ -1053,9 +1109,11 @@ async function writeNote(st,frames){
   S.busy=true;paint();
   if(!opened){$$('#stream .wait').forEach(e=>e.remove());$('#stream').insertAdjacentHTML('afterbegin','<div class="card wait writing" id="writing"><span>Writing a note</span><i style="width:78%"></i><i style="width:56%"></i></div>')}
   try{const w=writer(),r=w==='claude'?await claudeNotes(frames):w==='device'?await deviceNotes(frames,st):w==='sample'?await sampleNotes(frames):null;
-    if(r){const ns=arr(r.notes);st.label=[r.topic,r.app].filter(Boolean).join(' · ')||st.label;
+    if(r){const ns=arr(r.notes);if('cite' in r)setCite(typeof r.cite==='number'?[...S.pages.values()][r.cite-1]:r.cite);
+      if(w==='claude'&&r.url&&!WRITING.test(r.app||'')&&!NOCITE.test(r.app||''))remember(r.url,{app:String(r.app||''),title:String(r.topic||''),url:String(r.url)},ns.map(String));
+      st.label=[r.topic,r.app].filter(Boolean).join(' · ')||st.label;
       if(r.on_task===false&&!ns.length){st.isBreak=true;S.segs.forEach(s=>{if(s.st===st.id&&s.k==='focus')s.k='break'})}
-      else if(ns.length)addNote({t:Math.max(0,frames[frames.length-1].t-S.t0),title:String(r.topic||'Notes'),bullets:ns.slice(0,6).map(String),terms:arr(r.terms).map(String),src:String(r.app||'')})}
+      else if(ns.length)addNote({t:Math.max(0,frames[frames.length-1].t-S.t0),title:String(r.topic||'Notes'),bullets:ns.slice(0,6).map(String),terms:arr(r.terms).map(String),src:String(r.app||''),group:String(r.group||r.app||''),url:String(r.url||'')})}
   }catch(e){console.error(e);const m=String(e.message||e);if(m!==S.errMsg){S.errMsg=m;toast(m)}st.frames.unshift(...frames.slice(-2));S.cool=Date.now()+45000}
   const wr=$('#writing');if(wr)wr.remove();S.busy=false;paint()}
 // In the floating window a new note is shown being written: its title, then its first line (sliding if it is long), then back to the state.
@@ -1064,7 +1122,7 @@ function flashNote(n){const w=S.float,el=w&&w.document.querySelector('.pl-t');if
   const put=(txt,cls)=>{el.className='pl-t';el.textContent=txt;void el.offsetWidth;const over=el.scrollWidth-el.parentElement.clientWidth;el.style.setProperty('--dx',(over>0?-over-8:0)+'px');el.style.setProperty('--dur',Math.max(2.5,txt.length*.075)+'s');el.className='pl-t '+cls};
   const line=String(n.bullets[0]||'');put(n.title,'type');
   S.flashT=setTimeout(()=>{if(line)put(line,'type slide');S.flashT=setTimeout(()=>{S.flashing=false;el.className='pl-t';el.style.removeProperty('--dx');paint()},line?Math.max(4500,line.length*80+1500):600)},2800)}
-function addNote(n){flashNote(n);S.notes.push(n);if(!opened)$('#stream').insertAdjacentHTML('afterbegin',noteHTML(n,SAMPLE.subject))}
+function addNote(n){flashNote(n);S.notes.push(n);if(!opened)$('#stream').innerHTML=streamHTML(S.notes,SAMPLE.subject,true)}
 async function summarize(){
   const titles=[...new Set(S.notes.map(n=>n.title))],fall={title:titles.length?titles[0]+(titles.length>1?` and ${titles.length-1} more`:''):'Session notes',subject:S.demo?SAMPLE.subject:'General',takeaways:S.notes.slice(0,4).map(n=>n.bullets[0]),quiz:[]};
   if(!S.notes.length)return fall;const w=writer();if(w==='sample')return SAMPLE.summary;
@@ -1082,7 +1140,7 @@ Reply with one JSON object and nothing else:
   return fall}
 
 /* ---- session control ---- */
-function showLive(){opened=null;go('session');sessionShell(true);$('#stream').innerHTML=S.notes.length?[...S.notes].reverse().map(n=>noteHTML(n,SAMPLE.subject)).join(''):'<div class="card wait"><span>Notes appear here as you go.</span><i style="width:72%"></i><i style="width:54%"></i></div>';paint()}
+function showLive(){opened=null;go('session');sessionShell(true);$('#stream').innerHTML=S.notes.length?streamHTML(S.notes,SAMPLE.subject,true):'<div class="card wait"><span>Notes appear here as you go.</span><i style="width:72%"></i><i style="width:54%"></i></div>';paint()}
 function begin(){opened=null;go('session');sessionShell(true);$('#stream').innerHTML=`<div class="card wait"><span>${S.demo?'Watching the sample screen. The first note lands in a few seconds.':'Notes appear here as you go. Switch to your work to begin.'}</span><i style="width:72%"></i><i style="width:54%"></i><i style="width:63%"></i></div>`;show($('#pill'),true);show($('#dock'),false);clearInterval(S.timer);S.timer=setInterval(tick,1000);tick();if(!S.demo)loadTess().catch(()=>{})}
 if(Q.has('sim'))addEventListener('load',()=>startSim());
 async function startReal(){
@@ -1116,7 +1174,7 @@ async function finish(){
   if(S.main&&S.main.frames.length&&!S.main.isBreak)S.queue.push(S.main);
   while(S.queue.length){const st=S.queue.shift();await writeNote(st,st.frames.splice(0))}
   const sum=await summarize();
-  const rec={id:'s'+S.t0,at:S.t0,dur:S.end-S.t0,focusMs:focusMs(S.end),glances:glanceN(),title:String(sum.title||'Session notes'),subject:String(sum.subject||'General'),takeaways:arr(sum.takeaways).map(String),quiz:arr(sum.quiz).filter(q=>q&&q.q).map(q=>({q:String(q.q),a:String(q.a||'')})),notes:S.notes,segs:S.segs.map(s=>({k:s.k,a:s.a-S.t0,b:(s.b??S.end)-S.t0,...(s.app&&{app:s.app})})),engine:writer(),sample:S.demo};
+  const rec={id:'s'+S.t0,at:S.t0,dur:S.end-S.t0,focusMs:focusMs(S.end),glances:glanceN(),title:String(sum.title||'Session notes'),subject:String(sum.subject||'General'),takeaways:arr(sum.takeaways).map(String),quiz:arr(sum.quiz).filter(q=>q&&q.q).map(q=>({q:String(q.q),a:String(q.a||'')})),notes:S.notes,sources:S.demo?SAMPLE.sources.map(x=>({...x,at:S.t0})):[...S.pages.values()].filter(p=>p.title||p.url).map(p=>({app:p.app,title:p.title,url:p.url,at:p.at})).slice(0,12),segs:S.segs.map(s=>({k:s.k,a:s.a-S.t0,b:(s.b??S.end)-S.t0,...(s.app&&{app:s.app})})),engine:writer(),sample:S.demo};
   clearInterval(S.timer);S.running=false;S.finishing=false;show($('#pill'),false);show($('#dock'),true);if(S.float){try{S.float.close()}catch{}S.float=null}document.title='Rewrite';
   if(!rec.notes.length&&rec.focusMs<5000){toast('Nothing was recorded, so nothing was saved.');return go('home')}
   sessions.unshift(rec);sessions=sessions.slice(0,60);persist();openSession(rec);if(!document.hasFocus())notify(rec)}
@@ -1128,7 +1186,9 @@ function notify(r){const n=$('#notif'),k=r.notes.length,g=r.glances;clearTimeout
 const pillState=()=>S.finishing?'finishing':S.paused?'paused':!S.demo&&(S.selfAt||!S.main)?'ready':S.detour?'away':S.busy?'writing':'noting';
 function paint(){if(!S.running)return;const st=pillState(),now=S.end||Date.now(),f=clock(focusMs(now));
   [$('#pill'),S.float&&S.float.document.querySelector('.pill')].forEach((p,fl)=>{if(!p)return;p.dataset.state=st==='finishing'?'writing':st;
-    if(fl){if(!S.flashing)$('.pl-t',p).textContent=FL[st]}else{$('.pill-label',p).textContent=STATE[st];$('.pill-time',p).textContent=f}
+    if(fl){p.classList.toggle('has-cite',!!S.cite);
+      if(!S.flashing){const el=$('.pl-t',p),txt=S.cite&&st==='noting'?'Cite: '+[S.cite.title,S.cite.app].filter(Boolean).join(' · '):FL[st];
+        if(el.textContent!==txt){el.className='pl-t';el.textContent=txt;if(S.cite&&st==='noting'){const over=el.scrollWidth-el.parentElement.clientWidth;el.style.setProperty('--dx',(over>0?-over-8:0)+'px');el.style.setProperty('--dur',Math.max(4,txt.length*.11)+'s');if(over>0)el.className='pl-t loop'}}}}else{$('.pill-label',p).textContent=STATE[st];$('.pill-time',p).textContent=f}
     $('[data-act="pause"]',p).innerHTML=ic(S.paused?'play':'pause')});
   document.title=(st==='noting'||st==='writing'?'● ':'')+f+' · Rewrite';
   if(view!=='session'||opened)return;
@@ -1173,6 +1233,8 @@ function drawScene(c,id,t){
     const y2=wrap('9 + 10 equals 19. However, if you are referencing the popular internet meme from a viral 2013 Vine video, the joke answer is 21.',170,436,640,26,'16px system-ui','#202124')+10;
     wrap(id==='search2'?'A hackathon is an event where people build a working project in a short time. Teams usually have two to five people and present a demo at the end.':'Are you looking for more help with basic math, or would you like to know the origin story behind the viral meme?',170,y2,640,26,'16px system-ui','#202124');
     R(170,598,400,40,'#F1F3F4',20);Tx('Ask anything',194,624,'15px system-ui','#70757A');R(600,600,450,36,'#202124',8);Tx('goofturtles.github.io is sharing your screen.   Stop sharing   Hide',616,623,'13px system-ui','#FFFFFF')}
+  else if(id==='gdoc'||id==='gdoc2'){R(0,0,W,H,'#F9FBFD');R(0,0,W,44,'#DEE1E6');R(12,8,300,36,'#FFFFFF',10);Tx('Essay draft - Google Docs',28,31,'500 13px system-ui','#3C4043');R(0,44,W,44,'#FFFFFF');R(96,52,820,28,'#F1F3F4',14);Tx('docs.google.com/document/d/1AbCdEf/edit',116,71,'13px system-ui','#5F6368');R(0,88,W,1,'#DADCE0');R(220,112,840,H,'#FFFFFF',4);
+    let y3=190;for(const p of id==='gdoc'?['My essay starts with the structure of a cell.','The cell membrane is a phospholipid bilayer, and the hydrophilic heads face the water on each side.','Small nonpolar molecules such as oxygen cross the membrane freely by simple diffusion.']:['My essay is about the history of the bicycle.','The first pedal bicycles appeared in France during the 1860s and spread quickly across Europe.'])y3=wrap(p,290,y3,700,31,'19px Georgia','#202124')+18}
   else if(id==='music'){R(0,0,W,H,'#121212');R(0,0,240,H,'#000000');['Home','Search','Your Library'].forEach((n,i)=>Tx(n,28,52+i*40,'600 15px system-ui',i?'#B3B3B3':'#FFFFFF'));['Playlists','Liked Songs'].forEach((n,i)=>Tx(n,28,196+i*36,'14px system-ui','#B3B3B3'));Tx('Made for you',272,64,'700 28px system-ui','#FFFFFF');['#8D67AB','#1E3264','#E8115B','#148A08','#BC5900'].forEach((f,i)=>{R(272+i*196,96,176,176,f,8);Tx(['Focus mix','Lo-fi beats','Top hits','Chill','Throwback'][i],272+i*196,300,'600 15px system-ui','#FFFFFF')});R(0,H-84,W,84,'#181818');dot(W/2,H-52,18,'#1ED760');R(W/2-220,H-20,440,4,'#4D4D4D',2);R(W/2-220,H-20,60+(t/50)%300,4,'#FFFFFF',2)}
   else{R(0,0,W,H,'#0F0F0F');R(420,12,440,30,'#222222',15);Tx('Search',440,32,'14px system-ui','#AAAAAA');R(24,64,860,484,'#16324F',10);Tx(d.h,64,150,'600 36px system-ui','#FFFFFF');d.p.forEach((p,i)=>Tx('•  '+p,72,226+i*64,'24px system-ui','#DCE9F5'));R(24,542,860,6,'#3A3A3A',3);R(24,542,200+(t/40)%600,6,'#FF4E45',3);Tx('Biology 101, Lecture 7',24,592,'600 20px system-ui','#FFFFFF');for(let i=0;i<5;i++){R(908,64+i*104,160,92,'#272727',8);R(1080,72+i*104,170,12,'#3A3A3A',6);R(1080,96+i*104,110,10,'#2C2C2C',5)}}}
 
@@ -1339,6 +1401,7 @@ function onAct(e){const b=e.target.closest('[data-act]');if(!b)return;const a=b.
   if(a==='start')startReal();else if(a==='sample')startDemo();else if(a==='pause')togglePause();else if(a==='finish')finish();else if(a==='float')openFloat(false);
   else if(a==='show'){if(S.running)showLive()}
   else if(a==='mini')toggleMini();
+  else if(a==='cite')copyCite(S.cite,S.float);
   else if(a==='dismiss')show($('#notif'),false);
   else if(a==='copy'&&opened){const md=toMD(opened);(navigator.clipboard?navigator.clipboard.writeText(md):Promise.reject()).then(()=>toast('Notes copied.'),()=>toast('Copy did not work here. Use Download.'))}
   else if(a==='download'&&opened){const u=URL.createObjectURL(new Blob([toMD(opened)],{type:'text/markdown'})),l=document.createElement('a');l.href=u;l.download=opened.title.replace(/[^\w -]/g,'').trim().replace(/\s+/g,'-').toLowerCase()+'.md';l.click();setTimeout(()=>URL.revokeObjectURL(u),2000)}}
@@ -1360,6 +1423,8 @@ document.addEventListener('click',e=>{
   const g=e.target.closest('[data-go]');if(g){opened=null;return go(g.dataset.go)}
   const o=e.target.closest('[data-open]');if(o){show($('#notif'),false);const r=sessions.find(s=>s.id===o.dataset.open);if(r)openSession(r);return}
   const q=e.target.closest('.q button');if(q){q.setAttribute('aria-expanded',q.parentElement.classList.toggle('open'));return}
+  const sc=e.target.closest('[data-sec]');if(sc){const t=$('#sec-'+sc.dataset.sec);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});return}
+  const ci=e.target.closest('[data-cite]');if(ci&&opened){copyCite(arr(opened.sources)[+ci.dataset.cite]);return}
   const aq=e.target.closest('[data-ask]');if(aq){$('#ask-q').value=aq.dataset.ask;ask(aq.dataset.ask);return}
   const en=e.target.closest('[data-engine]');if(en){cfg.engine=en.dataset.engine;saveCfg();renderSettings();renderSetup();renderSide();if(view==='home'&&engine()==='none'){go('settings');toast('Paste your Claude key here, or switch back to "On this laptop".')}return}
   const ks=e.target.closest('[data-keys]');if(ks){cfg.keys=ks.dataset.keys==='1';saveCfg();renderSettings();return}
