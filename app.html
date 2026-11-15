@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1280">
+<meta name="build" content="1794768396">
 <title>Rewrite</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%23528200'/%3E%3Cpath d='M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18' fill='none' stroke='%23fff' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://api.fontshare.com">
@@ -274,6 +275,28 @@ kbd{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 
 .dock-sq:hover{transform:translateY(-2px)}
 .dock-sq:active{transform:scale(.95);transition-duration:.12s}
 .dock-sq svg{width:20px;height:20px}
+/* ask: a small panel that rises out of the dock */
+.askp{position:fixed;left:50%;bottom:108px;z-index:19;width:560px;padding:10px;border-radius:24px;background:var(--card);box-shadow:inset 0 0 0 1px var(--card-b),0 30px 70px -30px rgba(var(--deep-rgb),.6);transform:translate(-50%,16px) scale(.97);opacity:0;pointer-events:none;transition:transform .5s var(--spring),opacity .25s}
+[data-theme="dark"] .askp{box-shadow:inset 0 0 0 1px var(--card-b),0 30px 70px -30px #000}
+.askp.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.askp form{display:flex;align-items:center;gap:8px;height:50px;padding:0 6px 0 16px;border-radius:16px;background:var(--wash2)}
+.askp input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:16px;color:var(--ink)}
+.askp input::placeholder{color:var(--ink3)}
+.ask-go{width:38px;height:38px;border-radius:12px;background:var(--ink);color:var(--page);display:grid;place-items:center;flex:none;transition:transform .35s var(--spring)}
+.ask-go:hover{transform:translateX(2px)}
+.ask-go svg{width:16px;height:16px}
+.ask-sug,.ask-a .refs{display:flex;flex-wrap:wrap;gap:6px}
+.ask-sug{padding:10px 4px 4px}
+.ask-sug button,.ask-a .refs button{font-size:13px;line-height:1.5;padding:4px 12px;border-radius:99px;box-shadow:inset 0 0 0 1px var(--line);color:var(--ink2);transition:color .2s,box-shadow .2s}
+.ask-sug button:hover,.ask-a .refs button:hover{color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink3)}
+.ask-a{padding:0 8px}
+.ask-a:empty{display:none}
+.ask-a p{margin:12px 0 8px;font-size:15.5px;line-height:1.55;animation:rise .5s var(--ease) backwards}
+.ask-a ul{margin:0 0 10px;padding:0;list-style:none;display:grid;gap:5px}
+.ask-a li{position:relative;padding-left:15px;font-size:14px;line-height:1.5;color:var(--ink2);animation:rise .5s var(--ease) backwards;animation-delay:calc(80ms + var(--i)*70ms)}
+.ask-a li::before{content:"";position:absolute;left:0;top:.72em;width:7px;height:1.5px;background:var(--hot)}
+.ask-a .refs{margin:2px 0 8px}
+.ask-a .wait{margin:14px 0 10px}
 /* recap: striped bars with a cap, today's carries the label */
 .sbars{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;height:214px;background:repeating-linear-gradient(0deg,transparent 0 44px,var(--line2) 44px 45px)}
 .sbars.tall{height:250px}
@@ -577,7 +600,7 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
         <div class="card rise" style="--i:5">
           <h3>Shortcuts</h3>
           <p>One key each, when you are not typing.</p>
-          <div class="keys" data-el="shortcuts"><span><kbd>S</kbd>Start</span><span><kbd>P</kbd>Sample</span><span><kbd>H</kbd>Home</span><span><kbd>N</kbd>Notes</span><span><kbd>R</kbd>Recap</span><span><kbd>/</kbd>Search</span><span><kbd>,</kbd>Settings</span><span><kbd>D</kbd>Dark</span></div>
+          <div class="keys" data-el="shortcuts"><span><kbd>S</kbd>Start</span><span><kbd>P</kbd>Sample</span><span><kbd>H</kbd>Home</span><span><kbd>N</kbd>Notes</span><span><kbd>R</kbd>Recap</span><span><kbd>/</kbd>Search</span><span><kbd>A</kbd>Ask</span><span><kbd>,</kbd>Settings</span><span><kbd>D</kbd>Dark</span></div>
         </div>
         </div>
         <div class="set-col">
@@ -599,7 +622,8 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
   </main>
 </div></div>
 
-<div class="dock" id="dock" data-el="dock" inert><button class="dock-go" data-act="start"><span class="d-dot"><i></i></span><span id="start-label">Start a session</span></button><button class="dock-sq" id="dock-sample" data-act="sample" aria-label="Play the 50 second sample" title="Play the 50 second sample"></button><button class="dock-sq" id="dock-set" data-go="settings" aria-label="Settings" title="Settings"></button></div>
+<div class="dock" id="dock" data-el="dock" inert><button class="dock-go" data-act="start"><span class="d-dot"><i></i></span><span id="start-label">Start a session</span></button><button class="dock-sq" id="dock-sample" data-act="sample" aria-label="Play the 50 second sample" title="Play the 50 second sample"></button><button class="dock-sq" id="dock-ask" data-act="ask" aria-label="Ask about what you did" title="Ask about what you did"></button><button class="dock-sq" id="dock-set" data-go="settings" aria-label="Settings" title="Settings"></button></div>
+<div class="askp" id="askp" data-el="ask" inert><form id="ask"><input id="ask-q" placeholder="Ask about what you did" aria-label="Ask about what you did" autocomplete="off" spellcheck="false"><button class="ask-go" aria-label="Ask"></button></form><div class="ask-sug" id="ask-sug"></div><div class="ask-a" id="ask-a" aria-live="polite"></div></div>
 <div class="pill-wrap"><div class="pill" id="pill" data-state="noting" data-el="indicator" inert></div></div>
 <div class="toast" id="toast" role="status"></div>
 <div class="notif" id="notif" data-el="notification" role="status" inert></div>
@@ -631,7 +655,8 @@ const ICON={
   arrow:'<path d="M5 12h14m0 0-5-5m5 5-5 5"/>',plus:'<path d="M12 5v14M5 12h14"/>',x:'<path d="M6 6l12 12M18 6 6 18"/>',mini:'<path d="M6 12h12"/>',
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/>',
   moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
-  search:'<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.3-4.3"/>'
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.3-4.3"/>',
+  ask:'<path d="M5 6.5A2.500 2.500 0 0 1 7.500 4h9A2.500 2.500 0 0 1 19 6.500v6a2.500 2.500 0 0 1-2.500 2.500H11l-4 3.500V15a2.500 2.500 0 0 1-2-2.500z"/>'
 };
 const SAMPLE={
   subject:'Biology',
@@ -699,7 +724,7 @@ function streak(){const days=new Set(sessions.map(s=>day0(s.at)));let t=day0(Dat
 /* ================= RENDER: SHELL ================= */
 let view='home';
 const show=(el,on)=>{el.classList.toggle('on',on);el.inert=!on};
-function go(v,instant){view=v;const run=()=>{$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));const nav=v==='session'?'notes':v,ind=$('#nav-ind');let on=null;$$('#navs .nav').forEach(n=>{const y=n.dataset.go===nav;n.classList.toggle('on',y);if(y){on=n;n.setAttribute('aria-current','page')}else n.removeAttribute('aria-current')});ind.style.opacity=on?1:0;if(on){ind.style.width=on.offsetWidth+'px';ind.style.transform=`translateX(${on.offsetLeft}px)`}({home:renderHome,notes:renderNotes,recap:renderRecap,settings:renderSettings}[v]||(()=>{}))();scrollTo(0,0);World.play()};if(!instant&&!STILL&&document.startViewTransition)document.startViewTransition(run);else run()}
+function go(v,instant){view=v;show($('#askp'),false);const run=()=>{$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));const nav=v==='session'?'notes':v,ind=$('#nav-ind');let on=null;$$('#navs .nav').forEach(n=>{const y=n.dataset.go===nav;n.classList.toggle('on',y);if(y){on=n;n.setAttribute('aria-current','page')}else n.removeAttribute('aria-current')});ind.style.opacity=on?1:0;if(on){ind.style.width=on.offsetWidth+'px';ind.style.transform=`translateX(${on.offsetLeft}px)`}({home:renderHome,notes:renderNotes,recap:renderRecap,settings:renderSettings}[v]||(()=>{}))();scrollTo(0,0);World.play()};if(!instant&&!STILL&&document.startViewTransition)document.startViewTransition(run);else run()}
 function renderSide(){$('#n-count').textContent=sessions.reduce((a,s)=>a+s.notes.length,0);if(DEMO){$('#user').hidden=false;$('#ava').textContent='RP';$('#u-name').textContent='Riley Park';$('#u-sub').textContent='Demo data'}}
 function tiles(el,w,base){const cur=w[6],sum=k=>w.reduce((a,d)=>a+d[k],0);const T=[
   {l:'Focus time',v:sum('focus'),f:durHTML,k:'focus',s:'last 7 days'},
@@ -940,6 +965,10 @@ const SHORT=new Set('a i an as at be by do go he if in is it me my no of on or s
 // What a reader leaves behind when it meets icons, buttons and half-covered text: one- and two-letter scraps,
 // letters fused with digits, symbols inside words. A number on its own is not a scrap.
 const scrap=t=>{if(/^[=+×*÷\/&–—-]+$/.test(t))return false;const w=t.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g,'');if(!w)return true;if(/^\d[\d.,:%]*$/.test(w))return false;if(/^[A-Za-z]{1,2}$/.test(w))return!SHORT.has(w.toLowerCase());if(/[^A-Za-z0-9'’.\/-]/.test(w))return true;return/[A-Za-z]/.test(w)&&/\d/.test(w)&&w.length>4};
+// Code is not a note. Neither is markup, a file path, a web address, a log line or an error message.
+const codey=s=>/=>|==|!=|&&|\|\||::|->|<\/|\/>|[{}`\\]|\(\)|\[\]|;\s*$|:\/\/|\bwww\.|@media|\dpx\b|"\s*:\s*["{\[\d]|\b[A-Za-z]\w*_\w+|\b[a-z]+[A-Z]\w*[.(]|\b(?!sin\(|cos\(|tan\(|log\(|ln\(|exp\(|sqrt\(|max\(|min\(|lim\()[A-Za-z_]\w+\([^)\s]*\)|\.(js|ts|jsx|tsx|py|html|css|json|md|yml|png|jpg|webp|exe|txt)\b|\b[0-9a-f]{8,}\b|\b[A-Za-z_]{2,}\w*\s*=\s*[^=\s]/.test(s)
+  ||/^\W*(const|let|var|function|return|import|export|class|def|elif|else|print|console|await|async|public|private|static|void|using|npm|npx|git|cd|pip|py|node|error|warning|uncaught|traceback|exception|typeerror|referenceerror|syntaxerror)\b[\s:.(]/i.test(s)&&/[=(){}:;.<>\[\]"']/.test(s.split(/\s+/).slice(0,4).join(' '))
+  ||(s.match(/[{}\[\]<>;\\|_*#$@&^~]/g)||[]).length>Math.max(2,s.length*.05);
 // A line is kept only when it reads like a sentence. Scraps are trimmed off both ends first; what is left must start
 // like a sentence, be made of real words, and not be a question or a prompt aimed at the reader. A sum with its answer stays.
 function cleanLine(line){const t=line.split(/\s+/).filter(Boolean);
@@ -947,8 +976,9 @@ function cleanLine(line){const t=line.split(/\s+/).filter(Boolean);
   while(t.length&&scrap(t[t.length-1]))t.pop();
   if(!t.length)return'';const out=t.join(' ');
   if(/^[\d\s+\-×x*÷\/().^=,]{3,}$/.test(out)&&/\d\s*=\s*\d/.test(out))return out;
+  if(codey(out))return'';
   const bad=t.filter(scrap).length,good=t.filter(x=>/^["“(]?[A-Za-z][A-Za-z'’-]{2,}[.,;:!?)”"]*$/.test(x)).length,math=/\d\s*[=+×*÷]\s*\d|=\s*\d|\bequals\b/i.test(out);
-  if(bad/t.length>.12||good<(math?1:4)||t.length>40)return'';
+  if(bad/t.length>(math?.25:.12)||good<(math?1:4)||t.length>40)return'';
   if(!math&&!/^["“(]?[A-Z]/.test(out)&&!(/^\d/.test(out)&&(/^[A-Z]/.test(t[1]||'')||/[.!]$/.test(out))))return'';   // starts in the middle of something
   if(bad&&!/[.!:;)”"]$/.test(out))return'';                   // a scrap inside and no ending
   return/\?$/.test(out)||chatty.test(out)?'':out}
@@ -964,6 +994,7 @@ async function deviceNotes(frames){
     .filter(l=>l.c>=62&&l.t.length>3&&l.y>H*.125&&l.y<H*.93&&!FURNITURE.test(l.t)&&!own.test(l.t));
   const blank={on_task:true,app:here.app,topic:here.topic,notes:[]};
   if(!lines.length)return blank;
+  if(lines.length>=8&&lines.filter(l=>codey(l.t)).length/lines.length>.3)return blank;   // an editor, a terminal, a page of code
   const hs=lines.map(l=>l.h).sort((a,b)=>a-b),med=hs[hs.length>>1]||1;
   const head=lines.filter(l=>l.h>med*1.3&&l.t.split(/\s+/).length<=10&&/[A-Za-z]{3}/.test(l.t)).sort((a,b)=>b.h-a.h)[0];
   // lines join into one paragraph only when they sit under each other, are the same size and start at the same edge
@@ -1034,7 +1065,7 @@ const SIMSCRIPT=[['doc1',16000],['ai',7000],['doc1',10000],['chat',6000],['doc2'
 function startSim(){if(S.running)return;reset(false);S.sim=true;
   const cv=document.createElement('canvas');cv.width=1280;cv.height=720;const cx=cv.getContext('2d');S.sceneI=0;S.scene=SIMSCRIPT[0][0];S.sceneAt=Date.now();
   drawScene(cx,S.scene,0);S.demoT=setInterval(()=>drawScene(cx,S.scene,Date.now()-S.sceneAt),250);
-  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},clean:cleanLine,read:async id=>{const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);return deviceNotes([{c,t:Date.now(),tag:id}])}}}
+  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},clean:cleanLine,codey,read:async id=>{const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);return deviceNotes([{c,t:Date.now(),tag:id}])}}}
 function togglePause(){if(!S.running||S.finishing)return;const now=Date.now();S.paused=!S.paused;if(S.paused){if(S.detour)endDetour();S.off=null;if(S.main)openSeg('pause',now,null)}else{S.prev=S.sig=null;if(S.demo)S.sceneAt+=now-(S.pausedAt||now)}S.pausedAt=now;paint()}
 async function finish(){
   if(!S.running||S.finishing)return;S.finishing=true;const now=Date.now();stopCapture();
@@ -1100,6 +1131,30 @@ function drawScene(c,id,t){
     R(170,598,400,40,'#F1F3F4',20);Tx('Ask anything',194,624,'15px system-ui','#70757A');R(600,600,450,36,'#202124',8);Tx('goofturtles.github.io is sharing your screen.   Stop sharing   Hide',616,623,'13px system-ui','#FFFFFF')}
   else if(id==='music'){R(0,0,W,H,'#121212');R(0,0,240,H,'#000000');['Home','Search','Your Library'].forEach((n,i)=>Tx(n,28,52+i*40,'600 15px system-ui',i?'#B3B3B3':'#FFFFFF'));['Playlists','Liked Songs'].forEach((n,i)=>Tx(n,28,196+i*36,'14px system-ui','#B3B3B3'));Tx('Made for you',272,64,'700 28px system-ui','#FFFFFF');['#8D67AB','#1E3264','#E8115B','#148A08','#BC5900'].forEach((f,i)=>{R(272+i*196,96,176,176,f,8);Tx(['Focus mix','Lo-fi beats','Top hits','Chill','Throwback'][i],272+i*196,300,'600 15px system-ui','#FFFFFF')});R(0,H-84,W,84,'#181818');dot(W/2,H-52,18,'#1ED760');R(W/2-220,H-20,440,4,'#4D4D4D',2);R(W/2-220,H-20,60+(t/50)%300,4,'#FFFFFF',2)}
   else{R(0,0,W,H,'#0F0F0F');R(420,12,440,30,'#222222',15);Tx('Search',440,32,'14px system-ui','#AAAAAA');R(24,64,860,484,'#16324F',10);Tx(d.h,64,150,'600 36px system-ui','#FFFFFF');d.p.forEach((p,i)=>Tx('•  '+p,72,226+i*64,'24px system-ui','#DCE9F5'));R(24,542,860,6,'#3A3A3A',3);R(24,542,200+(t/40)%600,6,'#FF4E45',3);Tx('Biology 101, Lecture 7',24,592,'600 20px system-ui','#FFFFFF');for(let i=0;i<5;i++){R(908,64+i*104,160,92,'#272727',8);R(1080,72+i*104,170,12,'#3A3A3A',6);R(1080,96+i*104,110,10,'#2C2C2C',5)}}}
+
+/* ================= ASK =================
+   A question about what you did, answered from your own notes. With a Claude key the notes and the question go to Claude.
+   Without one the answer is put together on this laptop: time and glances are counted, anything else is looked up in the notes. */
+const ASKS=['What did I do today?','How long did I focus this week?','What was left out?'];
+function askLocal(q){
+  const ql=q.toLowerCase(),t0=day0(Date.now()),yest=/yesterday/.test(ql),today=/today|so far|just now/.test(ql),wk=/week/.test(ql);
+  const pool=yest?sessions.filter(s=>day0(s.at)===t0-864e5):today?sessions.filter(s=>day0(s.at)===t0):wk?sessions.filter(s=>t0-day0(s.at)<7*864e5):sessions,span=yest?'yesterday':today?'today':wk?'this week':'so far';
+  if(!pool.length)return{text:sessions.length?`Nothing was recorded ${span}.`:'There is nothing to look through yet. Start a session, or play the sample, and ask again.'};
+  const focus=pool.reduce((a,s)=>a+s.focusMs,0),notes=pool.flatMap(s=>s.notes.map(n=>({n,s}))),gl=pool.flatMap(s=>s.segs.filter(g=>g.k==='glance'));
+  if(/glance|distract|left out|ignored|skipp/.test(ql)||APPS.some(a=>ql.includes(a.toLowerCase()))){const by={};gl.forEach(g=>{const k=g.app||'Unnamed';by[k]=(by[k]||0)+1});
+    return{text:gl.length?`${plural(gl.length,'glance')} left out ${span}: ${Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([a,n])=>a+' '+n+' times').join(', ')}. None of it reached your notes.`:`Nothing was left out ${span}.`}}
+  if(/how long|how much|focus|minutes|hours|time/.test(ql))return{text:`You focused for ${dur(focus)} ${span}, over ${plural(pool.length,'session')}, and ${plural(notes.length,'note')} came out of it.`,refs:pool.slice(0,3)};
+  const skip=new Set('what whats did does was were are the and for with about from that this have has had you your mine tell show give notes note learn learned learnt work worked working doing done today yesterday week much many long know say said'.split(' '));
+  const kw=(ql.match(/[a-z0-9']{3,}/g)||[]).filter(w=>!skip.has(w));
+  const hits=kw.length?notes.map(o=>({o,v:kw.filter(w=>(o.n.title+' '+o.n.bullets.join(' ')).toLowerCase().includes(w)).length})).filter(x=>x.v).sort((a,b)=>b.v-a.v).slice(0,3):[];
+  if(hits.length)return{text:`From your notes on ${hits.map(h=>h.o.n.title).join(', ')}:`,bullets:hits.flatMap(h=>h.o.n.bullets.slice(0,2)).slice(0,4),refs:[...new Set(hits.map(h=>h.o.s))]};
+  if(kw.length&&!/\b(do|did|done|work|worked|working|learn|learned)\b/.test(ql))return{text:`Your notes ${span} do not mention that.`,refs:pool.slice(0,3)};
+  return{text:`${span[0].toUpperCase()+span.slice(1)}: ${[...new Set(pool.map(s=>s.title))].slice(0,3).join('; ')}. ${dur(focus)} of focus, ${plural(notes.length,'note')}, ${plural(gl.length,'glance')} left out.`,refs:pool.slice(0,3)}}
+const askClaude=q=>claude([{type:'text',text:`These are someone's own notes, taken automatically from their screen, newest first.\n\n${sessions.slice(0,12).map(s=>`## ${s.title} (${when(s.at)}, ${dur(s.focusMs)} of focus, glances left out: ${s.segs.filter(g=>g.k==='glance').map(g=>g.app||'unnamed').join(', ')||'none'})\n`+s.notes.map(n=>`### ${n.title}\n`+n.bullets.map(b=>'- '+b).join('\n')).join('\n')).join('\n\n')}\n\nTheir question: ${q}\n\nAnswer from these notes only, in at most four short sentences, in plain text. If the notes do not say, say so.`}],1200);
+async function ask(q){q=q.trim();if(!q)return;const box=$('#ask-a');box.innerHTML='<div class="wait"><i style="width:72%"></i><i style="width:48%"></i></div>';
+  let r=null;if(engine()==='claude'&&sessions.length)try{r={text:(await askClaude(q)).trim()}}catch(e){console.error(e)}
+  r=r&&r.text?r:askLocal(q);
+  box.innerHTML=`<p>${esc(r.text)}</p>${r.bullets&&r.bullets.length?`<ul>${r.bullets.map((b,i)=>`<li style="--i:${i}">${esc(b)}</li>`).join('')}</ul>`:''}${r.refs&&r.refs.length?`<div class="refs">${r.refs.map(x=>`<button data-open="${esc(x.id)}">${esc(x.title)}</button>`).join('')}</div>`:''}`}
 
 /* ================= THE WORLD =================
    The grass on the home page is the same render the landing page uses, drawn through a small shader:
@@ -1233,6 +1288,7 @@ function toggleTheme(e){const next=root.dataset.theme==='dark'?'light':'dark';cf
 
 /* ================= EVENTS ================= */
 function onAct(e){const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+  if(a==='ask'){const p=$('#askp'),on=!p.classList.contains('on');show(p,on);if(on)setTimeout(()=>$('#ask-q').focus(),60);return}
   if(a==='theme')return toggleTheme(e);
   if(a==='pal'){cfg.palette=b.dataset.pal;saveCfg();return applyPalette(cfg.palette)}
   if(a==='start')startReal();else if(a==='sample')startDemo();else if(a==='pause')togglePause();else if(a==='finish')finish();else if(a==='float')openFloat(false);
@@ -1259,13 +1315,16 @@ document.addEventListener('click',e=>{
   const g=e.target.closest('[data-go]');if(g){opened=null;return go(g.dataset.go)}
   const o=e.target.closest('[data-open]');if(o){show($('#notif'),false);const r=sessions.find(s=>s.id===o.dataset.open);if(r)openSession(r);return}
   const q=e.target.closest('.q button');if(q){q.setAttribute('aria-expanded',q.parentElement.classList.toggle('open'));return}
+  const aq=e.target.closest('[data-ask]');if(aq){$('#ask-q').value=aq.dataset.ask;ask(aq.dataset.ask);return}
   const en=e.target.closest('[data-engine]');if(en){cfg.engine=en.dataset.engine;saveCfg();renderSettings();renderSetup();renderSide();if(view==='home'&&engine()==='none'){go('settings');toast('Paste your Claude key here, or switch back to "On this laptop".')}return}
   const gl=e.target.closest('[data-glance]');if(gl){cfg.glance=+gl.dataset.glance;saveCfg();renderSetup();return}
   onAct(e)});
 // one key each, when nothing is being typed
 document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;const k=e.key.toLowerCase(),v={h:'home',n:'notes',r:'recap',',':'settings'}[k];
-  if(v){opened=null;go(v)}else if(k==='/'){e.preventDefault();opened=null;go('notes',true);$('#find').focus()}else if(k==='s')startReal();else if(k==='p')startDemo();else if(k==='d')toggleTheme(e)});
+  if(v){opened=null;go(v)}else if(k==='/'){e.preventDefault();opened=null;go('notes',true);$('#find').focus()}else if(k==='a'){e.preventDefault();onAct({target:$('#dock-ask')})}else if(k==='s')startReal();else if(k==='p')startDemo();else if(k==='d')toggleTheme(e)});
 $('#find').addEventListener('input',filterNotes);
+$('#ask').addEventListener('submit',e=>{e.preventDefault();ask($('#ask-q').value)});
+$('#ask-q').addEventListener('keydown',e=>{if(e.key==='Escape')show($('#askp'),false)});
 $('#key').addEventListener('input',e=>{cfg.key=e.target.value.trim();saveCfg();renderSide()});
 $('#model').addEventListener('change',e=>{cfg.model=e.target.value;saveCfg();renderSide()});
 $('#glance').addEventListener('input',e=>{cfg.glance=+e.target.value;$('#glance-v').textContent=cfg.glance+' s';saveCfg();renderSetup()});
@@ -1280,10 +1339,17 @@ function shotLive(){reset(true);S.shot=true;const now=Date.now(),t0=S.t0=now-129
   S.main={id:1,start:t0,label:'Mitochondria and ATP · Class notes',frames:[],ref:null};S.sid=1;last.width=1280;last.height=720;drawScene(lx,'doc2',0);begin();$('#stream').innerHTML='';
   ['doc1','doc2'].forEach((k,i)=>addNote({t:[134e3,58e4][i],title:SAMPLE.notes[k].topic,bullets:SAMPLE.notes[k].notes,terms:SAMPLE.notes[k].terms,src:SAMPLE.notes[k].app}));$('#pv').getContext('2d').drawImage(last,0,0,640,360);paint()}
 World.init();applyTheme(root.dataset.theme||'light');applyPalette(root.dataset.palette);renderSide();
-$('#dock-sample').innerHTML=ic('play');$('#dock-set').innerHTML=ic('sliders');if(!Q.has('bare'))show($('#dock'),true);
+$('#dock-sample').innerHTML=ic('play');$('#dock-set').innerHTML=ic('sliders');$('#dock-ask').innerHTML=ic('ask');$('.ask-go').innerHTML=ic('arrow');$('#ask-sug').innerHTML=ASKS.map(q=>`<button type="button" data-ask="${q}">${q}</button>`).join('');if(!Q.has('bare'))show($('#dock'),true);
 const v0=Q.get('view');
 if(v0==='live')shotLive();else if(v0==='session'&&sessions[0])openSession(sessions[0]);else go(['notes','recap','settings'].includes(v0)?v0:'home',true);
 if(Q.has('notif')&&sessions[0])notify(sessions[0]);
+/* The host keeps pages cached for ten minutes and a tab left open keeps running what it loaded.
+   So on load, and whenever the tab comes back into view with no session running, look for a newer build and move to it. */
+function checkBuild(){if(location.protocol!=='https:'||S.running)return;const mine=+$('meta[name=build]').content;
+  fetch(location.pathname+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/<meta name="build" content="(\d+)"/);
+    if(!m||+m[1]<=mine||S.running||sessionStorage.getItem('rw:tried')===m[1])return;sessionStorage.setItem('rw:tried',m[1]);
+    const q=new URLSearchParams(location.search);q.set('v',m[1]);location.replace(location.pathname+'?'+q)}).catch(()=>{})}
+checkBuild();document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkBuild()});
 if(Q.has('sample'))startDemo();
 })();
 </script>
