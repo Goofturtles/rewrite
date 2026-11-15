@@ -76,7 +76,7 @@ h1 mark{display:inline-block;background:#fff;color:var(--leaf);line-height:.97;p
 h1 em{color:#2F2F2F}
 .sub{margin-top:22px;font-size:18.5px;line-height:31px;color:#333}
 .hero .btn{margin-top:32px}
-.shot{position:absolute;z-index:3;left:144px;top:680px;width:1152px;border-radius:26px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.75),0 40px 90px -44px rgba(30,50,10,.5);transform:translate3d(0,var(--sy,0px),0);will-change:transform;mask-image:linear-gradient(#000 74%,transparent 98%)}
+.shot{position:absolute;z-index:3;left:144px;top:680px;width:1152px;border-radius:26px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.75),0 40px 90px -44px rgba(30,50,10,.5);transform:translate3d(0,var(--sy,0px),0) scale(var(--ss,1));transform-origin:50% 0;will-change:transform;mask-image:linear-gradient(#000 74%,transparent 98%)}
 .shot img{width:100%}
 
 /* intro: the wordmark alone over the hills, then everything arrives */
@@ -133,7 +133,7 @@ h1 .ln>span{transform:translateY(120%);transition:transform 1.2s var(--ease);tra
 .arrows button:last-child{color:#fff;background:linear-gradient(180deg,#5E9306,#487600);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 12px 20px -12px rgba(50,90,0,.8)}
 .arrows button:hover{transform:scale(1.06)}
 .arrows svg{width:20px;height:20px}
-.track{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:85px 60px 0 185px;cursor:grab}
+.track{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:85px 60px 0 185px;cursor:grab;transform:translate3d(var(--tx,0px),0,0);will-change:transform}
 .track::-webkit-scrollbar{display:none}
 .fcard{position:relative;flex:0 0 512px;height:576px;scroll-snap-align:start;scroll-margin-left:185px;border-radius:17px;overflow:hidden;background:#DDE3E6 50% 0/cover no-repeat}
 .fcard .ic{position:absolute;left:29px;top:29px;width:62px;height:62px;border-radius:13px;background:#fff;display:grid;place-items:center;box-shadow:0 12px 22px -12px rgba(0,0,0,.3)}
@@ -150,7 +150,7 @@ h1 .ln>span{transform:translateY(120%);transition:transform 1.2s var(--ease);tra
 .steps-h p{margin-top:25px;line-height:30px}
 .steps-h .btn{margin-top:37px}
 .s-wrap{position:relative;width:1440px;margin:98px auto 0}
-.s-track{display:flex;gap:51px;overflow-x:auto;scrollbar-width:none;padding:70px 25px;margin:-70px 0;cursor:grab}
+.s-track{display:flex;gap:51px;overflow-x:auto;scrollbar-width:none;padding:110px 25px;margin:-110px 0;cursor:grab}
 .s-track::-webkit-scrollbar{display:none}
 .step{position:relative;flex:0 0 359px;height:455px;border-radius:26px;padding:9px;margin-top:158px;overflow:hidden;background:linear-gradient(180deg,rgba(8,26,6,0) 38%,rgba(8,26,6,.5)),linear-gradient(180deg,var(--t1),var(--t2)),url(assets/hills.webp) var(--bp,50% 80%)/480% auto #3F6E1A;transform:translate3d(0,var(--py,0px),0);will-change:transform}
 .step:nth-child(even){margin-top:0}
@@ -164,7 +164,7 @@ h1 .ln>span{transform:translateY(120%);transition:transform 1.2s var(--ease);tra
 .pillbox{width:214px;height:107px;border-radius:54px;background:rgba(255,255,255,.84);display:grid;place-items:center;padding:0 22px;box-shadow:0 16px 28px -16px rgba(0,0,0,.5)}
 .step h3{color:#fff;font-size:30px;line-height:33px;letter-spacing:-.035em;margin-bottom:23px}
 .step p{font-size:19px;line-height:29px;color:rgba(255,255,255,.92)}
-.s-next{position:absolute;left:693px;top:621px;width:101px;height:65px;border-radius:33px;display:grid;place-items:center;color:#3F7000;box-shadow:inset 0 0 0 2px #4E8200;transition:transform .45s var(--ease),background .25s,color .25s}
+.s-next{position:absolute;left:693px;top:661px;width:101px;height:65px;border-radius:33px;display:grid;place-items:center;color:#3F7000;box-shadow:inset 0 0 0 2px #4E8200;transition:transform .45s var(--ease),background .25s,color .25s}
 .s-next:hover{transform:translateX(5px);background:#4E8200;color:#fff}
 .s-next svg{width:34px;height:34px}
 .rec{width:52px;height:52px;border-radius:50%;background:#121212;display:grid;place-items:center}
@@ -187,7 +187,8 @@ h1 .ln>span{transform:translateY(120%);transition:transform 1.2s var(--ease);tra
 .swap h2 b{font-weight:600;color:var(--leaf)}
 .swap h2 em{display:inline}
 .swap-h p{margin-top:23px;line-height:29px}
-.price{height:344px;margin-top:4px;border-radius:26px;padding:26px 12px 12px;display:flex;flex-direction:column;align-items:center;color:#fff;background:linear-gradient(165deg,rgba(150,186,28,.82) 0%,rgba(74,124,10,.8) 42%,rgba(14,34,5,.96) 100%),url(assets/hills.webp) 30% 60%/460% auto #3F7417;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+.swap-h>div:first-child{transform:translate3d(var(--hx,0px),0,0);opacity:var(--ho,1);will-change:transform,opacity}
+.price{transform:translate3d(var(--px,0px),0,0);opacity:var(--ho,1);will-change:transform,opacity;height:344px;margin-top:4px;border-radius:26px;padding:26px 12px 12px;display:flex;flex-direction:column;align-items:center;color:#fff;background:linear-gradient(165deg,rgba(150,186,28,.82) 0%,rgba(74,124,10,.8) 42%,rgba(14,34,5,.96) 100%),url(assets/hills.webp) 30% 60%/460% auto #3F7417;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
 .price svg{width:44px;height:44px}
 .price h3{color:#fff;font-weight:600;font-size:29px;line-height:1.2;letter-spacing:-.035em;margin-top:19px}
 .price small{font-size:13.5px;line-height:1.3;opacity:.9;margin-top:5px}
@@ -284,8 +285,8 @@ h1 .ln>span{transform:translateY(120%);transition:transform 1.2s var(--ease);tra
 /* close + footer */
 .end{background:#000;padding:0 40px}
 .end-card{position:relative;height:640px;border-radius:36px;overflow:hidden;background:#000;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;padding-bottom:84px}
-.end-card::before{content:"";position:absolute;inset:0;transform-origin:50% 100%;background:radial-gradient(118% 66% at 50% 106%,#E9FBCF 0%,#C6EF8C 20%,#8FCB3C 36%,#4D8A14 52%,#1D3D0A 68%,rgba(8,20,4,0) 86%);animation:breathe 7s ease-in-out infinite}
-@keyframes breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.08)}}
+.end-card::before{content:"";position:absolute;inset:0;transform-origin:50% 100%;background:radial-gradient(118% 66% at 50% 106%,#E9FBCF 0%,#C6EF8C 20%,#8FCB3C 36%,#4D8A14 52%,#1D3D0A 68%,rgba(8,20,4,0) 86%);transform:scaleY(var(--gy,1));animation:glow 6s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.82}50%{opacity:1}}
 .end-card>*{position:relative}
 .end-card h2{color:#fff;font-size:68px;line-height:84px}
 .end-card h2 em{color:rgba(255,255,255,.84)}
@@ -366,10 +367,10 @@ footer a:hover{color:#fff}
     </div>
     <div class="s-wrap">
       <div class="s-track" id="strack">
-        <div class="step rv" style="--t1:rgba(48,116,140,.88);--t2:rgba(118,178,58,.5);--bp:20% 62%" data-speed="-16"><div><div class="top"><span class="n">01</span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="art"><div class="pillbox"><span class="rec"><i></i></span></div></div><h3>Start and Share</h3><p>Press start and share your screen. A small pill shows it is taking notes.</p></div></div>
-        <div class="step rv" style="--d:110;--t1:rgba(58,72,68,.92);--t2:rgba(50,94,28,.7);--bp:50% 70%" data-speed="-36"><div><div class="top"><span class="n">02</span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="art"><div class="pillbox"><div class="rib"><i style="--w:30"></i><i class="x"></i><i style="--w:40"></i><i class="x"></i><i class="l" style="--w:24"></i></div></div></div><h3>Work Like Normal</h3><p>Read, watch, write or code. Rewrite looks at your screen about once a second.</p></div></div>
-        <div class="step rv" style="--d:220;--t1:rgba(160,204,70,.8);--t2:rgba(40,90,22,.78);--bp:70% 80%" data-speed="-20"><div><div class="top"><span class="n">03</span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="art"><div class="pillbox"><span class="gone"><s>Discord · 8 s</s><b>ignored</b></span></div></div><h3>Glances Dropped</h3><p>Check a message and come back. Detours shorter than your limit are never read.</p></div></div>
-        <div class="step rv" style="--d:330;--t1:rgba(38,126,122,.88);--t2:rgba(66,146,88,.58);--bp:90% 66%" data-speed="-32"><div><div class="top"><span class="n">04</span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="art"><div class="pillbox"><span class="mini"><b>Mitochondria and ATP</b>The inner membrane folds into <mark>cristae</mark>.</span></div></div><h3>Read Your Notes</h3><p>Press finish and your notes are ready, filed by topic and saved in your browser.</p></div></div>
+        <div class="step rv" style="--t1:rgba(48,116,140,.88);--t2:rgba(118,178,58,.5);--bp:20% 62%" data-speed="-40"><div><div class="top"><span class="n">01</span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="art"><div class="pillbox"><span class="rec"><i></i></span></div></div><h3>Start and Share</h3><p>Press start and share your screen. A small pill shows it is taking notes.</p></div></div>
+        <div class="step rv" style="--d:110;--t1:rgba(58,72,68,.92);--t2:rgba(50,94,28,.7);--bp:50% 70%" data-speed="-95"><div><div class="top"><span class="n">02</span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="art"><div class="pillbox"><div class="rib"><i style="--w:30"></i><i class="x"></i><i style="--w:40"></i><i class="x"></i><i class="l" style="--w:24"></i></div></div></div><h3>Work Like Normal</h3><p>Read, watch, write or code. Rewrite looks at your screen about once a second.</p></div></div>
+        <div class="step rv" style="--d:220;--t1:rgba(160,204,70,.8);--t2:rgba(40,90,22,.78);--bp:70% 80%" data-speed="-55"><div><div class="top"><span class="n">03</span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="art"><div class="pillbox"><span class="gone"><s>Discord · 8 s</s><b>ignored</b></span></div></div><h3>Glances Dropped</h3><p>Check a message and come back. Detours shorter than your limit are never read.</p></div></div>
+        <div class="step rv" style="--d:330;--t1:rgba(38,126,122,.88);--t2:rgba(66,146,88,.58);--bp:90% 66%" data-speed="-80"><div><div class="top"><span class="n">04</span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="art"><div class="pillbox"><span class="mini"><b>Mitochondria and ATP</b>The inner membrane folds into <mark>cristae</mark>.</span></div></div><h3>Read Your Notes</h3><p>Press finish and your notes are ready, filed by topic and saved in your browser.</p></div></div>
       </div>
       <button class="s-next" id="snext" aria-label="Show more steps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m0 0-6-6m6 6-6 6"/></svg></button>
     </div>
@@ -377,12 +378,12 @@ footer a:hover{color:#fff}
 
   <section class="swap" id="swap">
     <div class="wrap">
-      <div class="swap-h"><div class="rv"><h2>Replace your note-taking<br>with <b>one</b> <em>browser tab</em></h2><p>Instead of splitting your attention between the page<br>and your notebook, let Rewrite write while you work.</p></div>
-        <div class="price rv" style="--d:140"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="10" fill="#fff"/><path d="M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18" fill="none" stroke="#3f7417" stroke-width="2.8" stroke-linecap="round"/></svg><h3>Rewrite</h3><small>Everything in one place</small><b>1 tab</b><a href="app.html">Start a session<i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></i></a></div></div>
+      <div class="swap-h"><div><h2>Replace your note-taking<br>with <b>one</b> <em>browser tab</em></h2><p>Instead of splitting your attention between the page<br>and your notebook, let Rewrite write while you work.</p></div>
+        <div class="price"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="10" fill="#fff"/><path d="M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18" fill="none" stroke="#3f7417" stroke-width="2.8" stroke-linecap="round"/></svg><h3>Rewrite</h3><small>Everything in one place</small><b>1 tab</b><a href="app.html">Start a session<i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></i></a></div></div>
       <div class="field rv" id="field">
-        <div class="tall" data-speed="-10"><div class="blk"><b>42 min</b><div class="viz" aria-hidden="true"><div class="bars"><i style="--h:62"></i><i style="--h:62"></i><i style="--h:62"></i><i class="n" style="--h:84"></i><i class="n" style="--h:84"></i><i style="--h:84"></i><i style="--h:84"></i><i class="d" style="--h:62"></i><i class="d" style="--h:62"></i><i class="n" style="--h:90"></i><i class="n" style="--h:90"></i><i class="n" style="--h:90"></i><i class="d" style="--h:44"></i><i class="n" style="--h:30"></i><i class="d" style="--h:44"></i><i class="d" style="--h:44"></i><i class="d" style="--h:90"></i><i class="n" style="--h:36"></i><i style="--h:90"></i><i class="d" style="--h:90"></i><i class="n" style="--h:74"></i><i class="n" style="--h:74"></i></div></div><small>Time focused</small></div><div class="foot"><span>Counted</span><span class="pillv">100%</span></div></div>
-        <div class="tall wh" data-speed="-26"><div class="blk"><b>6 glances</b><div class="viz" aria-hidden="true"><svg viewBox="0 0 250 86" width="250" height="86" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6FB81C" stop-opacity=".55"/><stop offset="1" stop-color="#6FB81C" stop-opacity="0"/></linearGradient></defs><path d="M0 64 28 62 58 74 92 26 124 38 156 8 188 20 220 4 250 4V86H0z" fill="url(#lg)"/><path d="M0 64 28 62 58 74 92 26 124 38 156 8 188 20 220 4 250 4" stroke="#8ED52F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div><small>Quick looks away</small></div><div class="foot"><span>Ignored</span><span class="pillv">100%</span></div></div>
-        <div class="stack" data-speed="-18"><div class="frost"><b>3 notes</b><small>Written for you</small></div><div class="blk"><b>0 words</b><div class="viz" aria-hidden="true"><div class="code"></div></div><small>Typed by you</small></div></div>
+        <div class="tall" data-speed="-24"><div class="blk"><b>42 min</b><div class="viz" aria-hidden="true"><div class="bars"><i style="--h:62"></i><i style="--h:62"></i><i style="--h:62"></i><i class="n" style="--h:84"></i><i class="n" style="--h:84"></i><i style="--h:84"></i><i style="--h:84"></i><i class="d" style="--h:62"></i><i class="d" style="--h:62"></i><i class="n" style="--h:90"></i><i class="n" style="--h:90"></i><i class="n" style="--h:90"></i><i class="d" style="--h:44"></i><i class="n" style="--h:30"></i><i class="d" style="--h:44"></i><i class="d" style="--h:44"></i><i class="d" style="--h:90"></i><i class="n" style="--h:36"></i><i style="--h:90"></i><i class="d" style="--h:90"></i><i class="n" style="--h:74"></i><i class="n" style="--h:74"></i></div></div><small>Time focused</small></div><div class="foot"><span>Counted</span><span class="pillv">100%</span></div></div>
+        <div class="tall wh" data-speed="-60"><div class="blk"><b>6 glances</b><div class="viz" aria-hidden="true"><svg viewBox="0 0 250 86" width="250" height="86" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6FB81C" stop-opacity=".55"/><stop offset="1" stop-color="#6FB81C" stop-opacity="0"/></linearGradient></defs><path d="M0 64 28 62 58 74 92 26 124 38 156 8 188 20 220 4 250 4V86H0z" fill="url(#lg)"/><path d="M0 64 28 62 58 74 92 26 124 38 156 8 188 20 220 4 250 4" stroke="#8ED52F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div><small>Quick looks away</small></div><div class="foot"><span>Ignored</span><span class="pillv">100%</span></div></div>
+        <div class="stack" data-speed="-40"><div class="frost"><b>3 notes</b><small>Written for you</small></div><div class="blk"><b>0 words</b><div class="viz" aria-hidden="true"><div class="code"></div></div><small>Typed by you</small></div></div>
       </div>
       <p class="fine rv">Numbers from the sample day shown in the demo.</p>
     </div>
@@ -432,9 +433,8 @@ footer a:hover{color:#fff}
 <script>
 (()=>{'use strict';
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
-const Q=new URLSearchParams(location.search),root=document.documentElement;
-const STILL=Q.has('still')||matchMedia('(prefers-reduced-motion: reduce)').matches;
-const clamp=(v,a,b)=>Math.min(b,Math.max(a,v)),lerp=(a,b,t)=>a+(b-a)*t;
+const Q=new URLSearchParams(location.search),root=document.documentElement,STILL=Q.has('still');
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v)),lerp=(a,b,t)=>a+(b-a)*t,ease=t=>1-Math.pow(1-t,3);
 
 /* the page is drawn 1440 wide and scaled to the window, so it keeps the reference's proportions on any desktop */
 let Z=1;
@@ -449,39 +449,51 @@ function intro(){
   const r=brand.getBoundingClientRect(),s=1.9,dx=(innerWidth/2-(r.left+r.width*s/2))/Z,dy=(innerHeight*.36-(r.top+r.height/2))/Z;
   brand.style.transform=`translate(${dx}px,${dy}px) scale(${s})`;
   brand.style.opacity=0;brand.style.transition='opacity .9s ease';
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{brand.style.opacity=1;root.classList.remove('boot')}));
+  setTimeout(()=>{brand.style.opacity=1;root.classList.remove('boot')},60);
   setTimeout(()=>{brand.style.transition='transform 1.25s cubic-bezier(.7,0,.2,1)';brand.style.transform='none';root.classList.add('ready')},1300);
 }
 
-/* ---- smooth scrolling: the wheel moves a target and the page eases toward it ---- */
-let target=scrollY,cur=scrollY;
-if(!STILL){
-  addEventListener('wheel',e=>{if(e.ctrlKey||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;e.preventDefault();target=Math.max(0,target+e.deltaY*(e.deltaMode?34:1))},{passive:false});
-  addEventListener('scroll',()=>{if(Math.abs(scrollY-cur)>3)target=cur=scrollY});
-}
-document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;const el=$(a.getAttribute('href'));if(!el)return;e.preventDefault();const y=Math.max(0,el.getBoundingClientRect().top+scrollY);if(STILL)scrollTo(0,y);else target=y});
+/* ---- links inside the page: the browser does the scrolling ---- */
+document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;const el=$(a.getAttribute('href'));if(!el)return;e.preventDefault();el.scrollIntoView({behavior:STILL?'auto':'smooth',block:'start'})});
 
-/* ---- scroll-linked motion (all lengths in page px, so they hold at any zoom) ---- */
-const lines=$('#lines'),say=$('#say'),hero=$('#hero'),bshot=$('#bshot');
+/* ---- scroll-linked motion ----
+   The page scrolls natively. Each effect reads a smoothed copy of the scroll position, so it glides
+   even when the wheel moves in steps. All lengths are in page px, so they hold at any zoom. */
+const hero=$('#hero'),say=$('#say'),lines=$('#lines'),panel=$('.panel'),swapH=$('.swap-h'),stage=$('.stage'),bshot=$('#bshot'),endc=$('.end-card');
 const movers=[[$('#steps'),$$('.step')],[$('#field'),$$('#field>*')]];
 lines.innerHTML=lines.textContent.trim().split(/\s+/).map(w=>`<span>${w}</span>`).join(' ');
 const words=$$('span',lines);
 function update(sy){
-  const y=sy/Z,vh=innerHeight/Z,top=el=>el.getBoundingClientRect().top/Z;
-  hero.style.setProperty('--sy',lerp(0,-46,clamp(y/700,0,1))+'px');
-  hero.style.setProperty('--hy',y*.12+'px');hero.style.setProperty('--cy',y*-.08+'px');hero.style.setProperty('--co',clamp(1.2-y/480,0,1));
-  const q=clamp((vh*.84-top(say)-198)/(vh*.5),0,1)*(words.length+2);
+  const lag=scrollY-sy,y=sy/Z,vh=innerHeight/Z;
+  const box=el=>{const r=el.getBoundingClientRect();return{top:(r.top+lag)/Z,h:r.height/Z}};
+  const through=el=>{const b=box(el);return clamp((vh-b.top)/(vh+b.h),0,1)};   // 0 as it enters at the bottom, 1 as it leaves at the top
+  const enter=(el,span)=>clamp((vh-box(el).top)/(vh*span),0,1);                  // 0 to 1 over the first part of its way in
+  /* hero: the headline lifts away, the app screen grows toward you, the hills fall behind */
+  const p=clamp(y/700,0,1);
+  hero.style.setProperty('--sy',lerp(0,-70,p)+'px');hero.style.setProperty('--ss',lerp(1,1.05,p));
+  hero.style.setProperty('--hy',y*.16+'px');hero.style.setProperty('--cy',y*-.14+'px');hero.style.setProperty('--co',clamp(1.25-y/400,0,1));
+  /* statement: words darken one by one */
+  const q=clamp((vh*.86-box(say).top-198)/(vh*.5),0,1)*(words.length+2);
   words.forEach((w,i)=>{w.style.opacity=clamp(q-i,.6,1)});
-  movers.forEach(([sec,els])=>{const r=sec.getBoundingClientRect(),k=clamp((vh-r.top/Z)/(vh+r.height/Z),0,1)-.5;els.forEach(s=>s.style.setProperty('--py',(k*+s.dataset.speed*2)+'px'))});
-  const b=clamp((vh-top(bshot))/(vh*.7),0,1);
-  bshot.style.setProperty('--by',lerp(60,0,b)+'px');bshot.style.setProperty('--bs',lerp(.95,1,b));
+  /* feature cards drift sideways as the panel passes */
+  panel.style.setProperty('--tx',lerp(150,-190,through(panel))+'px');
+  /* step cards and comparison cards move at different speeds */
+  movers.forEach(([sec,els])=>{const k=through(sec)-.5;els.forEach(s=>s.style.setProperty('--py',(k*+s.dataset.speed*2)+'px'))});
+  /* the heading and its card slide in from opposite sides */
+  const e=ease(enter(swapH,.75));
+  swapH.style.setProperty('--hx',lerp(-180,0,e)+'px');swapH.style.setProperty('--px',lerp(180,0,e)+'px');swapH.style.setProperty('--ho',e);
+  /* the notes board grows into place */
+  const b=ease(enter(stage,.8));
+  bshot.style.setProperty('--by',lerp(110,0,b)+'px');bshot.style.setProperty('--bs',lerp(.86,1,b));
+  /* the closing glow rises */
+  endc.style.setProperty('--gy',lerp(.55,1.12,through(endc)));
 }
-/* the page end is found by trying: if the browser will not scroll as far as asked, that is the limit */
-function frame(){cur=lerp(cur,target,.105);if(Math.abs(target-cur)<.25)cur=target;if(Math.abs(scrollY-cur)>.5){scrollTo(0,cur);if(Math.abs(scrollY-cur)>1.5)cur=target=scrollY}update(cur);requestAnimationFrame(frame)}
+let sm=scrollY;
+function frame(){sm=lerp(sm,scrollY,.13);if(Math.abs(scrollY-sm)<.2)sm=scrollY;update(sm);requestAnimationFrame(frame)}
 
 /* ---- reveals and counters ---- */
 function count(b){const to=+b.dataset.count;if(!to||STILL)return;const t0=performance.now(),f=t=>{const p=Math.min(1,(t-t0)/1100);b.textContent=Math.round(to*(1-Math.pow(1-p,4)));if(p<1)requestAnimationFrame(f)};b.textContent='0';requestAnimationFrame(f)}
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;e.target.classList.add('in');io.unobserve(e.target);$$('[data-count]',e.target).forEach(count)}),{threshold:.16});
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;e.target.classList.add('in');io.unobserve(e.target);$$('[data-count]',e.target).forEach(count)}),{threshold:.14});
 $$('.rv').forEach(e=>STILL?e.classList.add('in'):io.observe(e));
 
 /* ---- carousels: arrows, and drag to scroll ---- */

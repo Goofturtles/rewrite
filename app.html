@@ -121,6 +121,7 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 .pals button[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.45),0 0 0 2.5px var(--field),0 0 0 4.5px var(--ink)}
 .theming::view-transition-old(root),.theming::view-transition-new(root){animation:none;mix-blend-mode:normal}
 .user{display:flex;align-items:center;gap:9px;height:42px;padding:0 16px 0 4px;border-radius:99px;background:var(--wash2);box-shadow:inset 0 0 0 1px var(--line)}
+.user[hidden]{display:none}
 .ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--peri),var(--blue));color:#fff;display:grid;place-items:center;font:600 12px/1.2 var(--ui);flex:none}
 .u-txt b{display:block;font-weight:600;font-size:13px;line-height:1.25}
 .u-txt small{display:block;font-size:11px;line-height:1.3;color:var(--ink3)}
@@ -174,7 +175,7 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 .link:hover{color:var(--ink)}
 
 /* home */
-.home{display:grid;grid-template-columns:1.02fr 1fr .98fr;grid-template-areas:"a b c" "d d c" "e f g";gap:14px}
+.home{display:grid;grid-template-columns:1.55fr 1fr;grid-template-areas:"b a" "c g";gap:16px}
 .a{grid-area:a}.b{grid-area:b}.c{grid-area:c}.d{grid-area:d}.e{grid-area:e}.f{grid-area:f}.g{grid-area:g}
 .today{display:flex;flex-direction:column;min-height:240px}
 .big{font:600 52px/1.1 var(--ui);letter-spacing:-.045em;font-variant-numeric:tabular-nums;margin-top:auto}
@@ -190,7 +191,9 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 .go:active{transform:scale(.95)}
 .go span{width:18px;height:18px;border-radius:50%;background:var(--hot);animation:led 2.4s ease-in-out infinite}
 .start h3{font:600 25px/1.2 var(--ui);letter-spacing:-.035em;margin:16px 0 2px}
-.start>p{margin:0 0 18px;font-size:13px;line-height:1.4;color:var(--ink2)}
+.start>p{margin:0 0 16px;font-size:13.5px;line-height:1.4;color:var(--ink2)}
+.start{min-height:330px}
+.start>.keep{margin:0 0 22px}
 .cells{position:relative;align-self:stretch;margin-top:auto;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(255,255,255,.3)}
 .cells>*{padding:13px 12px 15px 20px;text-align:left;border-left:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.07);transition:background .25s}
 .cells>*:first-child{border-left:0}
@@ -435,32 +438,29 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
     </nav>
     <button class="theme" id="theme" data-act="theme" aria-label="Switch between light and dark"></button>
     <div class="pals" id="pals" role="group" aria-label="Colour theme"><button data-act="pal" data-pal="green" style="--c:#6fa510" aria-label="Green" aria-pressed="false"></button><button data-act="pal" data-pal="blue" style="--c:#5b6bff" aria-label="Blue" aria-pressed="false"></button><button data-act="pal" data-pal="ember" style="--c:#ff4d2e" aria-label="Orange" aria-pressed="false"></button></div>
-    <div class="user" data-el="user-chip"><span class="ava" id="ava">ME</span><span class="u-txt"><b id="u-name">You</b><small id="u-sub">This laptop</small></span></div>
+    <div class="user" id="user" data-el="user-chip" hidden><span class="ava" id="ava">ME</span><span class="u-txt"><b id="u-name">You</b><small id="u-sub">This laptop</small></span></div>
   </header>
 
   <main class="main">
     <section class="view on" id="v-home">
-      <div class="p-head rise"><div><div class="eyebrow" id="today-date"></div><h1 class="title">You do the work. We <i>rewrite</i> it as notes.</h1></div><p class="lede">Rewrite watches your screen and writes down what matters. Quick glances at Discord or Spotify don't count.</p></div>
+      <div class="p-head rise"><div><div class="eyebrow" id="today-date"></div><h1 class="title">You do the work. We <i>rewrite</i> it as notes.</h1></div><p class="lede">Quick glances at Discord or Spotify don't count.</p></div>
       <div class="home">
-        <div class="card a today rise" style="--i:1" id="h-today" data-el="today-card"></div>
-        <div class="card hot b start rise" style="--i:2" data-el="hero">
-          <h2 class="cap">Start a session</h2>
+        <div class="card hot b start rise" style="--i:1" data-el="hero">
+          <h2 class="cap">New session</h2>
           <button class="go" data-act="start" aria-label="Start a session"><span></span></button>
           <h3>Start taking notes</h3>
           <p>Share your screen, then carry on</p>
+          <button class="keep" data-act="start"><span>Start a session</span><span class="arr" id="start-arr"></span></button>
           <div class="cells"><div><b id="c-glance"></b><small>Glance limit</small></div><div><b id="c-writer"></b><small>Writes the notes</small></div><button data-act="sample"><b>Sample</b><small>Play a demo</small></button></div>
         </div>
+        <div class="card a today rise" style="--i:2" id="h-today" data-el="today-card"></div>
         <div class="card peri c latest rise" style="--i:3" id="h-notes" data-el="prompt-card"></div>
-        <div class="card ink d rise" style="--i:4" id="h-chart" data-el="chart-days"></div>
-        <div class="card cream e resume rise" style="--i:5" id="h-resume" data-el="resume-card"></div>
-        <div class="card peri2 f gcard rise" style="--i:6" id="h-glance" data-el="stat-tile"></div>
-        <div class="card peri2 g rise" style="--i:7" id="h-recent" data-el="recent-card"></div>
+        <div class="card peri2 g rise" style="--i:4" id="h-recent" data-el="recent-card"></div>
       </div>
     </section>
 
     <section class="view" id="v-notes">
       <div class="p-head rise"><div><div class="eyebrow">Library · drag a note to re-file it</div><h1 class="title">Every note, by <i>subject</i></h1></div><button class="btn dark sm" data-act="start"><span class="rec"></span>New session</button></div>
-      <div class="bento" id="notes-tiles"></div>
       <div class="board" id="board"></div>
     </section>
 
@@ -628,7 +628,7 @@ let view='home';
 const GOAL=60*6e4;
 const show=(el,on)=>{el.classList.toggle('on',on);el.inert=!on};
 function go(v,instant){view=v;const run=()=>{$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));const nav=v==='session'?'notes':v,ind=$('#nav-ind');let on=null;$$('#navs .nav').forEach(n=>{const y=n.dataset.go===nav;n.classList.toggle('on',y);if(y){on=n;n.setAttribute('aria-current','page')}else n.removeAttribute('aria-current')});ind.style.opacity=on?1:0;if(on){ind.style.width=on.offsetWidth+'px';ind.style.transform=`translateX(${on.offsetLeft}px)`}({home:renderHome,notes:renderNotes,recap:renderRecap,settings:renderSettings}[v]||(()=>{}))();scrollTo(0,0)};if(!instant&&!STILL&&document.startViewTransition)document.startViewTransition(run);else run()}
-function renderSide(){$('#engine-txt').textContent=DEMO||engine()==='claude'?MODELS[cfg.model]:engine()==='device'?'On this laptop':'Set up notes';$('#n-count').textContent=sessions.reduce((a,s)=>a+s.notes.length,0);if(DEMO){$('#ava').textContent='RP';$('#u-name').textContent='Riley Park';$('#u-sub').textContent='Demo data'}}
+function renderSide(){$('#engine-txt').textContent=DEMO||engine()==='claude'?MODELS[cfg.model]:engine()==='device'?'On this laptop':'Set up notes';$('#n-count').textContent=sessions.reduce((a,s)=>a+s.notes.length,0);if(DEMO){$('#user').hidden=false;$('#ava').textContent='RP';$('#u-name').textContent='Riley Park';$('#u-sub').textContent='Demo data'}}
 function tiles(el,w,base){const cur=w[6],sum=k=>w.reduce((a,d)=>a+d[k],0);const T=[
   {l:'Focus time',v:sum('focus'),f:durHTML,k:'focus',s:'last 7 days'},
   {l:'Notes written',v:sum('notes'),f:v=>Math.round(v),k:'notes',s:cur.notes+' today'},
@@ -641,7 +641,6 @@ const rowHTML=(s,i)=>`<button class="row rise" style="--i:${i}" data-open="${esc
 const miniRow=s=>`<button class="mrow" data-open="${esc(s.id)}" data-el="session-row"><span class="av" style="--c:${colorOf(s.subject||'General')}">${esc((s.subject||'G')[0])}</span><span><b>${esc(s.title)}</b><small>${dur(s.focusMs)} focus · ${s.notes.length} notes</small></span><em>${when(s.at)}</em></button>`;
 // striped bars with a hot cap; today's bar is the highlighted one and carries the tooltip
 const barsHTML=w=>{const mx=Math.max(1,...w.map(d=>d.focus));return w.map((d,i)=>`<div class="sbar ${d.today?'t':''}" data-el="bar"><div class="plot" style="--h:${d.focus?Math.max(5,d.focus/mx*92):1.5};--i:${i}">${d.today&&d.focus?`<span class="tip"><small>Today</small>${dur(d.focus)}</span>`:''}<div class="bcol"></div></div><span>${d.label}</span></div>`).join('')};
-const sparkSVG=v=>{const mx=Math.max(1,...v),W=150,H=54,p=v.map((x,i)=>[5+i*(W-10)/(v.length-1),H-7-x/mx*(H-14)]),e=p[p.length-1];return `<svg class="sline" viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="M${p.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${e[0].toFixed(1)}" cy="${e[1].toFixed(1)}" r="3.5" fill="currentColor"/></svg>`};
 
 /* ================= RENDER: HOME / NOTES / RECAP ================= */
 function renderHome(){
@@ -653,15 +652,11 @@ function renderHome(){
   const ln=sessions.flatMap(x=>[...x.notes].reverse().map(n=>({n,x}))).slice(0,3);
   $('#h-notes').innerHTML=ln.length?`<div class="cap">Latest notes<span class="hint">${when(ln[0].x.at)}</span></div><button class="inner" data-open="${esc(ln[0].x.id)}"><b>${esc(ln[0].n.title)}</b><p>${esc(ln[0].n.bullets[0]||'')}</p></button>${ln.slice(1).map((o,i)=>`<button class="stackrow r${i}" data-open="${esc(o.x.id)}"><b>${esc(o.n.title)}</b><small>${esc(o.x.subject||'General')} · ${when(o.x.at)}</small></button>`).join('')}<button class="ask" data-open="${esc(s.id)}"><span class="dot">${ic('spark')}</span><span>${s.quiz&&s.quiz.length?'Check yourself: '+s.quiz.length+' questions':'Open the last session'}</span><span class="arr">${ic('arrow')}</span></button>`
     :`<div class="cap">Latest notes</div><div class="inner"><b>No notes yet</b><p>Start a session and what Rewrite writes will land here.</p></div><button class="ask" data-act="sample"><span class="dot">${ic('play')}</span><span>Play the 50 second sample</span><span class="arr">${ic('arrow')}</span></button>`;
-  $('#h-chart').innerHTML=`<div class="cap">Focus this week<span class="hint">${dur(w.reduce((a,d)=>a+d.focus,0))} total</span></div><div class="sbars">${barsHTML(w)}</div>`;
-  $('#h-resume').innerHTML=s?`<div class="cap">Pick up where you left off</div><h3>${esc(s.title)}</h3><div class="res-row"><div class="toks">${subjects().slice(0,4).map(x=>`<span style="--c:${colorOf(x)}">${esc(x[0])}</span>`).join('')}</div><button class="keep" data-act="start"><span>Keep going</span><span class="arr">${ic('arrow')}</span></button></div>`
-    :`<div class="cap">First time here</div><h3>See it work in 50 seconds</h3><div class="res-row"><p>What gets kept, and what gets thrown away.</p><button class="keep" data-act="sample"><span>Play the sample</span><span class="arr">${ic('arrow')}</span></button></div>`;
-  $('#h-glance').innerHTML=`<div class="cap">Glances ignored</div><div class="num" id="gl-n"></div><div class="sub">last 7 days, never read</div>${sparkSVG(w.map(d=>d.glances))}`;
-  countUp($('#gl-n'),w.reduce((a,d)=>a+d.glances,0),v=>Math.round(v));
+  $('#start-arr').innerHTML=ic('arrow');
   $('#h-recent').innerHTML=`<div class="cap">Recent sessions<button class="link" data-go="notes">See all</button></div><div>${sessions.length?sessions.slice(0,3).map(miniRow).join(''):'<p class="empty">Your sessions show up here.</p>'}</div>`;
 }
 function renderNotes(){
-  renderSide();tiles($('#notes-tiles'),week(),1);renderBoard()}
+  renderSide();renderBoard()}
 function renderBoard(quiet){
   const subs=subjects(),b=$('#board'),rise=quiet?'':' rise';
   if(!sessions.length){b.innerHTML=[0,1,2,3].map(i=>`<div class="col rise" style="--i:${5+i}" data-el="column"><div class="col-h"><span class="tok" style="--c:var(--ink4)"></span>${['First subject','Second subject','Third subject','Fourth subject'][i]}<em>0</em></div><button class="add" data-act="start">${ic('plus')}Start a session</button></div>`).join('');return}
