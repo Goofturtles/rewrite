@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1280">
-<meta name="build" content="1794771194">
+<meta name="build" content="1794772670">
 <title>Rewrite</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%23528200'/%3E%3Cpath d='M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18' fill='none' stroke='%23fff' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://api.fontshare.com">
@@ -514,6 +514,11 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
 .pill-wrap .pill.on{transform:none;opacity:1}
 .pill-wrap .pill-label{cursor:pointer}
 .toast{position:fixed;left:50%;top:22px;transform:translate(-50%,-160%);background:var(--night);color:#F5F6FF;padding:12px 18px;border-radius:16px;font-size:14px;line-height:1.45;max-width:560px;opacity:0;z-index:40;transition:transform .6s var(--spring),opacity .3s;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),0 20px 44px -18px rgba(0,0,0,.8)}
+.toast .t-act{margin-left:12px;font-weight:500;text-decoration:underline;text-underline-offset:3px}
+.n-del{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:var(--ink3);opacity:0;transition:opacity .2s,background .2s,color .2s}
+.note:hover .n-del,.n-del:focus-visible{opacity:1}
+.n-del:hover{background:var(--wash2);color:var(--ink)}
+.n-del svg{width:13px;height:13px}
 .toast.on{transform:translate(-50%,0);opacity:1}
 .notif{position:fixed;right:26px;top:24px;width:376px;z-index:30;padding:16px 18px 20px;border-radius:28px;overflow:hidden;color:#F5F6FF;--ink:#F5F6FF;--ink2:rgba(245,246,255,.8);--ink3:rgba(245,246,255,.62);--line:rgba(255,255,255,.16);--wash2:rgba(255,255,255,.1);--track:rgba(255,255,255,.17);background:var(--night);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 40px 80px -30px rgba(3,4,20,.9);transform:translateX(120%) scale(.96);opacity:0;transition:transform .9s var(--spring),opacity .4s}
 .notif.on{transform:none;opacity:1}
@@ -667,7 +672,7 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
 </div></div>
 
 <div class="dock" id="dock" data-el="dock" inert><button class="dock-go" data-act="start"><span class="d-dot"><i></i></span><span id="start-label">Start a session</span></button><button class="dock-sq" id="dock-sample" data-act="sample" aria-label="Play the 50 second sample" title="Play the 50 second sample"></button><button class="dock-sq" id="dock-ask" data-act="ask" aria-label="Ask about what you did" title="Ask about what you did"></button><button class="dock-sq" id="dock-set" data-go="settings" aria-label="Settings" title="Settings"></button></div>
-<div class="askp" id="askp" data-el="ask" inert><form id="ask"><input id="ask-q" placeholder="Ask about what you did" aria-label="Ask about what you did" autocomplete="off" spellcheck="false"><button class="ask-go" aria-label="Ask"></button></form><div class="ask-sug" id="ask-sug"></div><div class="ask-a" id="ask-a" aria-live="polite"></div></div>
+<div class="askp" id="askp" data-el="ask" inert><form id="ask"><input id="ask-q" placeholder="Ask about what you did, or tell it what to change" aria-label="Ask about what you did, or tell it what to change" autocomplete="off" spellcheck="false"><button class="ask-go" aria-label="Ask"></button></form><div class="ask-sug" id="ask-sug"></div><div class="ask-a" id="ask-a" aria-live="polite"></div></div>
 <div class="pill-wrap"><div class="pill" id="pill" data-state="noting" data-el="indicator" inert></div></div>
 <div class="toast" id="toast" role="status"></div>
 <div class="notif" id="notif" data-el="notification" role="status" inert></div>
@@ -701,6 +706,7 @@ const ICON={
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/>',
   moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
   search:'<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.3-4.3"/>',
+  trash:'<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12M10 11v5M14 11v5"/>',
   quote:'<path d="M10 7H6.500A1.500 1.500 0 0 0 5 8.500V12h4v3.500A1.500 1.500 0 0 1 7.500 17H7M19 7h-3.500A1.500 1.500 0 0 0 14 8.500V12h4v3.500A1.500 1.500 0 0 1 16.500 17H16"/>',
   ask:'<path d="M5 6.5A2.500 2.500 0 0 1 7.500 4h9A2.500 2.500 0 0 1 19 6.500v6a2.500 2.500 0 0 1-2.500 2.500H11l-4 3.500V15a2.500 2.500 0 0 1-2-2.500z"/>'
 };
@@ -748,7 +754,7 @@ const day0=t=>{const d=new Date(t);d.setHours(0,0,0,0);return +d};
 const when=t=>{const n=Math.round((day0(Date.now())-day0(t))/864e5);return n===0?'Today':n===1?'Yesterday':new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric'})};
 function markup(t,terms=[]){const low=t.toLowerCase(),hits=[];terms.forEach(k=>{k=String(k||'');const i=low.indexOf(k.toLowerCase());if(k&&i>=0&&!hits.some(h=>i<h[1]&&i+k.length>h[0]))hits.push([i,i+k.length])});hits.sort((a,b)=>a[0]-b[0]);let out='',p=0;hits.forEach((h,n)=>{out+=esc(t.slice(p,h[0]))+`<mark style="--i:${n}">`+esc(t.slice(h[0],h[1]))+'</mark>';p=h[1]});return out+esc(t.slice(p))}
 function countUp(el,to,fmt){if(STILL){el.innerHTML=fmt(to);return}const t0=performance.now(),D=1100;const f=t=>{const p=Math.min(1,(t-t0)/D);el.innerHTML=fmt(to*(1-Math.pow(1-p,4)));if(p<1)requestAnimationFrame(f)};el.innerHTML=fmt(0);requestAnimationFrame(f);setTimeout(()=>{el.innerHTML=fmt(to)},1400)}
-let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),5200)}
+let toastT;function toast(m,act){const t=$('#toast');t.innerHTML=esc(m)+(act?`<button class="t-act" data-act="undo">${esc(act)}</button>`:'');t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),act?9000:5200)}
 const rng=s=>()=>(s=(s*1664525+1013904223)%4294967296)/4294967296;
 function mkSegs(min,g,sd){const r=rng(sd*7919+11),parts=Array.from({length:g+1},()=>.5+r()),sum=parts.reduce((a,b)=>a+b,0);let t=0;const out=[];parts.forEach((p,i)=>{out.push({k:'focus',a:t,b:t+=p/sum*min*60e3});if(i<g)out.push({k:'glance',a:t,b:t+=(5+r()*10)*1e3,app:GLAPPS[Math.floor(r()*GLAPPS.length)]})});return out}
 
@@ -771,7 +777,7 @@ function streak(){const days=new Set(sessions.map(s=>day0(s.at)));let t=day0(Dat
 /* ================= RENDER: SHELL ================= */
 let view='home';
 const show=(el,on)=>{el.classList.toggle('on',on);el.inert=!on};
-function go(v,instant){view=v;show($('#askp'),false);const run=()=>{$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));const nav=v==='session'?'notes':v,ind=$('#nav-ind');let on=null;$$('#navs .nav').forEach(n=>{const y=n.dataset.go===nav;n.classList.toggle('on',y);if(y){on=n;n.setAttribute('aria-current','page')}else n.removeAttribute('aria-current')});ind.style.opacity=on?1:0;if(on){ind.style.width=on.offsetWidth+'px';ind.style.transform=`translateX(${on.offsetLeft}px)`}({home:renderHome,notes:renderNotes,recap:renderRecap,settings:renderSettings}[v]||(()=>{}))();scrollTo(0,0);World.play()};if(!instant&&!STILL&&document.startViewTransition)document.startViewTransition(run);else run()}
+function go(v,instant){view=v;const run=()=>{$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));const nav=v==='session'?'notes':v,ind=$('#nav-ind');let on=null;$$('#navs .nav').forEach(n=>{const y=n.dataset.go===nav;n.classList.toggle('on',y);if(y){on=n;n.setAttribute('aria-current','page')}else n.removeAttribute('aria-current')});ind.style.opacity=on?1:0;if(on){ind.style.width=on.offsetWidth+'px';ind.style.transform=`translateX(${on.offsetLeft}px)`}({home:renderHome,notes:renderNotes,recap:renderRecap,settings:renderSettings}[v]||(()=>{}))();scrollTo(0,0);World.play()};if(!instant&&!STILL&&document.startViewTransition)document.startViewTransition(run);else run()}
 function renderSide(){$('#n-count').textContent=sessions.reduce((a,s)=>a+s.notes.length,0);if(DEMO){$('#user').hidden=false;$('#ava').textContent='RP';$('#u-name').textContent='Riley Park';$('#u-sub').textContent='Demo data'}}
 function tiles(el,w,base){const cur=w[6],sum=k=>w.reduce((a,d)=>a+d[k],0);const T=[
   {l:'Focus time',v:sum('focus'),f:durHTML,k:'focus',s:'last 7 days'},
@@ -855,16 +861,16 @@ const groupOf=n=>n.group||n.src||'Notes';
 // The notes of a session. Three or more notes from more than one place are filed under headings, with a jump list on top.
 // Live, the newest comes first and only it animates in.
 function streamHTML(notes,sub,live){const g=new Map();notes.forEach(n=>{const k=groupOf(n);g.has(k)||g.set(k,[]);g.get(k).push(n)});
-  const newest=notes[notes.length-1],one=n=>noteHTML(n,sub,live&&n!==newest);
+  const newest=notes[notes.length-1],one=n=>noteHTML(n,sub,live&&n!==newest,live?null:notes.indexOf(n));
   if(g.size<2||notes.length<3)return(live?[...notes].reverse():notes).map(one).join('');
   const secs=[...g.entries()];if(live)secs.reverse();
   return `<nav class="toc" aria-label="Sections">${secs.map(([k,v],i)=>`<button data-sec="${i}">${esc(k)}<em>${v.length}</em></button>`).join('')}</nav>`+secs.map(([k,v],i)=>`<section class="grp" id="sec-${i}"><h2 class="grp-h">${esc(k)}<em>${plural(v.length,'note')}</em></h2>${(live?[...v].reverse():v).map(one).join('')}</section>`).join('')}
-const noteHTML=(n,sub,quiet)=>`<article class="card note"${quiet?' style="animation:none"':''} data-el="note"><div class="meta"><span class="tok" style="--c:${colorOf(sub)}"></span>${clock(n.t)} · ${esc(n.src||'Screen')}</div><h3>${esc(n.title)}</h3><ul>${n.bullets.map((b,i)=>`<li style="--i:${i}">${markup(b,n.terms)}</li>`).join('')}</ul></article>`;
+const noteHTML=(n,sub,quiet,del)=>`<article class="card note"${quiet?' style="animation:none"':''} data-el="note">${del!=null?`<button class="n-del" data-del-note="${del}" aria-label="Delete this note">${ic('x')}</button>`:''}<div class="meta"><span class="tok" style="--c:${colorOf(sub)}"></span>${clock(n.t)} · ${esc(n.src||'Screen')}</div><h3>${esc(n.title)}</h3><ul>${n.bullets.map((b,i)=>`<li style="--i:${i}">${markup(b,n.terms)}</li>`).join('')}</ul></article>`;
 function sessionShell(live,r){
   $('#stream').setAttribute('aria-live',live?'polite':'off');$('#c-see').hidden=!live;$('#c-sum').hidden=live||!r.takeaways.length;$('#c-quiz').hidden=live||!r.quiz.length;$('#c-facts').hidden=live;$('#c-src').hidden=live||!(r&&r.sources&&r.sources.length);
   $('#s-eyebrow').innerHTML=live?`<span class="tok"></span>${S.demo?'Sample session':'Live session'}`:`<span class="tok" style="--c:${colorOf(r.subject||'General')}"></span>${esc(r.subject||'General')} · ${when(r.at)}${r.sample?' · Sample':''}`;
   $('#s-title').textContent=live?'Taking notes now':r.title;
-  $('#s-actions').innerHTML=live?`<button class="btn line sm" data-act="pause" id="hd-pause">${ic('pause')}Pause</button><button class="btn dark sm" data-act="finish">${ic('stop')}Finish</button>`:`<button class="btn line sm" data-go="home">${ic('home')}Your field</button><button class="btn line sm" data-act="copy">${ic('copy')}Copy notes</button><button class="btn dark sm" data-act="download">${ic('down')}Download</button>`;
+  $('#s-actions').innerHTML=live?`<button class="btn line sm" data-act="pause" id="hd-pause">${ic('pause')}Pause</button><button class="btn dark sm" data-act="finish">${ic('stop')}Finish</button>`:`<button class="btn line sm" data-go="home">${ic('home')}Your field</button><button class="btn line sm" data-act="copy">${ic('copy')}Copy notes</button><button class="btn dark sm" data-act="download">${ic('down')}Download</button><button class="btn line sm" data-act="del-session" aria-label="Delete this session" title="Delete this session">${ic('trash')}</button>`;
   $('#ribbon').innerHTML='';$('#s-out').innerHTML='';S.outN=-1;
 }
 let opened=null;
@@ -1238,10 +1244,47 @@ function drawScene(c,id,t){
   else if(id==='music'){R(0,0,W,H,'#121212');R(0,0,240,H,'#000000');['Home','Search','Your Library'].forEach((n,i)=>Tx(n,28,52+i*40,'600 15px system-ui',i?'#B3B3B3':'#FFFFFF'));['Playlists','Liked Songs'].forEach((n,i)=>Tx(n,28,196+i*36,'14px system-ui','#B3B3B3'));Tx('Made for you',272,64,'700 28px system-ui','#FFFFFF');['#8D67AB','#1E3264','#E8115B','#148A08','#BC5900'].forEach((f,i)=>{R(272+i*196,96,176,176,f,8);Tx(['Focus mix','Lo-fi beats','Top hits','Chill','Throwback'][i],272+i*196,300,'600 15px system-ui','#FFFFFF')});R(0,H-84,W,84,'#181818');dot(W/2,H-52,18,'#1ED760');R(W/2-220,H-20,440,4,'#4D4D4D',2);R(W/2-220,H-20,60+(t/50)%300,4,'#FFFFFF',2)}
   else{R(0,0,W,H,'#0F0F0F');R(420,12,440,30,'#222222',15);Tx('Search',440,32,'14px system-ui','#AAAAAA');R(24,64,860,484,'#16324F',10);Tx(d.h,64,150,'600 36px system-ui','#FFFFFF');d.p.forEach((p,i)=>Tx('•  '+p,72,226+i*64,'24px system-ui','#DCE9F5'));R(24,542,860,6,'#3A3A3A',3);R(24,542,200+(t/40)%600,6,'#FF4E45',3);Tx('Biology 101, Lecture 7',24,592,'600 20px system-ui','#FFFFFF');for(let i=0;i<5;i++){R(908,64+i*104,160,92,'#272727',8);R(1080,72+i*104,170,12,'#3A3A3A',6);R(1080,96+i*104,110,10,'#2C2C2C',5)}}}
 
+/* ================= DELETING =================
+   A session or a single note can be deleted by hand or by asking. The state before the last such change is kept, so it can be put back once. */
+let undoSnap=null;
+const keepUndo=()=>{undoSnap=JSON.stringify(sessions)};
+const redraw=()=>{renderSide();if(view==='session'){const r=opened&&sessions.find(x=>x.id===opened.id);if(r)openSession(r);else{opened=null;go('home')}}else go(view,true)};
+function undo(){if(!undoSnap)return toast('Nothing to put back.');sessions=JSON.parse(undoSnap);undoSnap=null;persist();redraw();toast('Put back.')}
+function delSession(id){const i=sessions.findIndex(x=>x.id===id);if(i<0)return;keepUndo();const[r]=sessions.splice(i,1);persist();if(opened&&opened.id===id)opened=null;redraw();toast(`Deleted "${r.title}".`,'Undo')}
+function delNote(id,i){const r=sessions.find(x=>x.id===id);if(!r||!r.notes[i])return;keepUndo();const[n]=r.notes.splice(i,1);persist();redraw();toast(`Deleted the note "${n.title}".`,'Undo')}
+
 /* ================= ASK =================
    A question about what you did, answered from your own notes. With a Claude key the notes and the question go to Claude.
    Without one the answer is put together on this laptop: time and glances are counted, anything else is looked up in the notes. */
-const ASKS=['What did I do today?','How long did I focus this week?','What was left out?'];
+const ASKS=['What did I do today?','How long did I focus this week?','What was left out?','Switch to dark','Delete the last session'];
+let askPending=null;
+// What the chatbot can do, as well as answer. Deleting is put to you first; everything else is done at once and said.
+function askDo(q){const ql=q.toLowerCase(),has=re=>re.test(ql),cur=opened||sessions[0];let m;
+  const skip=new Set('note notes session sessions the about delete remove erase clear rename that this last latest from called named with and for'.split(' '));
+  const find=words=>{const kw=(words.match(/[a-z0-9']{3,}/g)||[]).filter(w=>!skip.has(w));if(!kw.length)return null;let best=null;
+    sessions.forEach(x=>x.notes.forEach((n,i)=>{const v=kw.filter(w=>(n.title+' '+n.bullets.join(' ')).toLowerCase().includes(w)).length;if(v&&(!best||v>best.v))best={v,s:x,n,i}}));return best};
+  const lastNote=()=>cur&&cur.notes.length?{s:cur,n:cur.notes[cur.notes.length-1],i:cur.notes.length-1}:null;
+  if(has(/\b(delete|remove|erase|clear|get rid of|wipe)\b/)){
+    if(has(/\b(everything|all)\b/))return sessions.length?{text:`Delete all ${plural(sessions.length,'session')} and their notes?`,yes:'Delete all',run(){keepUndo();sessions=[];opened=null;persist();redraw();return'Everything is deleted.'}}:{text:'There is nothing to delete.'};
+    if(has(/\bnotes?\b/)&&!has(/\b(today|yesterday)\b/)){const h=find(ql.replace(/.*\bnotes?\b/,''))||lastNote();return h?{text:`Delete the note "${h.n.title}"?`,yes:'Delete note',run(){delNote(h.s.id,h.i);return'The note is deleted.'}}:{text:'I could not find that note.'}}
+    if(has(/\b(today|yesterday)\b/)){const y=has(/\byesterday\b/),t=day0(Date.now())-(y?864e5:0),n=sessions.filter(x=>day0(x.at)===t).length;
+      return n?{text:`Delete ${plural(n,'session')} from ${y?'yesterday':'today'}?`,yes:'Delete',run(){keepUndo();sessions=sessions.filter(x=>day0(x.at)!==t);opened=null;persist();redraw();return'Deleted.'}}:{text:`Nothing was recorded ${y?'yesterday':'today'}.`}}
+    const h=has(/\b(this|last|latest|current|that)\b/)?null:find(ql),target=h?h.s:cur;
+    return target?{text:`Delete "${target.title}" and its ${plural(target.notes.length,'note')}?`,yes:'Delete session',run(){delSession(target.id);return'The session is deleted.'}}:{text:'There is nothing to delete.'}}
+  if(m=q.match(/\b(?:rename|retitle|call)\b\s*(.*?)\s*\b(?:to|as)\b\s+["“']?(.+?)["”']?\s*$/i)){const name=m[2].trim().slice(0,90),what=m[1].toLowerCase();
+    if(/\bnote\b/.test(what)){const h=find(what.replace(/.*\bnote\b/,''))||lastNote();if(!h)return{text:'I could not find that note.'};keepUndo();h.n.title=name;persist();redraw();return{text:`The note is now called "${name}".`,undo:true}}
+    if(!cur)return{text:'There is no session to rename yet.'};keepUndo();cur.title=name;persist();redraw();return{text:`The session is now called "${name}".`,undo:true}}
+  const look=has(/\b(mode|theme|switch|make|turn|go|use|it|set|change)\b/);
+  if(look&&has(/\b(dark|night)\b/)){cfg.theme='dark';saveCfg();applyTheme('dark');return{text:'The dark theme is on.'}}
+  if(look&&has(/\b(light|bright|day)\b/)){cfg.theme='light';saveCfg();applyTheme('light');return{text:'The light theme is on.'}}
+  if(look&&(m=ql.match(/\b(green|blue|orange|red|ember)\b/))){const p={orange:'ember',red:'ember'}[m[1]]||m[1];cfg.palette=p;saveCfg();applyPalette(p);return{text:`The ${m[1]} palette is on.`}}
+  if(has(/\bglance/)&&(m=ql.match(/(\d+)\s*(?:s\b|sec|second)/))){cfg.glance=Math.max(5,Math.min(60,+m[1]));saveCfg();renderSetup();renderSettings();return{text:`A glance is now anything under ${cfg.glance} seconds.`}}
+  if(has(/\b(use|switch|write|change)\b/)&&has(/\bclaude\b/)){cfg.engine='claude';saveCfg();renderSetup();renderSettings();renderSide();return{text:cfg.key?'Claude writes the notes now.':'Claude is selected. It needs your API key in Settings before it can write.'}}
+  if(has(/\b(use|switch|write|change)\b/)&&has(/\b(laptop|device|offline|local)\b/)){cfg.engine='device';saveCfg();renderSetup();renderSettings();renderSide();return{text:'This laptop writes the notes now. Nothing leaves it.'}}
+  if(m=ql.match(/\b(open|go to|show me|take me to)\b.*\b(home|notes|recap|settings)\b/)){const v=m[2];setTimeout(()=>{opened=null;go(v)},300);return{text:`Opening ${v[0].toUpperCase()+v.slice(1)}.`}}
+  if(has(/\b(start|begin)\b.*\bsession\b/)){startReal();return{text:'Pick the screen to share in the browser prompt.'}}
+  if(has(/\b(play|run|start|show)\b.*\bsample\b/)){startDemo();return{text:'Playing the sample.'}}
+  return null}
 function askLocal(q){
   const ql=q.toLowerCase(),t0=day0(Date.now()),yest=/yesterday/.test(ql),today=/today|so far|just now/.test(ql),wk=/week/.test(ql);
   const pool=yest?sessions.filter(s=>day0(s.at)===t0-864e5):today?sessions.filter(s=>day0(s.at)===t0):wk?sessions.filter(s=>t0-day0(s.at)<7*864e5):sessions,span=yest?'yesterday':today?'today':wk?'this week':'so far';
@@ -1257,7 +1300,9 @@ function askLocal(q){
   if(kw.length&&!/\b(do|did|done|work|worked|working|learn|learned)\b/.test(ql))return{text:`Your notes ${span} do not mention that.`,refs:pool.slice(0,3)};
   return{text:`${span[0].toUpperCase()+span.slice(1)}: ${[...new Set(pool.map(s=>s.title))].slice(0,3).join('; ')}. ${dur(focus)} of focus, ${plural(notes.length,'note')}, ${plural(gl.length,'glance')} left out.`,refs:pool.slice(0,3)}}
 const askClaude=q=>claude([{type:'text',text:`These are someone's own notes, taken automatically from their screen, newest first.\n\n${sessions.slice(0,12).map(s=>`## ${s.title} (${when(s.at)}, ${dur(s.focusMs)} of focus, glances left out: ${s.segs.filter(g=>g.k==='glance').map(g=>g.app||'unnamed').join(', ')||'none'})\n`+s.notes.map(n=>`### ${n.title}\n`+n.bullets.map(b=>'- '+b).join('\n')).join('\n')).join('\n\n')}\n\nTheir question: ${q}\n\nAnswer from these notes only, in at most four short sentences, in plain text. If the notes do not say, say so.`}],1200);
-async function ask(q){q=q.trim();if(!q)return;const box=$('#ask-a');box.innerHTML='<div class="wait"><i style="width:72%"></i><i style="width:48%"></i></div>';
+async function ask(q){q=q.trim();if(!q)return;const box=$('#ask-a'),act=askDo(q);
+  if(act){askPending=act.run||null;box.innerHTML=`<p>${esc(act.text)}</p>`+(act.run?`<div class="refs"><button data-ask-yes>${esc(act.yes)}</button><button data-ask-no>Keep</button></div>`:act.undo?'<div class="refs"><button data-act="undo">Undo</button></div>':'');return}
+  box.innerHTML='<div class="wait"><i style="width:72%"></i><i style="width:48%"></i></div>';
   let r=null;if(engine()==='claude'&&sessions.length)try{r={text:(await askClaude(q)).trim()}}catch(e){console.error(e)}
   r=r&&r.text?r:askLocal(q);
   box.innerHTML=`<p>${esc(r.text)}</p>${r.bullets&&r.bullets.length?`<ul>${r.bullets.map((b,i)=>`<li style="--i:${i}">${esc(b)}</li>`).join('')}</ul>`:''}${r.refs&&r.refs.length?`<div class="refs">${r.refs.map(x=>`<button data-open="${esc(x.id)}">${esc(x.title)}</button>`).join('')}</div>`:''}`}
@@ -1401,6 +1446,8 @@ function onAct(e){const b=e.target.closest('[data-act]');if(!b)return;const a=b.
   if(a==='start')startReal();else if(a==='sample')startDemo();else if(a==='pause')togglePause();else if(a==='finish')finish();else if(a==='float')openFloat(false);
   else if(a==='show'){if(S.running)showLive()}
   else if(a==='mini')toggleMini();
+  else if(a==='undo')undo();
+  else if(a==='del-session'){if(opened)delSession(opened.id)}
   else if(a==='cite')copyCite(S.cite,S.float);
   else if(a==='dismiss')show($('#notif'),false);
   else if(a==='copy'&&opened){const md=toMD(opened);(navigator.clipboard?navigator.clipboard.writeText(md):Promise.reject()).then(()=>toast('Notes copied.'),()=>toast('Copy did not work here. Use Download.'))}
@@ -1420,9 +1467,12 @@ document.addEventListener('pointerup',()=>{if(!drag)return;const d=drag;drag=nul
   else{d.g.style.transition='transform .5s cubic-bezier(.22,1,.36,1)';d.g.style.transform='none';setTimeout(()=>{d.g.remove();d.c.classList.remove('lifted')},500)}});
 document.addEventListener('click',e=>{
   if(dragged){e.preventDefault();return}
-  const g=e.target.closest('[data-go]');if(g){opened=null;return go(g.dataset.go)}
-  const o=e.target.closest('[data-open]');if(o){show($('#notif'),false);const r=sessions.find(s=>s.id===o.dataset.open);if(r)openSession(r);return}
+  const g=e.target.closest('[data-go]');if(g){opened=null;show($('#askp'),false);return go(g.dataset.go)}
+  const o=e.target.closest('[data-open]');if(o){show($('#notif'),false);show($('#askp'),false);const r=sessions.find(s=>s.id===o.dataset.open);if(r)openSession(r);return}
   const q=e.target.closest('.q button');if(q){q.setAttribute('aria-expanded',q.parentElement.classList.toggle('open'));return}
+  const dn=e.target.closest('[data-del-note]');if(dn&&opened){delNote(opened.id,+dn.dataset.delNote);return}
+  if(e.target.closest('[data-ask-yes]')){const msg=askPending?askPending():'';askPending=null;$('#ask-a').innerHTML=`<p>${esc(msg||'Done.')}</p><div class="refs"><button data-act="undo">Undo</button></div>`;return}
+  if(e.target.closest('[data-ask-no]')){askPending=null;$('#ask-a').innerHTML='<p>Kept. Nothing was deleted.</p>';return}
   const sc=e.target.closest('[data-sec]');if(sc){const t=$('#sec-'+sc.dataset.sec);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});return}
   const ci=e.target.closest('[data-cite]');if(ci&&opened){copyCite(arr(opened.sources)[+ci.dataset.cite]);return}
   const aq=e.target.closest('[data-ask]');if(aq){$('#ask-q').value=aq.dataset.ask;ask(aq.dataset.ask);return}
@@ -1432,7 +1482,7 @@ document.addEventListener('click',e=>{
   onAct(e)});
 // one key each, when nothing is being typed
 document.addEventListener('keydown',e=>{if(cfg.keys===false||e.ctrlKey||e.metaKey||e.altKey||e.repeat||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;const k=e.key.toLowerCase(),v={h:'home',n:'notes',r:'recap',',':'settings'}[k];
-  if(v){opened=null;go(v)}else if(k==='/'){e.preventDefault();opened=null;go('notes',true);$('#find').focus()}else if(k==='a'){e.preventDefault();onAct({target:$('#dock-ask')})}else if(k==='s')startReal();else if(k==='p')startDemo();else if(k==='d')toggleTheme(e)});
+  if(v){opened=null;show($('#askp'),false);go(v)}else if(k==='/'){e.preventDefault();opened=null;go('notes',true);$('#find').focus()}else if(k==='a'){e.preventDefault();onAct({target:$('#dock-ask')})}else if(k==='s')startReal();else if(k==='p')startDemo();else if(k==='d')toggleTheme(e)});
 $('#find').addEventListener('input',filterNotes);
 $('#ask').addEventListener('submit',e=>{e.preventDefault();ask($('#ask-q').value)});
 $('#ask-q').addEventListener('keydown',e=>{if(e.key==='Escape'){show($('#askp'),false);$('#dock-ask').setAttribute('aria-expanded',false);$('#dock-ask').focus()}});
