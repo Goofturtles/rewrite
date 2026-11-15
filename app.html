@@ -514,7 +514,7 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
         </div>
         <div class="card rise" style="--i:2">
           <h3>What counts as a glance</h3>
-          <p>If you leave what you are doing and come back within this time, it is a glance. It is thrown away and never read.</p>
+          <p>A visit to a social, chat, music or video app that is shorter than this is a glance: it is left out of your notes. Anything else you switch to, like another doc or an AI assistant, is kept.</p>
           <div class="rng"><b id="glance-v"></b><span>5 to 60 seconds</span></div>
           <input type="range" id="glance" min="5" max="60" step="1" aria-label="Glance length in seconds">
           <div class="field" style="margin-top:18px"><label for="sens">How different a screen must look to count as leaving</label><input type="range" id="sens" min="1" max="10" step="1"></div>
@@ -718,7 +718,7 @@ function openSeg(k,t,st){closeSeg(t);S.segs.push({k,a:t,b:null,st})}
 const focusMs=end=>S.segs.reduce((a,s)=>a+(s.k==='focus'?(s.b??end)-s.a:0),0);
 const glanceN=()=>S.segs.filter(s=>s.k==='glance').length;
 
-function reset(demo){Object.assign(S,{running:true,paused:false,finishing:false,shot:false,demo,t0:Date.now(),end:0,segs:[],notes:[],main:null,detour:null,prev:null,sig:null,off:null,queue:[],busy:false,seen:new Set(),sid:0,selfAt:0,cool:0,motion:0,stream:null,reader:null,scene:null,errMsg:''})}
+function reset(demo){Object.assign(S,{running:true,paused:false,finishing:false,shot:false,demo,t0:Date.now(),end:0,segs:[],notes:[],main:null,detour:null,prev:null,sig:null,off:null,queue:[],pending:[],busy:false,seen:new Set(),sid:0,selfAt:0,cool:0,motion:0,stream:null,reader:null,scene:null,errMsg:''})}
 function touch(st,g,now,dl){if(dl>TH.move)st.lastChange=now;st.dirty=!st.keyFine||mad(g.fine,st.keyFine)/255>TH.key}
 function step(g,now){
   const dl=S.prev?mad(g.fine,S.prev.fine)/255:0;S.motion=S.motion*.8+(dl>TH.move*2?.2:0);
@@ -727,21 +727,44 @@ function step(g,now){
   if(S.detour&&now-S.detour.start>=T().glance)promote();
   const m=S.main;
   if(S.detour){const d=S.detour;
-    if(same(g,m.ref)){S.detour=null;S.off=null;curSeg().k='glance';openSeg(m.isBreak?'break':'focus',now,m.id);touch(m,g,now,dl)}
-    else{if(!same(g,d.ref)){d.frames.length=0;d.keyFine=null}d.ref=refOf(g);touch(d,g,now,dl)}
+    if(same(g,m.ref)){endDetour();openSeg(m.isBreak?'break':'focus',now,m.id);touch(m,g,now,dl)}
+    else{if(!same(g,d.ref)){d.frames.length=0;d.keyFine=null;if(d.peeks.length<3)d.peeks.push(peek())}d.ref=refOf(g);touch(d,g,now,dl)}
   }else if(same(g,m.ref)){S.off=null;for(let i=0;i<64;i++)m.ref.hist[i]=m.ref.hist[i]*.7+g.hist[i]*.3;for(let i=0;i<324;i++)m.ref.app[i]=m.ref.app[i]*.7+g.app[i]*.3;touch(m,g,now,dl);
     const k=curSeg()?curSeg().k:'';if(k!=='focus'&&k!=='break')openSeg(m.isBreak?'break':'focus',now,m.id)
   }else if(!S.off)S.off={t:now,g};else startDetour(S.off.t,g);
   S.prev=S.sig=g}
-function startDetour(t,g){S.detour={start:t,ref:refOf(g),frames:[],dirty:true,lastChange:t,lastKeyAt:t,keyFine:null};S.off=null;openSeg('away',t,null)}
-function promote(){const d=S.detour,old=S.main;S.detour=null;if(old.frames.length)S.queue.push(old);const st=mkStretch(d.start,{app:d.ref.app,hist:d.ref.hist});Object.assign(st,{frames:d.frames,dirty:d.dirty,lastChange:d.lastChange,lastKeyAt:d.lastKeyAt,keyFine:d.keyFine});S.main=st;const sg=curSeg();sg.k='focus';sg.st=st.id}
+/* ---- what counts as a glance ----
+   Leaving your work is only a glance when the place you went is a social, chat, music, video or game app.
+   Anything else (another doc, a search, an AI assistant) is part of the work and is kept.
+   The check runs on this laptop: the screen is read for the names and tell-tale words of those apps. */
+const DISTRACT=/\b(discord|spotify|instagram|tiktok|snapchat|whatsapp|messenger|telegram|netflix|twitch|reddit|facebook|twitter|pinterest|tumblr|hulu|disney\+?|prime video|crunchyroll|soundcloud|apple music|youtube music|youtube shorts|steam|roblox|fortnite|valorant|minecraft|imessage|bereal|threads\.net|x\.com)\b/i;
+const HINTS=[/direct messages/i,/add friend/i,/\bnitro\b/i,/message [#@]/i,/your library/i,/liked songs/i,/now playing/i,/\bplaylists?\b/i,/\bfor you\b/i,/\breels\b/i,/\bstories\b/i,/what.?s happening/i,/\btrending\b/i,/\bretweet|\brepost\b/i,/\bfollowers\b/i,/\bupvote/i];
+const looksDistracting=text=>DISTRACT.test(text)||HINTS.filter(h=>h.test(text)).length>=2;
+function peek(){const k=1,c=document.createElement('canvas');c.width=Math.max(1,Math.round(last.width*k));c.height=Math.max(1,Math.round(last.height*k));c.getContext('2d').drawImage(last,0,0,c.width,c.height);return{c,tag:S.scene}}
+async function isDistraction(peeks){
+  if(!peeks||!peeks.length)return false;
+  if(S.demo)return peeks.every(p=>p.tag==='chat'||p.tag==='music');
+  try{const w=await withTimeout(loadTess(),45000,'reader');
+    for(const p of peeks){const x=p.c.getContext('2d',{willReadFrequently:true}),d=x.getImageData(0,0,p.c.width,p.c.height).data;let s=0,n=0;
+      for(let i=0;i<d.length;i+=388){s+=d[i]*.3+d[i+1]*.59+d[i+2]*.11;n++}
+      // dark apps read far better as dark text on a light page
+      if(s/n<115){x.globalCompositeOperation='difference';x.fillStyle='#fff';x.fillRect(0,0,p.c.width,p.c.height);x.globalCompositeOperation='source-over'}
+      const{data}=await withTimeout(w.recognize(p.c),30000,'reader');if(!looksDistracting(String(data.text||'')))return false}
+    return true}catch{return false}}
+// The detour is over. Until the check answers it shows as "away"; then it becomes a glance (dropped) or kept work (its frames go to the note writer).
+function endDetour(){const d=S.detour,seg=curSeg();S.detour=null;S.off=null;if(!d||!seg)return;seg.k='away';
+  const p=isDistraction(d.peeks).then(bad=>{if(bad)seg.k='glance';else{seg.k='focus';if(d.frames.length&&S.running){const st=mkStretch(d.start,{app:d.ref.app,hist:d.ref.hist});st.frames=d.frames;st.dirty=false;seg.st=st.id;S.queue.push(st)}}paint()});S.pending.push(p)}
+function startDetour(t,g){S.detour={start:t,ref:refOf(g),frames:[],dirty:true,lastChange:t,lastKeyAt:t,keyFine:null,peeks:[peek()]};S.off=null;openSeg('away',t,null)}
+function promote(){const d=S.detour,old=S.main;S.detour=null;if(old.frames.length)S.queue.push(old);const st=mkStretch(d.start,{app:d.ref.app,hist:d.ref.hist});Object.assign(st,{frames:d.frames,dirty:d.dirty,lastChange:d.lastChange,lastKeyAt:d.lastKeyAt,keyFine:d.keyFine});S.main=st;const sg=curSeg();sg.k='focus';sg.st=st.id;
+  // a long stay on a social or media app is a break, not focus, and is not written up
+  S.pending.push(isDistraction(d.peeks).then(bad=>{if(!bad)return;st.isBreak=true;st.frames.length=0;S.segs.forEach(s=>{if(s.st===st.id&&s.k==='focus')s.k='break'});paint()}))}
 function snap(st,now){const c=document.createElement('canvas');c.width=last.width;c.height=last.height;c.getContext('2d').drawImage(last,0,0);st.frames.push({t:now,c,tag:S.scene});if(st.frames.length>3)st.frames.shift();st.keyFine=S.sig.fine;st.dirty=false;st.lastKeyAt=now}
-function checkSelf(now){if(S.demo)return false;const self=document.hasFocus()||!!(S.float&&S.float.document.hasFocus());
-  if(self&&!S.selfAt){S.selfAt=now;S.off=null;if(S.main&&!S.paused){if(S.detour){curSeg().k='glance';S.detour=null}openSeg('pause',now,null)}}
+function checkSelf(now){if(S.demo||S.sim)return false;const self=document.hasFocus()||!!(S.float&&S.float.document.hasFocus());
+  if(self&&!S.selfAt){S.selfAt=now;S.off=null;if(S.main&&!S.paused){if(S.detour)endDetour();openSeg('pause',now,null)}}
   else if(!self&&S.selfAt){S.selfAt=0;S.prev=S.sig=null}
   return self}
 function onFrame(src,w,h){const now=Date.now();if(S.paused||S.finishing||checkSelf(now))return;
-  const k=Math.min(1,1568/Math.max(w,h)),W=Math.round(w*k),H=Math.round(h*k);if(last.width!==W||last.height!==H){last.width=W;last.height=H}
+  const k=Math.min(1,1920/Math.max(w,h)),W=Math.round(w*k),H=Math.round(h*k);if(last.width!==W||last.height!==H){last.width=W;last.height=H}
   lx.drawImage(src,0,0,W,H);step(signature(last),now);logic(now);if(view==='session')$('#pv').getContext('2d').drawImage(last,0,0,640,360)}
 function logic(now){if(!S.running||S.paused||S.finishing||S.shot||!S.main||S.selfAt)return;const t=T();
   if(S.off&&!S.detour&&now-S.off.t>1600)startDetour(S.off.t,S.off.g);
@@ -749,7 +772,7 @@ function logic(now){if(!S.running||S.paused||S.finishing||S.shot||!S.main||S.sel
   const st=S.detour||S.main;
   if(!S.off&&S.sig){if(st.dirty&&(now-st.lastChange>=t.settle||now-st.lastKeyAt>=t.maxWait))snap(st,now);else if(!st.dirty&&st.keyFine&&now-st.lastKeyAt>=t.lazy&&mad(S.sig.fine,st.keyFine)/255>TH.lazy)snap(st,now)}
   if(S.busy||now<S.cool)return;
-  let w=S.queue.shift();if(!w){const m=S.main;if(!S.detour&&m.frames.length&&now-m.start>=t.first&&now-m.lastNoteAt>=t.every)w=m}
+  let w=S.queue.shift();if(!w){const m=S.main;if(!S.detour&&!m.isBreak&&m.frames.length&&now-m.start>=t.first&&now-m.lastNoteAt>=t.every)w=m}
   if(w){w.lastNoteAt=now;writeNote(w,w.frames.splice(0))}}
 async function pump(track){
   if(window.MediaStreamTrackProcessor){const rd=S.reader=new MediaStreamTrackProcessor({track}).readable.getReader();let lastT=0;
@@ -768,8 +791,10 @@ async function claude(content,max=8000){
   if(j.stop_reason==='refusal')throw new Error('The model declined to read this screen.');
   return(j.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('')}
 const parseJSON=s=>{const m=String(s).match(/\{[\s\S]*\}/);if(!m)throw new Error('The note writer sent back something unreadable.');return JSON.parse(m[0])};
+// Frames are kept at up to 1920 px so small text stays readable on the laptop; images sent to Claude are capped at 1568 px.
+const jpg=c=>{const k=Math.min(1,1568/Math.max(c.width,c.height));let s=c;if(k<1){s=document.createElement('canvas');s.width=Math.round(c.width*k);s.height=Math.round(c.height*k);s.getContext('2d').drawImage(c,0,0,s.width,s.height)}return s.toDataURL('image/jpeg',.8).split(',')[1]};
 async function claudeNotes(frames){
-  const imgs=frames.slice(-2).map(f=>({type:'image',source:{type:'base64',media_type:'image/jpeg',data:f.c.toDataURL('image/jpeg',.8).split(',')[1]}}));
+  const imgs=frames.slice(-2).map(f=>({type:'image',source:{type:'base64',media_type:'image/jpeg',data:jpg(f.c)}}));
   const known=S.notes.slice(-8).map(n=>'- '+n.title+': '+n.bullets.join(' | ')).join('\n')||'(none yet)';
   return parseJSON(await claude([...imgs,{type:'text',text:`These are the latest screenshots of someone's screen during a focused session, oldest first.
 
@@ -803,7 +828,7 @@ async function deviceNotes(frames){
   const notes=picked.map(x=>x.s),terms=[...new Set(notes.join(' ').match(/\b[A-Za-z]{9,}\b/g)||[])].slice(0,3);
   return{on_task:true,app:'',topic:head?head.t.replace(/[^\w\s:'-]/g,'').trim():'Screen notes',notes,terms}}
 async function sampleNotes(frames){await sleep(900);const tag=frames[frames.length-1].tag,n=SAMPLE.notes[tag];if(!n||S.seen.has(tag))return{on_task:true,notes:[]};S.seen.add(tag);return{on_task:true,...n}}
-const writer=()=>{const e=engine();return e==='none'&&S.demo?'sample':e};
+const writer=()=>{if(S.sim)return'device';const e=engine();return e==='none'&&S.demo?'sample':e};
 async function writeNote(st,frames){
   S.busy=true;paint();
   if(!opened){$$('#stream .wait').forEach(e=>e.remove());$('#stream').insertAdjacentHTML('afterbegin','<div class="card wait writing" id="writing"><span>Writing a note</span><i style="width:78%"></i><i style="width:56%"></i></div>')}
@@ -832,7 +857,8 @@ Reply with one JSON object and nothing else:
 
 /* ---- session control ---- */
 function showLive(){opened=null;go('session');sessionShell(true);$('#stream').innerHTML=S.notes.length?[...S.notes].reverse().map(n=>noteHTML(n,SAMPLE.subject)).join(''):'<div class="card wait"><span>Notes appear here as you go.</span><i style="width:72%"></i><i style="width:54%"></i></div>';paint()}
-function begin(){opened=null;go('session');sessionShell(true);$('#stream').innerHTML=`<div class="card wait"><span>${S.demo?'Watching the sample screen. The first note lands in a few seconds.':'Notes appear here as you go. Switch to your work to begin.'}</span><i style="width:72%"></i><i style="width:54%"></i><i style="width:63%"></i></div>`;show($('#pill'),true);clearInterval(S.timer);S.timer=setInterval(tick,1000);tick()}
+function begin(){opened=null;go('session');sessionShell(true);$('#stream').innerHTML=`<div class="card wait"><span>${S.demo?'Watching the sample screen. The first note lands in a few seconds.':'Notes appear here as you go. Switch to your work to begin.'}</span><i style="width:72%"></i><i style="width:54%"></i><i style="width:63%"></i></div>`;show($('#pill'),true);clearInterval(S.timer);S.timer=setInterval(tick,1000);tick();if(!S.demo)loadTess().catch(()=>{})}
+if(Q.has('sim'))addEventListener('load',()=>startSim());
 async function startReal(){
   if(S.running)return showLive();
   if(engine()==='none'){go('settings');toast('Choose who writes the notes first: paste a Claude key or pick "On this laptop".');return}
@@ -848,12 +874,20 @@ function startDemo(){if(S.running)return showLive();reset(true);
   const cv=document.createElement('canvas');cv.width=1280;cv.height=720;const cx=cv.getContext('2d');S.sceneI=0;S.scene=SAMPLE.script[0][0];S.sceneAt=Date.now();
   drawScene(cx,S.scene,0);S.demoT=setInterval(()=>drawScene(cx,S.scene,Date.now()-S.sceneAt),250);
   S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin()}
-function togglePause(){if(!S.running||S.finishing)return;const now=Date.now();S.paused=!S.paused;if(S.paused){if(S.detour){curSeg().k='glance';S.detour=null}S.off=null;if(S.main)openSeg('pause',now,null)}else{S.prev=S.sig=null;if(S.demo)S.sceneAt+=now-(S.pausedAt||now)}S.pausedAt=now;paint()}
+/* Test run (?sim=1): a made-up desktop goes through the real on-laptop pipeline at real timings,
+   document, an AI assistant, the document, a chat app, another document, a music app, the document. */
+const SIMSCRIPT=[['doc1',16000],['ai',7000],['doc1',10000],['chat',6000],['doc2',16000],['music',5000],['doc2',13000]];
+function startSim(){if(S.running)return;reset(false);S.sim=true;
+  const cv=document.createElement('canvas');cv.width=1280;cv.height=720;const cx=cv.getContext('2d');S.sceneI=0;S.scene=SIMSCRIPT[0][0];S.sceneAt=Date.now();
+  drawScene(cx,S.scene,0);S.demoT=setInterval(()=>drawScene(cx,S.scene,Date.now()-S.sceneAt),250);
+  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions}}}
+function togglePause(){if(!S.running||S.finishing)return;const now=Date.now();S.paused=!S.paused;if(S.paused){if(S.detour)endDetour();S.off=null;if(S.main)openSeg('pause',now,null)}else{S.prev=S.sig=null;if(S.demo)S.sceneAt+=now-(S.pausedAt||now)}S.pausedAt=now;paint()}
 async function finish(){
   if(!S.running||S.finishing)return;S.finishing=true;const now=Date.now();stopCapture();
-  if(S.detour){curSeg().k='glance';S.detour=null}closeSeg(now);S.end=now;paint();
+  if(S.detour)endDetour();closeSeg(now);S.end=now;paint();
   while(S.busy)await sleep(150);
-  if(S.main&&S.main.frames.length)S.queue.push(S.main);
+  await Promise.allSettled(S.pending);   // let every glance check answer before the last notes are written
+  if(S.main&&S.main.frames.length&&!S.main.isBreak)S.queue.push(S.main);
   while(S.queue.length){const st=S.queue.shift();await writeNote(st,st.frames.splice(0))}
   const sum=await summarize();
   const rec={id:'s'+S.t0,at:S.t0,dur:S.end-S.t0,focusMs:focusMs(S.end),glances:glanceN(),title:String(sum.title||'Session notes'),subject:String(sum.subject||'General'),takeaways:arr(sum.takeaways).map(String),quiz:arr(sum.quiz).filter(q=>q&&q.q).map(q=>({q:String(q.q),a:String(q.a||'')})),notes:S.notes,segs:S.segs.map(s=>({k:s.k,a:s.a-S.t0,b:(s.b??S.end)-S.t0})),engine:writer(),sample:S.demo};
@@ -873,10 +907,10 @@ function paint(){if(!S.running)return;const st=pillState(),now=S.end||Date.now()
   ribbon($('#ribbon'),S.segs,now);$('#axis-end').textContent=clock(now-S.t0);$('#k-focus').textContent=f;$('#k-notes').textContent=S.notes.length;$('#k-gl').textContent=glanceN();
   const hp=$('#hd-pause');if(hp)hp.innerHTML=ic(S.paused?'play':'pause')+(S.paused?'Resume':'Pause');
   $('#see').classList.toggle('away',!!S.detour);
-  $('#now').textContent=st==='ready'?'Waiting for you to switch to your work. Time spent in this tab is not counted.':st==='away'?`Looking away for ${Math.round((now-S.detour.start)/1000)} s. Back within ${Math.round(T().glance/1000)} s and it will not count.`:st==='paused'?'Paused. Nothing is being read.':st==='finishing'?'Writing the last notes and the summary.':S.main&&S.main.label?'Reading: '+S.main.label:'Reading along.';
+  $('#now').textContent=st==='ready'?'Waiting for you to switch to your work. Time spent in this tab is not counted.':st==='away'?`Somewhere else for ${Math.round((now-S.detour.start)/1000)} s. Social, chat, music and video apps are left out of your notes; anything else is kept.`:st==='paused'?'Paused. Nothing is being read.':st==='finishing'?'Writing the last notes and the summary.':S.main&&S.main.label?'Reading: '+S.main.label:'Reading along.';
   if(DEBUG&&S.sig&&S.main){const d=$('#diag');d.hidden=false;d.textContent=`app ${mad(S.sig.app,S.main.ref.app).toFixed(3)} / ${(TH.app*sensK()).toFixed(3)}\ntabs ${topk(S.sig.app,S.main.ref.app).toFixed(3)} / ${(TH.tab*sensK()).toFixed(3)}   motion ${S.motion.toFixed(2)}\nhist ${hd(S.sig.hist,S.main.ref.hist).toFixed(3)} / ${(TH.hist*sensK()).toFixed(3)}\nfine ${S.main.keyFine?(mad(S.sig.fine,S.main.keyFine)/255).toFixed(4):'-'} / ${TH.key}\nframes ${S.main.frames.length} queue ${S.queue.length} writer ${writer()}`}}
 function tick(){if(!S.running)return;const now=Date.now();
-  if(S.demo&&!S.paused&&!S.finishing&&!S.shot){const sc=SAMPLE.script[S.sceneI];if(now-S.sceneAt>=sc[1]){if(++S.sceneI>=SAMPLE.script.length){finish();return}S.scene=SAMPLE.script[S.sceneI][0];S.sceneAt=now}}
+  if((S.demo||S.sim)&&!S.paused&&!S.finishing&&!S.shot){const script=S.sim?SIMSCRIPT:SAMPLE.script,sc=script[S.sceneI];if(now-S.sceneAt>=sc[1]){if(++S.sceneI>=script.length){finish();return}S.scene=script[S.sceneI][0];S.sceneAt=now}}
   if(!S.paused&&!S.finishing&&!S.shot)checkSelf(now);logic(now);paint()}
 async function openFloat(auto,pre){
   if(!('documentPictureInPicture' in window)){if(!auto)toast('The floating indicator needs Chrome or Edge on a computer.');return}
@@ -896,9 +930,11 @@ function drawScene(c,id,t){
   const blink=Math.floor(t/500)%2,d=SAMPLE.docs[id];
   if(id==='doc1'||id==='doc2'){R(0,0,W,H,'#F1F3F4');R(0,0,W,44,'#DEE1E6');R(12,8,270,36,'#FFFFFF',10);Tx(d.tab,28,31,'500 13px system-ui','#3C4043');R(0,44,W,44,'#FFFFFF');R(96,52,820,28,'#F1F3F4',14);Tx('docs.school.example/unit-3-notes',116,71,'13px system-ui','#5F6368');R(0,88,W,1,'#DADCE0');R(220,112,840,H,'#FFFFFF',4);
     let y=186;Tx(d.h,290,y,'600 34px Georgia','#202124');y+=56;for(const p of d.p)y=wrap(p,290,y,700,31,'19px Georgia','#3C4043')+18;if(blink)R(290,y-24,2,24,'#1A73E8')}
-  else if(id==='chat'){R(0,0,W,H,'#313338');R(0,0,72,H,'#1E1F22');['#5865F2','#3BA55D','#FAA61A','#ED4245','#4E5058','#4E5058'].forEach((f,i)=>dot(36,48+i*60,22,f));R(72,0,240,H,'#2B2D31');Tx('Study group',92,36,'600 16px system-ui','#F2F3F5');['general','homework','memes','voice'].forEach((n,i)=>Tx('# '+n,96,86+i*34,'15px system-ui',i?'#949BA4':'#FFFFFF'));Tx('# general',336,36,'600 16px system-ui','#F2F3F5');R(312,56,W-312,1,'#26272B');
+  else if(id==='chat'){R(0,0,W,H,'#313338');R(0,0,72,H,'#1E1F22');['#5865F2','#3BA55D','#FAA61A','#ED4245','#4E5058','#4E5058'].forEach((f,i)=>dot(36,48+i*60,22,f));R(72,0,240,H,'#2B2D31');Tx('Discord',W-92,20,'600 12px system-ui','#949BA4');Tx('Study group',92,36,'600 16px system-ui','#F2F3F5');['general','homework','memes','voice'].forEach((n,i)=>Tx('# '+n,96,86+i*34,'15px system-ui',i?'#949BA4':'#FFFFFF'));Tx('# general',336,36,'600 16px system-ui','#F2F3F5');R(312,56,W-312,1,'#26272B');
     [['Jordan','are we still meeting at 4?'],['Priya','yes, library second floor'],['Jordan','bring the chem worksheet pls'],['Priya','ok']].forEach((m,i)=>{const y=110+i*76;dot(352,y,20,i%2?'#3BA55D':'#5865F2');Tx(m[0],386,y-4,'600 15px system-ui','#F2F3F5');Tx(m[1],386,y+20,'15px system-ui','#DBDEE1')});R(336,H-76,W-360,48,'#383A40',10);Tx('Message #general'+(blink?' |':''),356,H-46,'15px system-ui','#949BA4')}
-  else if(id==='music'){R(0,0,W,H,'#121212');R(0,0,240,H,'#000000');['Home','Search','Your Library'].forEach((n,i)=>Tx(n,28,52+i*40,'600 15px system-ui',i?'#B3B3B3':'#FFFFFF'));Tx('Made for you',272,64,'700 28px system-ui','#FFFFFF');['#8D67AB','#1E3264','#E8115B','#148A08','#BC5900'].forEach((f,i)=>{R(272+i*196,96,176,176,f,8);Tx(['Focus mix','Lo-fi beats','Top hits','Chill','Throwback'][i],272+i*196,300,'600 15px system-ui','#FFFFFF')});R(0,H-84,W,84,'#181818');dot(W/2,H-52,18,'#1ED760');R(W/2-220,H-20,440,4,'#4D4D4D',2);R(W/2-220,H-20,60+(t/50)%300,4,'#FFFFFF',2)}
+  else if(id==='ai'){R(0,0,W,H,'#FAF9F5');R(0,0,W,52,'#F0EEE6');Tx('Claude',28,33,'600 17px Georgia','#3D3929');Tx('Cell membrane question',W/2-90,33,'14px system-ui','#6B6A63');R(700,92,460,54,'#EDE9DD',14);Tx('Why can oxygen cross the membrane on its own?',724,125,'16px system-ui','#3D3929');
+    let y=196;for(const p of ['Oxygen is a small nonpolar molecule, so it dissolves in the fatty middle of the bilayer and slips straight through.','Charged or large molecules cannot do that. They need a channel or carrier protein, and pumps spend ATP to move them against the gradient.'])y=wrap(p,160,y,820,30,'18px Georgia','#3D3929')+16;R(160,H-104,960,60,'#FFFFFF',16);Tx('Reply to Claude'+(blink?' |':''),184,H-67,'16px system-ui','#8A8778')}
+  else if(id==='music'){R(0,0,W,H,'#121212');R(0,0,240,H,'#000000');['Home','Search','Your Library'].forEach((n,i)=>Tx(n,28,52+i*40,'600 15px system-ui',i?'#B3B3B3':'#FFFFFF'));['Playlists','Liked Songs'].forEach((n,i)=>Tx(n,28,196+i*36,'14px system-ui','#B3B3B3'));Tx('Made for you',272,64,'700 28px system-ui','#FFFFFF');['#8D67AB','#1E3264','#E8115B','#148A08','#BC5900'].forEach((f,i)=>{R(272+i*196,96,176,176,f,8);Tx(['Focus mix','Lo-fi beats','Top hits','Chill','Throwback'][i],272+i*196,300,'600 15px system-ui','#FFFFFF')});R(0,H-84,W,84,'#181818');dot(W/2,H-52,18,'#1ED760');R(W/2-220,H-20,440,4,'#4D4D4D',2);R(W/2-220,H-20,60+(t/50)%300,4,'#FFFFFF',2)}
   else{R(0,0,W,H,'#0F0F0F');R(420,12,440,30,'#222222',15);Tx('Search',440,32,'14px system-ui','#AAAAAA');R(24,64,860,484,'#16324F',10);Tx(d.h,64,150,'600 36px system-ui','#FFFFFF');d.p.forEach((p,i)=>Tx('•  '+p,72,226+i*64,'24px system-ui','#DCE9F5'));R(24,542,860,6,'#3A3A3A',3);R(24,542,200+(t/40)%600,6,'#FF4E45',3);Tx('Biology 101, Lecture 7',24,592,'600 20px system-ui','#FFFFFF');for(let i=0;i<5;i++){R(908,64+i*104,160,92,'#272727',8);R(1080,72+i*104,170,12,'#3A3A3A',6);R(1080,96+i*104,110,10,'#2C2C2C',5)}}}
 
 /* ================= SETTINGS ================= */
