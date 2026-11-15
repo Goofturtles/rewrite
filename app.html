@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1280">
-<meta name="build" content="1794768782">
+<meta name="build" content="1794768958">
 <title>Rewrite</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%23528200'/%3E%3Cpath d='M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18' fill='none' stroke='%23fff' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://api.fontshare.com">
@@ -28,7 +28,7 @@
   color-scheme:dark;
 }
 :root[data-theme="light"]{
-  --ink:var(--deep);--ink2:rgba(var(--deep-rgb),.78);--ink3:rgba(var(--deep-rgb),.6);--ink4:rgba(var(--deep-rgb),.26);
+  --ink:var(--deep);--ink2:rgba(var(--deep-rgb),.78);--ink3:rgba(var(--deep-rgb),.67);--ink4:rgba(var(--deep-rgb),.26);
   --line:rgba(var(--deep-rgb),.14);--line2:rgba(var(--deep-rgb),.075);
   --wash:rgba(var(--deep-rgb),.04);--wash2:rgba(var(--deep-rgb),.075);--track:rgba(var(--deep-rgb),.13);
   --card:#fff;--card-b:rgba(var(--deep-rgb),.09);--page:#F6F7FB;
@@ -53,6 +53,7 @@
 *{box-sizing:border-box}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
 :focus-visible{outline:2px solid currentColor;outline-offset:3px;border-radius:10px}
+.btn.dark:focus-visible,.dock button:focus-visible,.segs .on:focus-visible,.segc .on:focus-visible,.ask-go:focus-visible{outline-color:var(--ink)}
 </style>
 <style id="pill-css">
 .pill{display:flex;align-items:center;gap:12px;height:52px;padding:0 9px;border-radius:999px;background:var(--night);color:#F5F6FF;font:500 14px/1.3 var(--ui);box-shadow:inset 0 0 0 1px rgba(255,255,255,.15),0 26px 54px -18px rgba(0,0,0,.85)}
@@ -165,7 +166,7 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 /* cards: flat surfaces with a hairline */
 .card{position:relative;border-radius:26px;padding:20px 22px;background:var(--card);box-shadow:inset 0 0 0 1px var(--card-b)}
 .card.ink{background:var(--night);color:#F5F6FF;--ink:#F5F6FF;--ink2:rgba(245,246,255,.76);--ink3:rgba(245,246,255,.58);--track:rgba(255,255,255,.15)}
-.card.cream{color:var(--deep);--ink:var(--deep);--ink2:rgba(var(--deep-rgb),.78);--ink3:rgba(var(--deep-rgb),.62);--ink4:rgba(var(--deep-rgb),.3);--line:rgba(var(--deep-rgb),.15);--line2:rgba(var(--deep-rgb),.08);--wash2:rgba(var(--deep-rgb),.08);--track:rgba(var(--deep-rgb),.14);--hl:rgba(var(--blue-rgb),.24);background:#F2EEE1;box-shadow:none}
+.card.cream{color:var(--deep);--ink:var(--deep);--ink2:rgba(var(--deep-rgb),.78);--ink3:rgba(var(--deep-rgb),.67);--ink4:rgba(var(--deep-rgb),.3);--line:rgba(var(--deep-rgb),.15);--line2:rgba(var(--deep-rgb),.08);--wash2:rgba(var(--deep-rgb),.08);--track:rgba(var(--deep-rgb),.14);--hl:rgba(var(--blue-rgb),.24);background:#F2EEE1;box-shadow:none}
 .card.peri2{background:rgba(var(--peri-rgb),.2)}
 .lift{transition:transform .5s var(--ease)}
 .lift:hover{transform:translateY(-3px)}
@@ -306,6 +307,7 @@ kbd{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 
 .askp form{display:flex;align-items:center;gap:8px;height:50px;padding:0 6px 0 16px;border-radius:16px;background:var(--wash2)}
 .askp input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:16px;color:var(--ink)}
 .askp input::placeholder{color:var(--ink3)}
+.askp form:focus-within{box-shadow:inset 0 0 0 1.5px var(--ink3)}
 .ask-go{width:38px;height:38px;border-radius:12px;background:var(--ink);color:var(--page);display:grid;place-items:center;flex:none;transition:transform .35s var(--spring)}
 .ask-go:hover{transform:translateX(2px)}
 .ask-go svg{width:16px;height:16px}
@@ -479,7 +481,7 @@ mark{color:var(--ink);padding:0 3px;margin:0 -3px;border-radius:5px;background:l
 .field{display:grid;gap:6px;margin-top:12px}
 .field label{font:500 12.5px/1.4 var(--ui);color:var(--ink3)}
 .input{height:46px;border-radius:14px;border:1px solid var(--ink4);background:var(--field);padding:0 14px;font:inherit;color:var(--ink);outline:none;width:100%;transition:border-color .25s,box-shadow .25s}
-.input:focus{border-color:var(--peri);box-shadow:0 0 0 4px rgba(var(--peri-rgb),.22)}
+.input:focus{border-color:var(--ink);box-shadow:0 0 0 4px rgba(var(--peri-rgb),.3)}
 .inline{display:flex;gap:8px}
 input[type=range]{accent-color:var(--hot);width:100%;height:28px}
 .status{font-size:13px;margin:10px 0 0;color:var(--ink3);min-height:20px;line-height:1.5}
@@ -532,7 +534,7 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
     <button class="brand" data-go="home" data-el="wordmark" aria-label="Rewrite, home">rewrite</button>
     <nav class="tabs" id="navs" aria-label="Main"><span class="nav-ind" id="nav-ind"></span>
       <button class="nav on" data-go="home" data-el="nav-row">Home</button>
-      <button class="nav" data-go="notes" data-el="nav-row">Notes<em id="n-count">0</em></button>
+      <button class="nav" data-go="notes" data-el="nav-row">Notes <em id="n-count">0</em></button>
       <button class="nav" data-go="recap" data-el="nav-row">Recap</button>
       <button class="nav" data-go="settings" data-el="nav-row">Settings</button>
     </nav>
@@ -623,7 +625,7 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
         </div>
         <div class="card rise" style="--i:5">
           <h3>Shortcuts</h3>
-          <p>One key each, when you are not typing.</p>
+          <p>One key each, when you are not typing. <span class="segs" id="keys-sw" role="group" aria-label="Shortcuts" style="display:inline-flex;vertical-align:middle;margin-left:6px"><button data-keys="1">On</button><button data-keys="0">Off</button></span></p>
           <div class="keys" data-el="shortcuts"><span><kbd>S</kbd>Start</span><span><kbd>P</kbd>Sample</span><span><kbd>H</kbd>Home</span><span><kbd>N</kbd>Notes</span><span><kbd>R</kbd>Recap</span><span><kbd>/</kbd>Search</span><span><kbd>A</kbd>Ask</span><span><kbd>,</kbd>Settings</span><span><kbd>D</kbd>Dark</span></div>
         </div>
         </div>
@@ -737,7 +739,7 @@ const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 const cfg=Object.assign({engine:'device',key:'',model:'claude-opus-5-5',glance:20,sens:5},load(LS.cfg,{}));   // works out of the box on the laptop; a Claude key is an upgrade
 const saveCfg=()=>save(LS.cfg,cfg);
 function seed(){const now=Date.now();return SEED.map(s=>{const x=new Date(now-s.d*864e5);x.setHours(s.h,s.m,0,0);const segs=mkSegs(s.focus,s.glances,s.d+3);return{id:'seed'+s.d,at:+x,dur:segs[segs.length-1].b,focusMs:s.focus*60e3,glances:s.glances,title:s.title,subject:s.subject,takeaways:s.takeaways,quiz:s.quiz||[],segs,sample:true,engine:'claude',notes:s.notes.map((n,i)=>({t:(i+1)*s.focus*60e3/(s.notes.length+1),...n}))}})}
-let sessions=DEMO?seed():load(LS.ses,[]);
+let sessions=DEMO?seed():arr(load(LS.ses,[])).filter(x=>x&&Array.isArray(x.notes)&&Array.isArray(x.segs)).map(x=>({takeaways:[],quiz:[],glances:0,focusMs:0,title:'Session notes',...x}));
 const persist=()=>{if(!DEMO)save(LS.ses,sessions.filter(s=>!s.sample))};
 const subOf=(s,n)=>n.subject||s.subject||'General';
 const subjects=()=>[...new Set(sessions.flatMap(s=>[s.subject||'General',...s.notes.map(n=>n.subject).filter(Boolean)]))];
@@ -759,7 +761,7 @@ function tiles(el,w,base){const cur=w[6],sum=k=>w.reduce((a,d)=>a+d[k],0);const 
   el.innerHTML=`<div class="card strip s12 rise" style="--i:${base}" data-el="stat-strip">${T.map((t,i)=>{const mx=Math.max(1,...w.map(d=>d[t.k]));return `<div class="scell" data-el="stat-tile"><span class="lab">${t.l}</span><div class="num" data-n="${i}"></div><div class="sub">${t.s}</div><div class="spark">${w.map((d,j)=>`<i class="${d.today?'hi':''}" style="--h:${Math.max(6,d[t.k]/mx*100)};--i:${j}"></i>`).join('')}</div></div>`}).join('')}</div>`;
   T.forEach((t,i)=>countUp($(`[data-n="${i}"]`,el),t.v,t.f))}
 const ribS=s=>`<div class="rib-s">${s.segs.map(g=>`<i class="${g.k}" style="--w:${Math.max(1,Math.round((g.b-g.a)/1000))}"></i>`).join('')}</div>`;
-const rowHTML=(s,i)=>`<button class="row rise" style="--i:${i}" data-open="${esc(s.id)}" data-el="session-row"><span class="tok" style="--c:${colorOf(s.subject||'General')}"></span><span><h3>${esc(s.title)}</h3><p>${esc(s.subject||'General')} · ${when(s.at)} · ${dur(s.focusMs)} focus · ${s.notes.length} notes</p></span>${ribS(s)}${ic('arrow')}</button>`;
+const rowHTML=(s,i)=>`<button class="row rise" style="--i:${i}" data-open="${esc(s.id)}" data-el="session-row"><span class="tok" style="--c:${colorOf(s.subject||'General')}"></span><span><h3>${esc(s.title)}</h3><p>${esc(s.subject||'General')} · ${when(s.at)} · ${dur(s.focusMs)} focus · ${plural(s.notes.length,'note')}</p></span>${ribS(s)}${ic('arrow')}</button>`;
 // striped bars with a hot cap; today's bar is the highlighted one and carries the tooltip
 const barsHTML=w=>{const mx=Math.max(1,...w.map(d=>d.focus));return w.map((d,i)=>`<div class="sbar ${d.today?'t':''}" data-el="bar"><div class="plot" style="--h:${d.focus?Math.max(5,d.focus/mx*92):1.5};--i:${i}">${d.today&&d.focus?`<span class="tip"><small>Today</small>${dur(d.focus)}</span>`:''}<div class="bcol"></div></div><span>${d.label}</span></div>`).join('')};
 
@@ -847,7 +849,7 @@ function openSession(r){opened=r;go('session');sessionShell(false,r);
   const who={claude:'Claude',device:'This laptop',sample:'Scripted sample',none:'Nobody'}[r.engine]||'Claude';
   $('#facts').innerHTML=[['Started',new Date(r.at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})],['Length',dur(r.dur)],['Written by',who]].map(([a,b])=>`<div><dt>${a}</dt><dd>${esc(b)}</dd></div>`).join('');
 }
-function toMD(r){const L=[`# ${r.title}`,'',`${new Date(r.at).toLocaleString()} · ${dur(r.focusMs)} of focus · ${r.glances} glances ignored`,''];if(r.takeaways.length)L.push('## What you learned','',...r.takeaways.map(t=>'- '+t),'');L.push('## Notes','');r.notes.forEach(n=>L.push(`### ${n.title}`,...n.bullets.map(b=>'- '+b),''));if(r.quiz.length){L.push('## Check yourself','');r.quiz.forEach((q,i)=>L.push(`${i+1}. ${q.q}`,`   - ${q.a}`))}return L.join('\n')}
+function toMD(r){const L=[`# ${r.title}`,'',`${new Date(r.at).toLocaleString()} · ${dur(r.focusMs)} of focus · ${plural(r.glances,'glance')} left out`,''];if(r.takeaways.length)L.push('## What you learned','',...r.takeaways.map(t=>'- '+t),'');L.push('## Notes','');r.notes.forEach(n=>L.push(`### ${n.title}`,...n.bullets.map(b=>'- '+b),''));if(r.quiz.length){L.push('## Check yourself','');r.quiz.forEach((q,i)=>L.push(`${i+1}. ${q.q}`,`   - ${q.a}`))}return L.join('\n')}
 
 /* ================= ENGINE ================= */
 const S={running:false,float:null};
@@ -1178,7 +1180,7 @@ function askLocal(q){
   if(!pool.length)return{text:sessions.length?`Nothing was recorded ${span}.`:'There is nothing to look through yet. Start a session, or play the sample, and ask again.'};
   const focus=pool.reduce((a,s)=>a+s.focusMs,0),notes=pool.flatMap(s=>s.notes.map(n=>({n,s}))),gl=pool.flatMap(s=>s.segs.filter(g=>g.k==='glance'));
   if(/glance|distract|left out|ignored|skipp/.test(ql)||APPS.some(a=>ql.includes(a.toLowerCase()))){const by={};gl.forEach(g=>{const k=g.app||'Unnamed';by[k]=(by[k]||0)+1});
-    return{text:gl.length?`${plural(gl.length,'glance')} left out ${span}: ${Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([a,n])=>a+' '+n+' times').join(', ')}. None of it reached your notes.`:`Nothing was left out ${span}.`}}
+    return{text:gl.length?`${plural(gl.length,'glance')} left out ${span}: ${Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([a,n])=>a+' '+(n===1?'once':n+' times')).join(', ')}. None of it reached your notes.`:`Nothing was left out ${span}.`}}
   if(/how long|how much|focus|minutes|hours|time/.test(ql))return{text:`You focused for ${dur(focus)} ${span}, over ${plural(pool.length,'session')}, and ${plural(notes.length,'note')} came out of it.`,refs:pool.slice(0,3)};
   const skip=new Set('what whats did does was were are the and for with about from that this have has had you your mine tell show give notes note learn learned learnt work worked working doing done today yesterday week much many long know say said'.split(' '));
   const kw=(ql.match(/[a-z0-9']{3,}/g)||[]).filter(w=>!skip.has(w));
@@ -1258,14 +1260,15 @@ void main(){
   float m=max(smoothstep(.84,1.,uv.y),1.-I);             // it rises out of the page: mist at the bottom, and all of it while loading
   gl_FragColor=vec4(mix(col,PG,m),1.);
 }`;
-  function size(){const r=host.getBoundingClientRect(),k=Math.min(devicePixelRatio||1,1.25)*q,w=Math.max(2,Math.round(r.width*k)),h=Math.max(2,Math.round(r.height*k));
+  function size(){const r=host.getBoundingClientRect();if(r.width<4)return;   // hidden: keep the last size
+    const k=Math.min(devicePixelRatio||1,1.25)*q,w=Math.max(2,Math.round(r.width*k)),h=Math.max(2,Math.round(r.height*k));
     if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;gl.viewport(0,0,w,h)}
     // the render is 16:9 and fills the width; the ridge is kept about a third of the way down
     const sv=Math.min(1,h/w*img.width/img.height),v0=Math.max(0,Math.min(1-sv,.345-.36*sv));gl.uniform4f(U.F,v0,sv,v0+.36*sv,0);gl.uniform2f(U.R,w,h)}
   function draw(t){gl.uniform1f(U.T,t);gl.uniform2f(U.P,ptr[0],ptr[1]);gl.uniform1f(U.V,vel);gl.uniform1f(U.N,night);gl.uniform1f(U.I,inn);gl.uniform1f(U.G,gr);gl.uniform1f(U.S,Math.min(.06,scrollY*.00005));gl.drawArrays(gl.TRIANGLES,0,3)}
   function frame(now){raf=0;if(!ready||view!=='home'||document.hidden){last=prevT=0;return}
     // if the first second of frames is slow, draw fewer pixels (once or twice) rather than stutter
-    if(last&&q>.5){seen++;if(now-last>24)slow++;if(seen===50){if(slow>18){q*=.72;size()}seen=slow=0}}last=now;
+    if(last&&q>.5){seen++;if(now-last>40)slow++;if(seen===50){if(slow>18){q*=.72;size()}seen=slow=0}}last=now;
     const dt=Math.min(.05,(now-(prevT||now))/1000);prevT=now;const k=r=>1-Math.exp(-dt*r),dx=aim[0]-ptr[0],dy=aim[1]-ptr[1];
     ptr[0]+=dx*k(4.5);ptr[1]+=dy*k(4.5);vel+=(Math.min(1,Math.hypot(dx,dy)*9)-vel)*k(5);night+=(tgt-night)*k(2.8);inn+=(1-inn)*k(1.9);if(inn>.6)gr+=(tgr-gr)*k(.8);
     const cl=v=>Math.max(-.5,Math.min(.5,v-.5)).toFixed(4);host.style.setProperty('--px',cl(ptr[0]));host.style.setProperty('--py',cl(ptr[1]));
@@ -1277,7 +1280,7 @@ void main(){
     gl.uniform3f(U.TI,...(pal==='ember'?[1.13,.95,.72]:pal==='blue'?[.80,.92,1.12]:[1,1,1]));gl.uniform3f(U.HZ,...(pal==='ember'?[.99,.86,.72]:pal==='blue'?[.78,.85,.97]:[.83,.89,.93]));
     if(STILL){night=tgt;gr=tgr;draw(8)}}
   // how grown the field is, 0 to 1; it eases there, so new focus is seen arriving
-  function grow(v){tgr=v;if(ready&&STILL){gr=v;draw(8)}}
+  function grow(v){tgr=v;if(!ready)return;size();if(STILL){gr=v;draw(8)}}   // Home calls this every time it is shown, so the canvas is measured while it is visible
   function init(){
     try{gl=cv.getContext('webgl',{alpha:false,antialias:false,powerPreference:'low-power'})}catch{}
     if(!gl)return;
@@ -1306,7 +1309,7 @@ function renderSettings(){renderSide();
   const seg=$('#engine'),on=$(`[data-engine="${cfg.engine}"]`,seg);$$('button',seg).forEach(b=>{b.classList.toggle('on',b===on);b.setAttribute('aria-pressed',b===on)});const th=$('.thumb',seg);th.style.width=on.offsetWidth+'px';th.style.transform=`translateX(${on.offsetLeft}px)`;
   $('#pane-claude').classList.toggle('on',cfg.engine==='claude');$('#pane-device').classList.toggle('on',cfg.engine==='device');
   $('#key').value=cfg.key;$('#model').innerHTML=Object.entries(MODELS).map(([k,v])=>`<option value="${k}"${k===cfg.model?' selected':''}>${v}</option>`).join('');
-  $('#glance').value=cfg.glance;$('#glance-v').textContent=cfg.glance+' s';$('#sens').value=cfg.sens;$('#apps').innerHTML=APPS.map(a=>`<span>${a}</span>`).join('')}
+  $$('#keys-sw button').forEach(b=>{const on=(cfg.keys!==false)===(b.dataset.keys==='1');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});$('#glance').value=cfg.glance;$('#glance-v').textContent=cfg.glance+' s';$('#sens').value=cfg.sens;$('#apps').innerHTML=APPS.map(a=>`<span>${a}</span>`).join('')}
 async function testKey(){const st=$('#key-status');if(!cfg.key){st.className='status err';st.textContent='Paste a key first.';return}st.className='status';st.textContent='Checking the key...';
   try{await claude([{type:'text',text:'Reply with the single word: ready'}],256);st.className='status ok';st.textContent='The key works. Notes will be written by '+MODELS[cfg.model]+'.'}catch(e){st.className='status err';st.textContent=String(e.message||e)}}
 
@@ -1324,7 +1327,7 @@ function toggleTheme(e){const next=root.dataset.theme==='dark'?'light':'dark';cf
 
 /* ================= EVENTS ================= */
 function onAct(e){const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
-  if(a==='ask'){const p=$('#askp'),on=!p.classList.contains('on');show(p,on);if(on)setTimeout(()=>$('#ask-q').focus(),60);return}
+  if(a==='ask'){const p=$('#askp'),on=!p.classList.contains('on');show(p,on);$('#dock-ask').setAttribute('aria-expanded',on);if(on)setTimeout(()=>$('#ask-q').focus(),60);return}
   if(a==='theme')return toggleTheme(e);
   if(a==='pal'){cfg.palette=b.dataset.pal;saveCfg();return applyPalette(cfg.palette)}
   if(a==='start')startReal();else if(a==='sample')startDemo();else if(a==='pause')togglePause();else if(a==='finish')finish();else if(a==='float')openFloat(false);
@@ -1353,14 +1356,15 @@ document.addEventListener('click',e=>{
   const q=e.target.closest('.q button');if(q){q.setAttribute('aria-expanded',q.parentElement.classList.toggle('open'));return}
   const aq=e.target.closest('[data-ask]');if(aq){$('#ask-q').value=aq.dataset.ask;ask(aq.dataset.ask);return}
   const en=e.target.closest('[data-engine]');if(en){cfg.engine=en.dataset.engine;saveCfg();renderSettings();renderSetup();renderSide();if(view==='home'&&engine()==='none'){go('settings');toast('Paste your Claude key here, or switch back to "On this laptop".')}return}
+  const ks=e.target.closest('[data-keys]');if(ks){cfg.keys=ks.dataset.keys==='1';saveCfg();renderSettings();return}
   const gl=e.target.closest('[data-glance]');if(gl){cfg.glance=+gl.dataset.glance;saveCfg();renderSetup();return}
   onAct(e)});
 // one key each, when nothing is being typed
-document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;const k=e.key.toLowerCase(),v={h:'home',n:'notes',r:'recap',',':'settings'}[k];
+document.addEventListener('keydown',e=>{if(cfg.keys===false||e.ctrlKey||e.metaKey||e.altKey||e.repeat||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;const k=e.key.toLowerCase(),v={h:'home',n:'notes',r:'recap',',':'settings'}[k];
   if(v){opened=null;go(v)}else if(k==='/'){e.preventDefault();opened=null;go('notes',true);$('#find').focus()}else if(k==='a'){e.preventDefault();onAct({target:$('#dock-ask')})}else if(k==='s')startReal();else if(k==='p')startDemo();else if(k==='d')toggleTheme(e)});
 $('#find').addEventListener('input',filterNotes);
 $('#ask').addEventListener('submit',e=>{e.preventDefault();ask($('#ask-q').value)});
-$('#ask-q').addEventListener('keydown',e=>{if(e.key==='Escape')show($('#askp'),false)});
+$('#ask-q').addEventListener('keydown',e=>{if(e.key==='Escape'){show($('#askp'),false);$('#dock-ask').setAttribute('aria-expanded',false);$('#dock-ask').focus()}});
 $('#key').addEventListener('input',e=>{cfg.key=e.target.value.trim();saveCfg();renderSide()});
 $('#model').addEventListener('change',e=>{cfg.model=e.target.value;saveCfg();renderSide()});
 $('#glance').addEventListener('input',e=>{cfg.glance=+e.target.value;$('#glance-v').textContent=cfg.glance+' s';saveCfg();renderSetup()});
@@ -1381,12 +1385,12 @@ if(v0==='live')shotLive();else if(v0==='session'&&sessions[0])openSession(sessio
 if(Q.has('notif')&&sessions[0])notify(sessions[0]);
 /* The host keeps pages cached for ten minutes and a tab left open keeps running what it loaded.
    So on load, and whenever the tab comes back into view with no session running, look for a newer build and move to it. */
-function checkBuild(){if(location.protocol!=='https:'||S.running)return;const mine=+$('meta[name=build]').content;
+function checkBuild(){if(location.protocol!=='https:'||S.running||view!=='home')return;const mine=+$('meta[name=build]').content;
   fetch(location.pathname+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/<meta name="build" content="(\d+)"/);
-    if(!m||+m[1]<=mine||S.running||sessionStorage.getItem('rw:tried')===m[1])return;sessionStorage.setItem('rw:tried',m[1]);
+    if(!m||+m[1]<=mine||S.running||view!=='home'||sessionStorage.getItem('rw:tried')===m[1])return;sessionStorage.setItem('rw:tried',m[1]);
     const q=new URLSearchParams(location.search);q.set('v',m[1]);location.replace(location.pathname+'?'+q)}).catch(()=>{})}
 checkBuild();document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkBuild()});
-if(Q.has('sample'))startDemo();
+if(Q.has('sample')){history.replaceState(null,'',location.pathname);startDemo()}   // a reload then shows the app, not the sample again
 })();
 </script>
 </body>
