@@ -7,7 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%23528200'/%3E%3Cpath d='M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18' fill='none' stroke='%23fff' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://api.fontshare.com">
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
-<link id="fonts" rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=general-sans@400,401,500,600,700&display=swap">
+<link id="fonts" rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=general-sans@400,401,500,600,700&f[]=clash-display@600&display=swap">
 <script>(function(){var d=document.documentElement.dataset,c={},q=new URLSearchParams(location.search);try{c=JSON.parse(localStorage.getItem('rewrite:cfg')||'{}')||{}}catch(e){}d.theme=q.get('theme')||c.theme||'light';d.palette=q.get('palette')||c.palette||'green'})()</script>
 <style id="base-css">
 :root{
@@ -90,12 +90,8 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 
 /* top bar */
 .top{display:flex;align-items:center;gap:10px;padding:2px 2px 16px}
-.brand{display:flex;align-items:center;gap:10px;font:600 21px/1.3 var(--ui);letter-spacing:-.03em;margin-right:8px}
-.brand svg{width:36px;height:36px;flex:none}
-.chip{display:flex;align-items:center;gap:9px;height:42px;padding:0 16px 0 6px;border-radius:99px;background:var(--wash2);box-shadow:inset 0 0 0 1px var(--line);font-weight:500;font-size:13.5px;line-height:1.3;transition:background .25s,transform .4s var(--ease)}
-.chip:hover{background:var(--track);transform:translateY(-1px)}
-.chip .tok{width:30px;height:30px;border-radius:50%;background:var(--hot);color:#fff;display:grid;place-items:center}
-.chip .tok svg{width:15px;height:15px}
+.brand{font:600 28px/1.25 "Clash Display",var(--ui);letter-spacing:-.02em;margin-right:8px;transition:letter-spacing .6s var(--ease)}
+.brand:hover{letter-spacing:.012em}
 .tabs{margin-left:auto;position:relative;display:flex;gap:2px;padding:4px;border-radius:99px;background:rgba(var(--night-rgb),.5);box-shadow:inset 0 0 0 1px var(--line2)}
 [data-theme="light"] .tabs{background:rgba(var(--deep-rgb),.07)}
 .nav{position:relative;z-index:1;display:flex;align-items:center;gap:7px;height:36px;padding:0 17px;border-radius:99px;font-weight:500;font-size:14px;color:var(--ink2);transition:color .25s}
@@ -127,6 +123,10 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 @keyframes vtIn{from{opacity:0}}
 @keyframes growY{from{transform:scaleY(0)}to{transform:none}}
 @keyframes growX{from{transform:scaleX(0)}to{transform:none}}
+@keyframes wipeX{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+/* below the first screen, things arrive when you reach them */
+.rv{opacity:0;translate:0 26px;transition:opacity .8s var(--ease),translate 1s var(--ease)}
+.rv.in,.still .rv{opacity:1;translate:0 0}
 .p-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:8px 6px 18px}
 .eyebrow{font:500 12px/1.4 var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px}
 .title{font:500 38px/1.12 var(--ui);letter-spacing:-.042em;margin:6px 0 0}
@@ -171,7 +171,7 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 .m-pill .led{width:30px;height:30px}
 .m-pill .led::after{width:8px;height:8px}
 .mega-sub{margin:16px auto 0;max-width:50ch;font-size:16.5px;line-height:1.5;color:var(--ink2)}
-.zgrid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) 470px;gap:72px;align-items:start;margin-top:26px;padding:0 6px}
+.zgrid{position:relative;z-index:1;display:grid;gap:44px;max-width:812px;margin:26px auto 0;padding:0 6px}
 .zline{position:absolute;left:11px;top:-62px;width:calc(50% - 11px);height:72px;overflow:visible;clip-path:inset(0 0 0 0);animation:wipe 1.5s var(--ease) .3s backwards}
 .zline path{fill:none;stroke:var(--ink4);stroke-width:1.2;vector-effect:non-scaling-stroke}
 @keyframes wipe{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
@@ -195,7 +195,9 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 .fgl{position:relative;display:flex;align-items:center;flex-wrap:wrap;gap:3px 12px;padding:7px 0 7px 72px;border-top:1px dashed var(--line);font-size:12.5px;line-height:1.5;color:var(--ink3)}
 .fgl::before{content:"";position:absolute;left:-34px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:var(--page);box-shadow:inset 0 0 0 1.2px var(--ink4)}
 .fmore{display:flex;gap:8px}
-.fs .rib-s{height:10px;margin-top:14px;max-width:520px}
+.fs .rib-s{height:10px;margin-top:14px;max-width:520px;animation:wipeX 1.2s var(--ease) .45s backwards}
+.fs.rv .rib-s{animation:none;clip-path:inset(0 100% 0 0);transition:clip-path 1.2s var(--ease) .25s}
+.fs.rv.in .rib-s,.still .fs .rib-s{clip-path:inset(0 0 0 0)}
 .fs .rib-s i{border-radius:3px}
 /* before the first session: the three steps sit on the rail as numbered nodes */
 .how{display:grid;gap:24px}
@@ -235,9 +237,6 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 .w-card li{position:relative;padding-left:16px;font-size:13.5px;line-height:1.45;opacity:.84}
 .w-card li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:1.5px;background:var(--hot)}
 .w-chip{--k:-54px;left:47%;bottom:21%;display:flex;align-items:center;gap:9px;height:40px;padding:0 15px;border-radius:99px;font:500 13px/1.3 var(--ui);animation-delay:-3.5s}
-.w-chip s{color:var(--ink3)}
-.w-chip b{font-weight:500;color:#3F7000}
-[data-theme="dark"] .w-chip b{color:var(--peri)}
 @keyframes floaty{0%,100%{translate:0 0}50%{translate:0 -7px}}
 .lab{display:block;font:500 12px/1.4 var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
 .wk{--k:-38px;right:0;top:30%;width:336px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;animation-delay:-2.2s}
@@ -247,7 +246,8 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 .wbars i{position:relative;width:12px;height:calc(var(--h)*1%);min-height:3px;border-radius:4px 4px 2px 2px;background:var(--ink4);transform-origin:bottom;animation:growY .9s var(--ease) backwards;animation-delay:calc(400ms + var(--i)*60ms)}
 .wbars i.t{background:var(--hot)}
 .wbars em{position:absolute;left:50%;top:calc(100% + 6px);transform:translateX(-50%);font:500 10.5px/1.3 var(--ui);font-style:normal;color:var(--ink3)}
-.setup{display:grid;gap:13px}
+.setup{display:grid;grid-template-columns:1fr 1fr;gap:12px 34px;align-items:center}
+.setup .lab,.setup .snote{grid-column:1/-1}
 .srow{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;line-height:1.4;color:var(--ink2)}
 .segs{display:flex;flex:none;padding:3px;border-radius:99px;background:var(--wash2)}
 .segs button{height:30px;padding:0 12px;border-radius:99px;font:500 13px/1.3 var(--ui);color:var(--ink2);white-space:nowrap;transition:background .25s,color .25s}
@@ -255,7 +255,7 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 .segs button.on{background:var(--ink);color:var(--page)}
 .snote{margin:0;font-size:12.5px;line-height:1.55;color:var(--ink3)}
 .snote .link{font-size:12.5px}
-.keys{display:flex;flex-wrap:wrap;gap:8px 18px;padding:6px 8px 0;font-size:12.5px;line-height:1.6;color:var(--ink3)}
+.keys{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12.5px;line-height:1.6;color:var(--ink3)}
 .keys span{display:flex;align-items:center;gap:7px;white-space:nowrap}
 kbd{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:6px;font:500 11.5px/1 var(--ui);color:var(--ink2);background:var(--card);box-shadow:inset 0 0 0 1px var(--line),0 1px 0 var(--line)}
 /* the dock: the one place the main action lives, always at the bottom */
@@ -449,7 +449,7 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
 .notif{position:fixed;right:26px;top:24px;width:376px;z-index:30;padding:16px 18px 20px;border-radius:28px;overflow:hidden;color:#F5F6FF;--ink:#F5F6FF;--ink2:rgba(245,246,255,.8);--ink3:rgba(245,246,255,.62);--line:rgba(255,255,255,.16);--wash2:rgba(255,255,255,.1);--track:rgba(255,255,255,.17);background:var(--night);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 40px 80px -30px rgba(3,4,20,.9);transform:translateX(120%) scale(.96);opacity:0;transition:transform .9s var(--spring),opacity .4s}
 .notif.on{transform:none;opacity:1}
 .n-top{display:flex;align-items:center;gap:9px;font:500 13px/1.3 var(--ui);color:var(--ink3)}
-.n-top>svg{width:26px;height:26px;flex:none}
+.n-top .wm{font:600 18px/1.3 "Clash Display",var(--ui);letter-spacing:-.02em}
 .n-top b{font-weight:500;font-size:14px;color:var(--ink);letter-spacing:-.01em}
 .n-top span{margin-left:auto}
 .n-x{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--wash2);color:var(--ink2);transition:background .2s,transform .4s var(--ease)}
@@ -479,8 +479,7 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
 <body>
 <div class="stage"><div class="frame">
   <header class="top" data-el="topbar">
-    <button class="brand" data-go="home" data-el="wordmark"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="10" style="fill:var(--hot)"/><path d="M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></svg><span>Rewrite</span></button>
-    <button class="chip" data-go="settings" data-el="workspace-chip" aria-label="Who writes the notes"><span class="tok"><i data-ic="spark"></i></span><span id="engine-txt"></span></button>
+    <button class="brand" data-go="home" data-el="wordmark" aria-label="Rewrite, home">rewrite</button>
     <nav class="tabs" id="navs" aria-label="Main"><span class="nav-ind" id="nav-ind"></span>
       <button class="nav on" data-go="home" data-el="nav-row">Home</button>
       <button class="nav" data-go="notes" data-el="nav-row">Notes<em id="n-count">0</em></button>
@@ -502,13 +501,12 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
         <h1 class="mega rise" style="--i:1"><span id="mega"></span><span class="m-pill" aria-hidden="true"><span class="led"></span><svg class="pen" viewBox="0 0 64 20"><path class="ghost" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/><path class="trace" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/></svg></span></h1>
         <p class="mega-sub rise" style="--i:2" id="mega-sub"></p>
       </div>
-      <div class="world rise" style="--i:2" data-el="hero"><canvas id="world-gl" aria-hidden="true"></canvas><div class="w-in"><button class="w-card" id="w-card"></button><button class="wk" id="wk" data-go="recap" data-el="week"></button><div class="w-chip" id="w-chip"></div><div class="w-chip w-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-9M12 13c0-4-3-6.5-7.5-6.500 0 4.200 3 6.500 7.500 6.500zM12 10.500c0-3 2.400-5 6-5 0 3-2.400 5-6 5z"/></svg><span id="w-note"></span></div></div></div>
+      <div class="world rise" style="--i:2" data-el="hero"><canvas id="world-gl" aria-hidden="true"></canvas><div class="w-in"><button class="w-card" id="w-card"></button><button class="wk" id="wk" data-go="recap" data-el="week"></button><div class="w-chip w-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-9M12 13c0-4-3-6.5-7.5-6.500 0 4.200 3 6.500 7.500 6.500zM12 10.500c0-3 2.400-5 6-5 0 3-2.400 5-6 5z"/></svg><span id="w-note"></span></div></div></div>
       <div class="zgrid">
         <svg class="zline" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M100 0C100 62 0 30 0 100" pathLength="100"/></svg>
         <div class="feed" id="feed" data-el="feed"></div>
         <aside class="side" aria-label="Set-up and shortcuts">
-          <div class="card setup rise" style="--i:5" id="setup" data-el="setup"></div>
-          <div class="keys rise" style="--i:6" data-el="shortcuts"><span><kbd>S</kbd>Start</span><span><kbd>P</kbd>Sample</span><span><kbd>N</kbd>Notes</span><span><kbd>R</kbd>Recap</span><span><kbd>/</kbd>Search</span><span><kbd>,</kbd>Settings</span><span><kbd>D</kbd>Dark</span></div>
+          <div class="card setup rv" id="setup" data-el="setup"></div>
         </aside>
       </div>
     </section>
@@ -572,6 +570,11 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
           <h3>Your data</h3>
           <p>Saved in this browser, on this laptop. Screen frames are never saved.</p>
           <button class="btn line sm" id="wipe">Delete all saved sessions</button>
+        </div>
+        <div class="card rise" style="--i:5">
+          <h3>Shortcuts</h3>
+          <p>One key each, when you are not typing.</p>
+          <div class="keys" data-el="shortcuts"><span><kbd>S</kbd>Start</span><span><kbd>P</kbd>Sample</span><span><kbd>H</kbd>Home</span><span><kbd>N</kbd>Notes</span><span><kbd>R</kbd>Recap</span><span><kbd>/</kbd>Search</span><span><kbd>,</kbd>Settings</span><span><kbd>D</kbd>Dark</span></div>
         </div>
         </div>
         <div class="set-col">
@@ -694,7 +697,7 @@ function streak(){const days=new Set(sessions.map(s=>day0(s.at)));let t=day0(Dat
 let view='home';
 const show=(el,on)=>{el.classList.toggle('on',on);el.inert=!on};
 function go(v,instant){view=v;const run=()=>{$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));const nav=v==='session'?'notes':v,ind=$('#nav-ind');let on=null;$$('#navs .nav').forEach(n=>{const y=n.dataset.go===nav;n.classList.toggle('on',y);if(y){on=n;n.setAttribute('aria-current','page')}else n.removeAttribute('aria-current')});ind.style.opacity=on?1:0;if(on){ind.style.width=on.offsetWidth+'px';ind.style.transform=`translateX(${on.offsetLeft}px)`}({home:renderHome,notes:renderNotes,recap:renderRecap,settings:renderSettings}[v]||(()=>{}))();scrollTo(0,0);World.play()};if(!instant&&!STILL&&document.startViewTransition)document.startViewTransition(run);else run()}
-function renderSide(){$('#engine-txt').textContent=DEMO||engine()==='claude'?MODELS[cfg.model]:engine()==='device'?'On this laptop':'Set up notes';$('#n-count').textContent=sessions.reduce((a,s)=>a+s.notes.length,0);if(DEMO){$('#user').hidden=false;$('#ava').textContent='RP';$('#u-name').textContent='Riley Park';$('#u-sub').textContent='Demo data'}}
+function renderSide(){$('#n-count').textContent=sessions.reduce((a,s)=>a+s.notes.length,0);if(DEMO){$('#user').hidden=false;$('#ava').textContent='RP';$('#u-name').textContent='Riley Park';$('#u-sub').textContent='Demo data'}}
 function tiles(el,w,base){const cur=w[6],sum=k=>w.reduce((a,d)=>a+d[k],0);const T=[
   {l:'Focus time',v:sum('focus'),f:durHTML,k:'focus',s:'last 7 days'},
   {l:'Notes written',v:sum('notes'),f:v=>Math.round(v),k:'notes',s:cur.notes+' today'},
@@ -720,7 +723,7 @@ function fsHTML(s,open,i){
     const flush=()=>{if(run.length)body+=`<div class="fgl">${run.map(g=>`<s>${glTxt(g)}</s>`).join('')}</div>`;run=[]};
     for(const o of its){if(o.g){run.push(o.g);continue}if(shown===5)break;flush();shown++;body+=`<button class="fn" ${act} data-el="session-row"><time>${hm(s.at+o.n.t)}</time><b>${esc(o.n.title)}</b></button>`}
     flush();body=`<div class="fitems">${body}</div>`;if(s.notes.length>shown)body+=`<div class="fmeta"><button class="link" ${act}>${plural(s.notes.length-shown,'more note')}</button></div>`}
-  return `<article class="fs rise" style="--i:${3+i}"><i class="fdot"></i><div class="fhead">${when(s.at)} · ${hm(s.at)}</div><button class="ftitle" ${act}>${esc(s.title)}</button>${ribS(s)}<div class="fmeta"><span class="tok" style="--c:${colorOf(sub)}"></span>${esc(sub)} · ${dur(s.focusMs)} focused · ${plural(s.notes.length,'note')} · ${s.glances} left out</div>${body}</article>`}
+  return `<article class="fs ${i?'rv':'rise'}" style="--i:${3+i}"><i class="fdot"></i><div class="fhead">${when(s.at)} · ${hm(s.at)}</div><button class="ftitle" ${act}>${esc(s.title)}</button>${ribS(s)}<div class="fmeta"><span class="tok" style="--c:${colorOf(sub)}"></span>${esc(sub)} · ${dur(s.focusMs)} focused · ${plural(s.notes.length,'note')} · ${s.glances} left out</div>${body}</article>`}
 const howHTML=()=>`<div class="how"><div class="fhead rise" style="--i:3">How it works</div>${HOW.map((h,i)=>`<div class="hstep rise" style="--i:${3+i}"><i>${i+1}</i><span><b>${h[0]}</b><small>${h[1]}</small></span><svg class="hpic" viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${h[2]}</svg></div>`).join('')}<div class="hrib rise" style="--i:6"><div class="rib-s"><i style="--w:30"></i><i class="glance"></i><i style="--w:22"></i><i class="glance"></i><i style="--w:16"></i></div><small><b>Solid</b> is kept. <b>Striped</b> is a glance, left out.</small></div><div class="hbtns rise" style="--i:7"><button class="btn dark sm" data-act="start"><span class="rec"></span>Start a session</button><button class="btn line sm" data-act="sample">${ic('play')}Play the 50 second sample</button></div></div>`;
 // the two choices that matter, changed right on the home page
 function renderSetup(){const e=cfg.engine,on=(a,b)=>`class="${a===b?'on':''}" aria-pressed="${a===b}"`;
@@ -735,10 +738,9 @@ function renderHome(){
   // the feed: the live session if there is one, then the latest sessions; before the first one, how it works and an example
   $('#feed').innerHTML=sessions.length||live?(live?`<article class="fs live rise" style="--i:3"><i class="fdot"></i><div class="fhead">Now</div><button class="ftitle" data-act="show">Taking notes now</button><div class="fmeta">Carry on with your work. Open the live session to read along.</div></article>`:'')+sessions.slice(0,4).map((s,i)=>fsHTML(s,i===0,i)).join('')+(sessions.length?`<div class="fmore rise" style="--i:7"><button class="btn line sm" data-go="notes">All notes${ic('arrow')}</button><button class="btn line sm" data-go="recap">This week${ic('arrow')}</button></div>`:''):howHTML();
   // on the world: the newest note, or an example before there is one
-  const s0=sessions[0],n0=s0&&s0.notes[s0.notes.length-1],g0=s0&&[...s0.segs].reverse().find(g=>g.k==='glance'),ex=SAMPLE.notes.doc1,wc=$('#w-card');
+  const s0=sessions[0],n0=s0&&s0.notes[s0.notes.length-1],ex=SAMPLE.notes.doc1,wc=$('#w-card');
   wc.innerHTML=`<small>${n0?'Latest note · '+esc(s0.subject||'General'):'Example note'}</small><b>${esc(n0?n0.title:ex.topic)}</b><ul>${(n0?n0.bullets:ex.notes).slice(0,2).map(b=>`<li>${esc(b)}</li>`).join('')}</ul>`;
   if(n0){wc.dataset.open=s0.id;delete wc.dataset.act}else{wc.dataset.act='sample';delete wc.dataset.open}
-  $('#w-chip').innerHTML=`<s>${g0?glTxt(g0):'Discord · 8 s'}</s><b>left out</b>`;
   // the field is as grown as today's focus: bare at none, first shoots after any session, nearly full at an hour
   const fm=t.focus/6e4;World.grow(fm>0?Math.max(.12,1-Math.exp(-fm/22)):0);
   $('#w-note').textContent=fm>0?`Your field: ${dur(t.focus)} of focus today`:'Your field is bare. It grows as you focus.';
@@ -746,7 +748,10 @@ function renderHome(){
   const sum=k=>w.reduce((a,d)=>a+d[k],0),mx=Math.max(1,...w.map(d=>d.focus)),f=sum('focus');
   $('#wk').innerHTML=`<span><span class="lab">This week</span><b>${f?dur(f):'0 min'}</b><span class="s">${f?`${plural(sum('notes'),'note')} · ${plural(sum('n'),'session')}`:'No sessions yet'}</span></span><span class="wbars" aria-hidden="true">${w.map((d,i)=>`<i class="${d.today?'t':''}" style="--h:${d.focus?Math.max(8,d.focus/mx*100):0};--i:${i}"><em>${esc(d.label[0])}</em></i>`).join('')}</span>`;
   renderSetup();
+  if(f)countUp($('#wk b'),f,v=>dur(v));
+  $$('#v-home .rv').forEach(e=>STILL?e.classList.add('in'):seenIO.observe(e));
 }
+const seenIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');seenIO.unobserve(e.target)}}),{threshold:.1});
 function renderNotes(){
   renderSide();renderBoard()}
 function renderBoard(quiet){
@@ -1029,7 +1034,7 @@ async function finish(){
   if(!rec.notes.length&&rec.focusMs<5000){toast('Nothing was recorded, so nothing was saved.');return go('home')}
   sessions.unshift(rec);sessions=sessions.slice(0,60);persist();openSession(rec);if(!document.hasFocus())notify(rec)}
 function notify(r){const n=$('#notif'),k=r.notes.length,g=r.glances;clearTimeout(S.nT);n.classList.remove('timed');
-  n.innerHTML=`<div class="n-top"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="10" style="fill:var(--hot)"/><path d="M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></svg><b>Rewrite</b><span>just now</span><button class="n-x" data-act="dismiss" aria-label="Dismiss">${ic('x')}</button></div><h3>Your notes are ready</h3><p>${esc(r.title)}</p><div class="n-stats"><div><b>${dur(r.focusMs)}</b><span>of focus</span></div><div><b>${k}</b><span>${k===1?'note':'notes'}</span></div><div><b>${g}</b><span>${g===1?'glance':'glances'} ignored</span></div></div><div class="cta"><button class="btn dark sm" data-open="${esc(r.id)}">Read your notes${ic('arrow')}</button><button class="btn line sm" data-act="dismiss">Later</button></div><i class="n-bar"></i>`;
+  n.innerHTML=`<div class="n-top"><b class="wm">rewrite</b><span>just now</span><button class="n-x" data-act="dismiss" aria-label="Dismiss">${ic('x')}</button></div><h3>Your notes are ready</h3><p>${esc(r.title)}</p><div class="n-stats"><div><b>${dur(r.focusMs)}</b><span>of focus</span></div><div><b>${k}</b><span>${k===1?'note':'notes'}</span></div><div><b>${g}</b><span>${g===1?'glance':'glances'} ignored</span></div></div><div class="cta"><button class="btn dark sm" data-open="${esc(r.id)}">Read your notes${ic('arrow')}</button><button class="btn line sm" data-act="dismiss">Later</button></div><i class="n-bar"></i>`;
   requestAnimationFrame(()=>show(n,true));const hide=()=>{clearTimeout(S.nT);n.offsetWidth;n.classList.add('timed');S.nT=setTimeout(()=>show(n,false),9000)};if(document.hasFocus())hide();else addEventListener('focus',hide,{once:true})}
 
 /* ---- live paint ---- */
