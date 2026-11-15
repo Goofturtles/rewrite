@@ -866,7 +866,7 @@ function checkSelf(now){if(S.demo||S.sim)return false;const self=document.hasFoc
   else if(!self&&S.selfAt){S.selfAt=0;S.prev=S.sig=null}
   return self}
 function onFrame(src,w,h){const now=Date.now();if(S.paused||S.finishing||checkSelf(now))return;
-  const k=Math.min(1,1920/Math.max(w,h)),W=Math.round(w*k),H=Math.round(h*k);if(last.width!==W||last.height!==H){last.width=W;last.height=H}
+  const k=Math.min(1,2560/Math.max(w,h)),W=Math.round(w*k),H=Math.round(h*k);if(last.width!==W||last.height!==H){last.width=W;last.height=H}
   lx.drawImage(src,0,0,W,H);step(signature(last),now);logic(now);if(view==='session')$('#pv').getContext('2d').drawImage(last,0,0,640,360)}
 function logic(now){if(!S.running||S.paused||S.finishing||S.shot||!S.main||S.selfAt)return;const t=T();
   if(S.off&&!S.detour&&now-S.off.t>1600)startDetour(S.off.t,S.off.g);
@@ -893,7 +893,7 @@ async function claude(content,max=8000){
   if(j.stop_reason==='refusal')throw new Error('The model declined to read this screen.');
   return(j.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('')}
 const parseJSON=s=>{const m=String(s).match(/\{[\s\S]*\}/);if(!m)throw new Error('The note writer sent back something unreadable.');return JSON.parse(m[0])};
-// Frames are kept at up to 1920 px so small text stays readable on the laptop; images sent to Claude are capped at 1568 px.
+// Frames are kept at up to 2560 px so small text stays readable on the laptop; images sent to Claude are capped at 1568 px.
 const jpg=c=>{const k=Math.min(1,1568/Math.max(c.width,c.height));let s=c;if(k<1){s=document.createElement('canvas');s.width=Math.round(c.width*k);s.height=Math.round(c.height*k);s.getContext('2d').drawImage(c,0,0,s.width,s.height)}return s.toDataURL('image/jpeg',.8).split(',')[1]};
 async function claudeNotes(frames){
   const imgs=frames.slice(-2).map(f=>({type:'image',source:{type:'base64',media_type:'image/jpeg',data:jpg(f.c)}}));
@@ -932,6 +932,23 @@ function whereAmI(top){
   return/search$/i.test(tab[2])?{app:app+' search',topic:app+' search: '+name}:{app,topic:(DOING[app]?DOING[app]+': ':'')+name}}
 // lines that belong to the screen's furniture, not to what you are reading
 const FURNITURE=/sharing your screen|stop sharing|^\W*(ask anything|type here to search|search google or type|sign in|sign up|log in|accept all|reject all|learn more|show more|see more|send feedback|people also ask)\b/i;
+const cue=/\b(is|are|was|were|means|called|defined|because|therefore|causes?|produces?|makes?|uses?|needs?|allows?|equals?)\b/i,chatty=/^(are you|would you|do you|did you|want to|try |click|tap |sign |log in|subscribe|follow |download|get the app|learn more|see more|show more|ask |looking for)/i;
+const SHORT=new Set('a i an as at be by do go he if in is it me my no of on or so to up us we am ok vs ai uk tv pc id ph'.split(' '));
+// What a reader leaves behind when it meets icons, buttons and half-covered text: one- and two-letter scraps,
+// letters fused with digits, symbols inside words. A number on its own is not a scrap.
+const scrap=t=>{if(/^[=+×*÷\/&–—-]+$/.test(t))return false;const w=t.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g,'');if(!w)return true;if(/^\d[\d.,:%]*$/.test(w))return false;if(/^[A-Za-z]{1,2}$/.test(w))return!SHORT.has(w.toLowerCase());if(/[^A-Za-z0-9'’.\/-]/.test(w))return true;return/[A-Za-z]/.test(w)&&/\d/.test(w)&&w.length>4};
+// A line is kept only when it reads like a sentence. Scraps are trimmed off both ends first; what is left must start
+// like a sentence, be made of real words, and not be a question or a prompt aimed at the reader. A sum with its answer stays.
+function cleanLine(line){const t=line.split(/\s+/).filter(Boolean);
+  for(;;){const a=t[0],b=t[1]||'';if(!a)break;if(/[=+×*÷]/.test(b)&&/^\d/.test(a))break;if(scrap(a)||/^\d+[.)]$/.test(a)||(/^\d[\d.,]*$/.test(a)&&(!b||scrap(b))))t.shift();else break}
+  while(t.length&&scrap(t[t.length-1]))t.pop();
+  if(!t.length)return'';const out=t.join(' ');
+  if(/^[\d\s+\-×x*÷\/().^=,]{3,}$/.test(out)&&/\d\s*=\s*\d/.test(out))return out;
+  const bad=t.filter(scrap).length,good=t.filter(x=>/^["“(]?[A-Za-z][A-Za-z'’-]{2,}[.,;:!?)”"]*$/.test(x)).length,math=/\d\s*[=+×*÷]\s*\d|=\s*\d|\bequals\b/i.test(out);
+  if(bad/t.length>.12||good<(math?1:4)||t.length>40)return'';
+  if(!math&&!/^["“(]?[A-Z]/.test(out)&&!(/^\d/.test(out)&&(/^[A-Z]/.test(t[1]||'')||/[.!]$/.test(out))))return'';   // starts in the middle of something
+  if(bad&&!/[.!:;)”"]$/.test(out))return'';                   // a scrap inside and no ending
+  return/\?$/.test(out)||chatty.test(out)?'':out}
 async function deviceNotes(frames){
   const w=await withTimeout(loadTess(),60000,'The on-device reader took too long to load.'),c=frames[frames.length-1].c,W=c.width,H=c.height;
   const{data}=await withTimeout(w.recognize(c),60000,'Reading the screen took too long.');
@@ -941,7 +958,7 @@ async function deviceNotes(frames){
     here=whereAmI(String((await withTimeout(w.recognize(s),30000,'top strip')).data.text||''))}catch{}
   const own=new RegExp(location.hostname.split('.').filter(p=>p.length>2).join('\\W*')||'^$','i');   // this page's own name, as the browser's sharing bar shows it
   const lines=(data.lines&&data.lines.length?data.lines.map(l=>({t:l.text.trim(),h:l.bbox.y1-l.bbox.y0,y:l.bbox.y0,x:l.bbox.x0,c:l.confidence})):String(data.text||'').split('\n').map((t,i)=>({t:t.trim(),h:20,y:H*.2+i*30,x:0,c:80})))
-    .filter(l=>l.c>=55&&l.t.length>3&&l.y>H*.125&&l.y<H*.93&&!FURNITURE.test(l.t)&&!own.test(l.t));
+    .filter(l=>l.c>=62&&l.t.length>3&&l.y>H*.125&&l.y<H*.93&&!FURNITURE.test(l.t)&&!own.test(l.t));
   const blank={on_task:true,app:here.app,topic:here.topic,notes:[]};
   if(!lines.length)return blank;
   const hs=lines.map(l=>l.h).sort((a,b)=>a-b),med=hs[hs.length>>1]||1;
@@ -951,12 +968,7 @@ async function deviceNotes(frames){
   for(const l of lines){if(l===head)continue;const bullet=/^[^A-Za-z0-9("']/.test(l.t),t=l.t.replace(/^[^A-Za-z0-9("']+\s*/,'');
     if(cur&&!bullet&&!/[.!?]$/.test(cur.t)&&l.y-prev.y<prev.h*2.1&&Math.abs(l.h-prev.h)<prev.h*.35&&Math.abs(l.x-cur.x)<W*.04)cur.t+=' '+t;else{if(cur)paras.push(cur);cur={t,h:l.h,y:l.y,x:l.x}}prev=l}
   if(cur)paras.push(cur);
-  const cue=/\b(is|are|was|were|means|called|defined|because|therefore|causes?|produces?|makes?|uses?|needs?|allows?|equals?)\b/i,chatty=/^(are you|would you|do you|did you|want to|try |click|tap |sign |log in|subscribe|follow |download|get the app|learn more|see more|show more|ask |looking for)/i;
-  // a line worth keeping states something: questions to the reader, prompts and scraps are left; a sum with its answer stays even though it is short
-  const sents=paras.flatMap(p=>p.t.split(/(?<=[.!?])\s+/).map(x=>({s:x.trim(),h:p.h,y:p.y}))).filter(({s})=>{
-    if(/^[\d\s+\-×x*÷\/().^=,]{3,}$/.test(s)&&/\d\s*=\s*\d/.test(s))return true;
-    const n=s.split(/\s+/).length,math=/\d\s*[=+×*÷]\s*\d|=\s*\d|\bequals\b/i.test(s);
-    return n>=(math?3:5)&&n<=40&&(s.match(/[A-Za-z0-9]/g)||[]).length/s.length>.6&&/[A-Za-z]{2}/.test(s)&&!/\?$/.test(s)&&!chatty.test(s)});
+  const sents=paras.flatMap(p=>p.t.split(/(?<=[.!?])\s+/).map(x=>({s:cleanLine(x.trim()),h:p.h,y:p.y}))).filter(o=>o.s);
   // the three best: statements, sums and figures, bigger type, nearer the top
   const picked=sents.map((o,i)=>({...o,i,v:(cue.test(o.s)?2:0)+(/\d/.test(o.s)?.5:0)+(/=|\bequals\b/i.test(o.s)?1.5:0)+Math.min(2,Math.max(0,o.h/med-1)*2)+(o.y<H*.45?.5:0)}))
     .filter(x=>!S.seen.has(x.s.toLowerCase().slice(0,40))).sort((a,b)=>b.v-a.v).slice(0,3).sort((a,b)=>a.i-b.i);
@@ -1019,7 +1031,7 @@ const SIMSCRIPT=[['doc1',16000],['ai',7000],['doc1',10000],['chat',6000],['doc2'
 function startSim(){if(S.running)return;reset(false);S.sim=true;
   const cv=document.createElement('canvas');cv.width=1280;cv.height=720;const cx=cv.getContext('2d');S.sceneI=0;S.scene=SIMSCRIPT[0][0];S.sceneAt=Date.now();
   drawScene(cx,S.scene,0);S.demoT=setInterval(()=>drawScene(cx,S.scene,Date.now()-S.sceneAt),250);
-  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},read:async id=>{const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);return deviceNotes([{c,t:Date.now(),tag:id}])}}}
+  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},clean:cleanLine,read:async id=>{const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);return deviceNotes([{c,t:Date.now(),tag:id}])}}}
 function togglePause(){if(!S.running||S.finishing)return;const now=Date.now();S.paused=!S.paused;if(S.paused){if(S.detour)endDetour();S.off=null;if(S.main)openSeg('pause',now,null)}else{S.prev=S.sig=null;if(S.demo)S.sceneAt+=now-(S.pausedAt||now)}S.pausedAt=now;paint()}
 async function finish(){
   if(!S.running||S.finishing)return;S.finishing=true;const now=Date.now();stopCapture();
