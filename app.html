@@ -611,7 +611,7 @@ function mkSegs(min,g,sd){const r=rng(sd*7919+11),parts=Array.from({length:g+1},
 const LS={cfg:'rewrite:cfg',ses:'rewrite:sessions'};
 const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
-const cfg=Object.assign({engine:'claude',key:'',model:'claude-opus-5-5',glance:20,sens:5},load(LS.cfg,{}));
+const cfg=Object.assign({engine:'device',key:'',model:'claude-opus-5-5',glance:20,sens:5},load(LS.cfg,{}));   // works out of the box on the laptop; a Claude key is an upgrade
 const saveCfg=()=>save(LS.cfg,cfg);
 function seed(){const now=Date.now();return SEED.map(s=>{const x=new Date(now-s.d*864e5);x.setHours(s.h,s.m,0,0);const segs=mkSegs(s.focus,s.glances,s.d+3);return{id:'seed'+s.d,at:+x,dur:segs[segs.length-1].b,focusMs:s.focus*60e3,glances:s.glances,title:s.title,subject:s.subject,takeaways:s.takeaways,quiz:s.quiz||[],segs,sample:true,engine:'claude',notes:s.notes.map((n,i)=>({t:(i+1)*s.focus*60e3/(s.notes.length+1),...n}))}})}
 let sessions=DEMO?seed():load(LS.ses,[]);
