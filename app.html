@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1280">
-<meta name="build" content="1794775511">
+<meta name="build" content="1794780768">
 <title>Rewrite</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%23528200'/%3E%3Cpath d='M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18' fill='none' stroke='%23fff' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://api.fontshare.com">
@@ -90,7 +90,11 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 /* a citation stays on the line and drifts end to end when it is longer than the window */
 .pl-t.loop{animation:pl-slide var(--dur,6s) ease-in-out 1s infinite alternate}
 .fl .pill-btn.cite-b{display:none!important}
-.fl:hover .pill.has-cite:not(.mini) .pill-btn.cite-b{display:grid!important}
+.fl .pill.has-cite:not(.mini) .pill-btn.cite-b{display:grid!important;flex:none;background:var(--hot);animation:cite-pulse 1.8s ease-out 4}
+.fl .pill.has-cite .pl-d{display:none!important}
+.pl-t.cite{animation:pl-type .9s steps(24) both}
+.pl-t.cite.loop{animation:pl-type .9s steps(24) both,pl-slide var(--dur,6s) ease-in-out 1.6s infinite alternate}
+@keyframes cite-pulse{from{box-shadow:0 0 0 0 var(--hot-hi)}70%,to{box-shadow:0 0 0 9px transparent}}
 /* it is never still: a ring leaves the dot while it watches, and three small dots walk after the word */
 .fl .led{position:relative}
 .fl .pill[data-state="noting"] .led::before,.fl .pill[data-state="writing"] .led::before{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 1.5px var(--hot-hi);animation:pl-ring 2.4s cubic-bezier(.22,1,.36,1) infinite}
@@ -545,6 +549,12 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
 .notif.on>*{animation:n-in .7s var(--ease) backwards}
 .notif.on>:nth-child(2){animation-delay:.08s}.notif.on>:nth-child(3){animation-delay:.12s}.notif.on>:nth-child(4){animation-delay:.18s}.notif.on>:nth-child(5){animation-delay:.24s}
 .notif.on>.n-bar{animation:none}
+/* a source to cite pops up on its own while you write: lower right, under the preview and clear of the pill */
+.cite-pop{top:auto;bottom:96px;z-index:31}
+.cite-pop h3{display:flex;align-items:center;gap:10px}
+.cite-pop .c-ic{width:32px;height:32px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--hot);color:#fff}
+.cite-pop .c-ic svg{width:15px;height:15px}
+.cite-pop .c-t{color:var(--ink);font-weight:500;font-size:15px}
 @keyframes n-in{from{opacity:0;transform:translateY(10px)}}
 .cta{display:flex;gap:8px;padding-top:14px}
 .bare .stage{padding:0;background:var(--bare)}
@@ -684,6 +694,7 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
 <div class="pill-wrap"><div class="pill" id="pill" data-state="noting" data-el="indicator" inert></div></div>
 <div class="toast" id="toast" role="status"></div>
 <div class="notif" id="notif" data-el="notification" role="status" inert></div>
+<div class="notif cite-pop" id="citepop" data-el="citation" role="status" inert></div>
 
 <script>
 (()=>{'use strict';
@@ -721,16 +732,19 @@ const ICON={
 const SAMPLE={
   subject:'Biology',
   sources:[{app:'Class notes',title:'Unit 3 notes: Cell biology',url:'docs.school.example/unit-3-notes'},{app:'Lecture video',title:'Biology 101, Lecture 7',url:'video.school.example/biology-101/7'}],
-  script:[['doc1',13000],['chat',3500],['doc2',12000],['music',3000],['doc2',5000],['talk',12000]],
+  script:[['doc1',13000],['chat',3500],['doc2',12000],['music',3000],['doc2',5000],['talk',12000],['essay',17000]],
   docs:{
     doc1:{tab:'Unit 3 notes: Cell biology',h:'Unit 3: The cell membrane',p:['The cell membrane is a phospholipid bilayer. The hydrophilic heads face the water on each side and the hydrophobic tails face inward.','The membrane is selectively permeable. Small nonpolar molecules such as oxygen and carbon dioxide cross freely by simple diffusion.','Larger or charged molecules need membrane proteins. Channel and carrier proteins allow facilitated diffusion, and pumps use ATP for active transport against the gradient.']},
     doc2:{tab:'Unit 3 notes: Cell biology',h:'Mitochondria and ATP',p:['Mitochondria make most of the cell\'s ATP through cellular respiration.','The inner membrane folds into cristae. The folds add surface area for the electron transport chain.','Overall: glucose + oxygen gives carbon dioxide + water + about 30 ATP.']},
-    talk:{h:'Photosynthesis: the light reactions',p:['Take place in the thylakoid membrane','Water is split: releases oxygen, supplies electrons','Products: ATP and NADPH, which power the Calvin cycle']}
+    talk:{h:'Photosynthesis: the light reactions',p:['Take place in the thylakoid membrane','Water is split: releases oxygen, supplies electrons','Products: ATP and NADPH, which power the Calvin cycle']},
+    essay:{tab:'Essay draft - Google Docs',h:'How cells make energy',p:['Mitochondria make most of the cell\'s ATP through cellular respiration. Their inner membrane folds into cristae, which add surface area for the electron transport chain.']}
   },
   notes:{
     doc1:{app:'Class notes',topic:'The cell membrane',notes:['The membrane is a phospholipid bilayer: heads face the water, tails face inward.','It is selectively permeable. Small nonpolar molecules cross freely.','Larger or charged molecules need proteins: facilitated diffusion, or active transport using ATP.'],terms:['phospholipid bilayer','selectively permeable','active transport']},
     doc2:{app:'Class notes',topic:'Mitochondria and ATP',notes:['Mitochondria make most of the cell\'s ATP through cellular respiration.','The inner membrane folds into cristae, which add surface area for the electron transport chain.','Glucose + oxygen gives carbon dioxide + water + about 30 ATP.'],terms:['ATP','cristae','electron transport chain']},
-    talk:{app:'Lecture video',topic:'Photosynthesis: light reactions',notes:['The light reactions happen in the thylakoid membrane.','Water is split, which releases oxygen and supplies electrons.','The products, ATP and NADPH, power the Calvin cycle.'],terms:['thylakoid membrane','NADPH','Calvin cycle']}
+    talk:{app:'Lecture video',topic:'Photosynthesis: light reactions',notes:['The light reactions happen in the thylakoid membrane.','Water is split, which releases oxygen and supplies electrons.','The products, ATP and NADPH, power the Calvin cycle.'],terms:['thylakoid membrane','NADPH','Calvin cycle']},
+    // writing, not reading: no note is taken, and the page it restates is offered as a source
+    essay:{app:'Google Docs',topic:'Essay draft',notes:[],cite:{app:'Class notes',title:'Unit 3 notes: Cell biology',url:'docs.school.example/unit-3-notes'}}
   },
   summary:{title:'Cell biology: membranes and energy',subject:'Biology',takeaways:['Membranes control what enters and leaves a cell.','Mitochondria turn glucose and oxygen into ATP.','Photosynthesis stores light energy as ATP and NADPH, then sugar.'],quiz:[{q:'Why can small nonpolar molecules cross the membrane without help?',a:'The inside of the bilayer is nonpolar, so they pass straight through it.'},{q:'What do cristae do for a mitochondrion?',a:'They add surface area for the electron transport chain.'},{q:'Which two products of the light reactions feed the Calvin cycle?',a:'ATP and NADPH.'}]}
 };
@@ -917,7 +931,7 @@ function openSeg(k,t,st){closeSeg(t);S.segs.push({k,a:t,b:null,st})}
 const focusMs=end=>S.segs.reduce((a,s)=>a+(s.k==='focus'?(s.b??end)-s.a:0),0);
 const glanceN=()=>S.segs.filter(s=>s.k==='glance').length;
 
-function reset(demo){Object.assign(S,{running:true,paused:false,finishing:false,shot:false,demo,t0:Date.now(),end:0,segs:[],notes:[],main:null,detour:null,prev:null,sig:null,off:null,queue:[],pending:[],busy:false,seen:new Set(),sid:0,selfAt:0,cool:0,motion:0,flashing:false,cite:null,pages:new Map(),stream:null,reader:null,scene:null,errMsg:''})}
+function reset(demo){Object.assign(S,{running:true,paused:false,finishing:false,shot:false,demo,t0:Date.now(),end:0,segs:[],notes:[],main:null,detour:null,prev:null,sig:null,off:null,queue:[],pending:[],busy:false,seen:new Set(),sid:0,selfAt:0,cool:0,motion:0,flashing:false,cite:null,citeKey:'',pages:new Map(),stream:null,reader:null,scene:null,errMsg:''});show($('#citepop'),false)}
 function touch(st,g,now,dl){if(dl>TH.move)st.lastChange=now;st.dirty=!st.keyFine||mad(g.fine,st.keyFine)/255>TH.key}
 function step(g,now){
   const dl=S.prev?mad(g.fine,S.prev.fine)/255:0;S.motion=S.motion*.8+(dl>TH.move*2?.2:0);
@@ -1080,9 +1094,13 @@ function bestSource(lines){if(!S.pages)return null;const D=lines.map(wordsOf).fi
     if(hits&&(!best||score>best.score))best={score,hits,p}}
   return best&&(best.hits>=2||best.score>=.8)?{app:best.p.app,title:best.p.title,url:best.p.url,at:best.p.at}:null}
 const citeText=c=>[c.title,c.app,c.url,'Accessed '+new Date(c.at||Date.now()).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})].filter(Boolean).join('. ')+'.';
-function setCite(c){S.cite=c||null;paint()}
+// A new source pops up on its own, in the page and on the floating window's line. One you closed stays closed until a different one turns up.
+function setCite(c){c=c||null;const k=c?String(c.url||c.title||c.app||''):'';S.cite=c;if(k!==S.citeKey){S.citeKey=k;popCite(c)}paint()}
+function popCite(c){const n=$('#citepop');if(!c)return show(n,false);
+  n.innerHTML=`<div class="n-top"><b class="wm">rewrite</b><span>From a page you read</span><button class="n-x" data-act="cite-x" aria-label="Dismiss">${ic('x')}</button></div><h3><i class="c-ic">${ic('quote')}</i>Cite this</h3><p class="c-t">${esc(c.title||c.app||'A page you read')}</p><p>${esc([c.title?c.app:'',c.url].filter(Boolean).join(' · ')||'Read earlier in this session')}</p><div class="cta"><button class="btn dark sm" data-act="cite">${ic('copy')}Copy citation</button><button class="btn line sm" data-act="cite-x">Not now</button></div>`;
+  n.classList.remove('on');void n.offsetWidth;show(n,true)}
 function copyCite(c,win){if(!c)return;const t=citeText(c),done=()=>toast('Citation copied. Check it against your style guide.');
-  ((win&&win.navigator.clipboard)||navigator.clipboard).writeText(t).then(done,()=>navigator.clipboard.writeText(t).then(done,()=>toast('Copy did not work here.')))}
+  ((win&&win.navigator&&win.navigator.clipboard)||navigator.clipboard).writeText(t).then(done,()=>navigator.clipboard.writeText(t).then(done,()=>toast('Copy did not work here.')))}
 async function deviceNotes(frames,st={}){
   const w=await withTimeout(loadTess(),60000,'The on-device reader took too long to load.'),top=frames[frames.length-1].c;
   // the top strip on its own, at twice the size: its text is small
@@ -1129,7 +1147,7 @@ async function writeNote(st,frames){
   S.busy=true;paint();
   if(!opened){$$('#stream .wait').forEach(e=>e.remove());$('#stream').insertAdjacentHTML('afterbegin','<div class="card wait writing" id="writing"><span>Writing a note</span><i style="width:78%"></i><i style="width:56%"></i></div>')}
   try{const w=writer(),r=w==='claude'?await claudeNotes(frames):w==='device'?await deviceNotes(frames,st):w==='sample'?await sampleNotes(frames):null;
-    if(r){const ns=arr(r.notes);if('cite' in r)setCite(typeof r.cite==='number'?[...S.pages.values()][r.cite-1]:r.cite);
+    if(r){const ns=arr(r.notes);if('cite' in r)setCite(typeof r.cite==='number'?[...S.pages.values()][r.cite-1]:r.cite&&typeof r.cite==='object'?r.cite:null);else if(S.cite&&!WRITING.test(String(r.app||'')))setCite(null);
       if(w==='claude'&&r.url&&!WRITING.test(r.app||'')&&!NOCITE.test(r.app||''))remember(r.url,{app:String(r.app||''),title:String(r.topic||''),url:String(r.url)},ns.map(String));
       st.label=[r.topic,r.app].filter(Boolean).join(' · ')||st.label;
       if(r.on_task===false&&!ns.length){st.isBreak=true;S.segs.forEach(s=>{if(s.st===st.id&&s.k==='focus')s.k='break'})}
@@ -1184,7 +1202,7 @@ const SIMSCRIPT=[['doc1',16000],['ai',7000],['doc1',10000],['chat',6000],['doc2'
 function startSim(){if(S.running)return;reset(false);S.sim=true;
   const cv=document.createElement('canvas');cv.width=1280;cv.height=720;const cx=cv.getContext('2d');S.sceneI=0;S.scene=SIMSCRIPT[0][0];S.sceneAt=Date.now();
   drawScene(cx,S.scene,0);S.demoT=setInterval(()=>drawScene(cx,S.scene,Date.now()-S.sceneAt),250);
-  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},clean:cleanLine,codey,which:whichApp,skipHost,float(){const f=document.createElement('iframe');f.style.cssText='position:fixed;left:24px;top:90px;width:236px;height:44px;border:0;z-index:99';document.body.append(f);dressFloat(f.contentDocument);S.float={document:f.contentDocument,close(){f.remove()},resizeTo(){}};paint();return f},read:async(ids,st={})=>{const out=[];for(const id of [].concat(ids)){const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);out.push(await deviceNotes([{c,t:Date.now(),tag:id}],st))}return out.length>1?out:out[0]}}}
+  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},clean:cleanLine,codey,which:whichApp,skipHost,cite:setCite,float(){const f=document.createElement('iframe');f.style.cssText='position:fixed;left:24px;top:90px;width:236px;height:44px;border:0;z-index:99';document.body.append(f);dressFloat(f.contentDocument);S.float={document:f.contentDocument,close(){f.remove()},resizeTo(){}};paint();return f},read:async(ids,st={})=>{const out=[];for(const id of [].concat(ids)){const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);out.push(await deviceNotes([{c,t:Date.now(),tag:id}],st))}return out.length>1?out:out[0]}}}
 function togglePause(){if(!S.running||S.finishing)return;const now=Date.now();S.paused=!S.paused;if(S.paused){if(S.detour)endDetour();S.off=null;if(S.main)openSeg('pause',now,null)}else{S.prev=S.sig=null;if(S.demo)S.sceneAt+=now-(S.pausedAt||now)}S.pausedAt=now;paint()}
 async function finish(){
   if(!S.running||S.finishing)return;S.finishing=true;const now=Date.now();stopCapture();
@@ -1195,7 +1213,7 @@ async function finish(){
   while(S.queue.length){const st=S.queue.shift();await writeNote(st,st.frames.splice(0))}
   const sum=await summarize();
   const rec={id:'s'+S.t0,at:S.t0,dur:S.end-S.t0,focusMs:focusMs(S.end),glances:glanceN(),title:String(sum.title||'Session notes'),subject:String(sum.subject||'General'),takeaways:arr(sum.takeaways).map(String),quiz:arr(sum.quiz).filter(q=>q&&q.q).map(q=>({q:String(q.q),a:String(q.a||'')})),notes:S.notes,sources:S.demo?SAMPLE.sources.map(x=>({...x,at:S.t0})):[...S.pages.values()].filter(p=>p.title||p.url).map(p=>({app:p.app,title:p.title,url:p.url,at:p.at})).slice(0,12),segs:S.segs.map(s=>({k:s.k,a:s.a-S.t0,b:(s.b??S.end)-S.t0,...(s.app&&{app:s.app})})),engine:writer(),sample:S.demo};
-  clearInterval(S.timer);S.running=false;S.finishing=false;show($('#pill'),false);show($('#dock'),true);if(S.float){try{S.float.close()}catch{}S.float=null}document.title='Rewrite';
+  clearInterval(S.timer);S.running=false;S.finishing=false;show($('#pill'),false);show($('#citepop'),false);show($('#dock'),true);if(S.float){try{S.float.close()}catch{}S.float=null}document.title='Rewrite';
   if(!rec.notes.length&&rec.focusMs<5000){toast('Nothing was recorded, so nothing was saved.');return go('home')}
   sessions.unshift(rec);sessions=sessions.slice(0,60);persist();openSession(rec);if(!document.hasFocus())notify(rec)}
 function notify(r){const n=$('#notif'),k=r.notes.length,g=r.glances;clearTimeout(S.nT);n.classList.remove('timed');
@@ -1207,15 +1225,15 @@ const pillState=()=>S.finishing?'finishing':S.paused?'paused':!S.demo&&(S.selfAt
 function paint(){if(!S.running)return;const st=pillState(),now=S.end||Date.now(),f=clock(focusMs(now));
   [$('#pill'),S.float&&S.float.document.querySelector('.pill')].forEach((p,fl)=>{if(!p)return;p.dataset.state=st==='finishing'?'writing':st;
     if(fl){p.classList.toggle('has-cite',!!S.cite);
-      if(!S.flashing){const el=$('.pl-t',p),txt=S.cite&&st==='noting'?'Cite: '+[S.cite.title,S.cite.app].filter(Boolean).join(' · '):FL[st];
-        if(el.textContent!==txt){el.className='pl-t';el.textContent=txt;if(S.cite&&st==='noting'){const over=el.scrollWidth-el.parentElement.clientWidth;el.style.setProperty('--dx',(over>0?-over-8:0)+'px');el.style.setProperty('--dur',Math.max(4,txt.length*.11)+'s');if(over>0)el.className='pl-t loop'}}}}else{$('.pill-label',p).textContent=STATE[st];$('.pill-time',p).textContent=f}
+      if(!S.flashing){const el=$('.pl-t',p),txt=S.cite&&st==='noting'?'Cite this: '+[S.cite.title,S.cite.app].filter(Boolean).join(' · '):FL[st];
+        if(el.textContent!==txt){el.className='pl-t';el.textContent=txt;if(S.cite&&st==='noting'){void el.offsetWidth;const over=el.scrollWidth-el.parentElement.clientWidth;el.style.setProperty('--dx',(over>0?-over-8:0)+'px');el.style.setProperty('--dur',Math.max(4,txt.length*.11)+'s');el.className='pl-t cite'+(over>0?' loop':'')}}}}else{$('.pill-label',p).textContent=STATE[st];$('.pill-time',p).textContent=f}
     $('[data-act="pause"]',p).innerHTML=ic(S.paused?'play':'pause')});
   document.title=(st==='noting'||st==='writing'?'● ':'')+f+' · Rewrite';
   if(view!=='session'||opened)return;
   ribbon($('#ribbon'),S.segs,now);$('#axis-end').textContent=clock(now-S.t0);$('#k-focus').textContent=f;$('#k-notes').textContent=S.notes.length;const gn=glanceN();$('#k-gl').textContent=gn;if(gn!==S.outN){S.outN=gn;$('#s-out').innerHTML=outHTML(S.segs)}
   const hp=$('#hd-pause');if(hp)hp.innerHTML=ic(S.paused?'play':'pause')+(S.paused?'Resume':'Pause');
   $('#see').classList.toggle('away',!!S.detour);
-  $('#now').textContent=st==='ready'?'Waiting for you to switch to your work. Time spent in this tab is not counted.':st==='away'?`Somewhere else for ${Math.round((now-S.detour.start)/1000)} s. Social, chat, music and video apps are left out of your notes; anything else is kept.`:st==='paused'?'Paused. Nothing is being read.':st==='finishing'?'Writing the last notes and the summary.':S.main&&S.main.label?'Reading: '+S.main.label:'Reading along.';
+  $('#now').textContent=st==='ready'?'Waiting for you to switch to your work. Time spent in this tab is not counted.':st==='away'?`Somewhere else for ${Math.round((now-S.detour.start)/1000)} s. Social, chat, music and video apps are left out of your notes; anything else is kept.`:st==='paused'?'Paused. Nothing is being read.':st==='finishing'?'Writing the last notes and the summary.':S.main&&S.main.label?(/^(Reading|Watching|Writing|Slides|Asking)\b/.test(S.main.label)?'':WRITING.test(S.main.label)?'Writing: ':'Reading: ')+S.main.label:'Reading along.';
   if(DEBUG&&S.sig&&S.main){const d=$('#diag');d.hidden=false;d.textContent=`app ${mad(S.sig.app,S.main.ref.app).toFixed(3)} / ${(TH.app*sensK()).toFixed(3)}\ntabs ${topk(S.sig.app,S.main.ref.app).toFixed(3)} / ${(TH.tab*sensK()).toFixed(3)}   motion ${S.motion.toFixed(2)}\nhist ${hd(S.sig.hist,S.main.ref.hist).toFixed(3)} / ${(TH.hist*sensK()).toFixed(3)}\nfine ${S.main.keyFine?(mad(S.sig.fine,S.main.keyFine)/255).toFixed(4):'-'} / ${TH.key}\nframes ${S.main.frames.length} queue ${S.queue.length} writer ${writer()}`}}
 function tick(){if(!S.running)return;const now=Date.now();
   if((S.demo||S.sim)&&!S.paused&&!S.finishing&&!S.shot){const script=S.sim?SIMSCRIPT:SAMPLE.script,sc=script[S.sceneI];if(now-S.sceneAt>=sc[1]){if(++S.sceneI>=script.length){finish();return}S.scene=script[S.sceneI][0];S.sceneAt=now}}
@@ -1256,6 +1274,9 @@ function drawScene(c,id,t){
   else if(id==='gdoc'||id==='gdoc2'){R(0,0,W,H,'#F9FBFD');R(0,0,W,44,'#DEE1E6');R(12,8,300,36,'#FFFFFF',10);Tx('Essay draft - Google Docs',28,31,'500 13px system-ui','#3C4043');R(0,44,W,44,'#FFFFFF');R(96,52,820,28,'#F1F3F4',14);Tx('docs.google.com/document/d/1AbCdEf/edit',116,71,'13px system-ui','#5F6368');R(0,88,W,1,'#DADCE0');R(220,112,840,H,'#FFFFFF',4);
     let y3=190;for(const p of id==='gdoc'?['My essay starts with the structure of a cell.','The cell membrane is a phospholipid bilayer, and the hydrophilic heads face the water on each side.','Small nonpolar molecules such as oxygen cross the membrane freely by simple diffusion.']:['My essay is about the history of the bicycle.','The first pedal bicycles appeared in France during the 1860s and spread quickly across Europe.'])y3=wrap(p,290,y3,700,31,'19px Georgia','#202124')+18}
   else if(id==='music'){R(0,0,W,H,'#121212');R(0,0,240,H,'#000000');['Home','Search','Your Library'].forEach((n,i)=>Tx(n,28,52+i*40,'600 15px system-ui',i?'#B3B3B3':'#FFFFFF'));['Playlists','Liked Songs'].forEach((n,i)=>Tx(n,28,196+i*36,'14px system-ui','#B3B3B3'));Tx('Made for you',272,64,'700 28px system-ui','#FFFFFF');['#8D67AB','#1E3264','#E8115B','#148A08','#BC5900'].forEach((f,i)=>{R(272+i*196,96,176,176,f,8);Tx(['Focus mix','Lo-fi beats','Top hits','Chill','Throwback'][i],272+i*196,300,'600 15px system-ui','#FFFFFF')});R(0,H-84,W,84,'#181818');dot(W/2,H-52,18,'#1ED760');R(W/2-220,H-20,440,4,'#4D4D4D',2);R(W/2-220,H-20,60+(t/50)%300,4,'#FFFFFF',2)}
+  else if(id==='essay'){R(0,0,W,H,'#F9FBFD');R(0,0,W,44,'#DEE1E6');R(12,8,300,36,'#FFFFFF',10);Tx(d.tab,28,31,'500 13px system-ui','#3C4043');R(0,44,W,44,'#FFFFFF');R(96,52,820,28,'#F1F3F4',14);Tx('docs.google.com/document/d/1AbCdEf/edit',116,71,'13px system-ui','#5F6368');R(0,88,W,1,'#DADCE0');R(220,112,840,H,'#FFFFFF',4);
+    // the paragraph is typed as you watch, then the caret waits at its end
+    Tx(d.h,290,186,'600 34px Georgia','#202124');const tx=d.p[0],k=Math.min(tx.length,Math.floor(t/30));wrap(tx.slice(0,k)+(k<tx.length||blink?'|':''),290,242,700,31,'19px Georgia','#202124')}
   else{R(0,0,W,H,'#0F0F0F');R(420,12,440,30,'#222222',15);Tx('Search',440,32,'14px system-ui','#AAAAAA');R(24,64,860,484,'#16324F',10);Tx(d.h,64,150,'600 36px system-ui','#FFFFFF');d.p.forEach((p,i)=>Tx('•  '+p,72,226+i*64,'24px system-ui','#DCE9F5'));R(24,542,860,6,'#3A3A3A',3);R(24,542,200+(t/40)%600,6,'#FF4E45',3);Tx('Biology 101, Lecture 7',24,592,'600 20px system-ui','#FFFFFF');for(let i=0;i<5;i++){R(908,64+i*104,160,92,'#272727',8);R(1080,72+i*104,170,12,'#3A3A3A',6);R(1080,96+i*104,110,10,'#2C2C2C',5)}}}
 
 /* ================= DELETING =================
@@ -1466,7 +1487,8 @@ function onAct(e){const b=e.target.closest('[data-act]');if(!b)return;const a=b.
   else if(a==='mini')toggleMini();
   else if(a==='undo')undo();
   else if(a==='del-session'){if(opened)delSession(opened.id)}
-  else if(a==='cite')copyCite(S.cite,S.float);
+  else if(a==='cite'){copyCite(S.cite,S.float);show($('#citepop'),false)}
+  else if(a==='cite-x')show($('#citepop'),false);
   else if(a==='dismiss')show($('#notif'),false);
   else if(a==='copy'&&opened){const md=toMD(opened);(navigator.clipboard?navigator.clipboard.writeText(md):Promise.reject()).then(()=>toast('Notes copied.'),()=>toast('Copy did not work here. Use Download.'))}
   else if(a==='download'&&opened){const u=URL.createObjectURL(new Blob([toMD(opened)],{type:'text/markdown'})),l=document.createElement('a');l.href=u;l.download=opened.title.replace(/[^\w -]/g,'').trim().replace(/\s+/g,'-').toLowerCase()+'.md';l.click();setTimeout(()=>URL.revokeObjectURL(u),2000)}}
@@ -1534,6 +1556,20 @@ function checkBuild(){if(location.protocol!=='https:'||S.running||view!=='home')
     if(!m||+m[1]<=mine||S.running||view!=='home'||sessionStorage.getItem('rw:tried')===m[1])return;sessionStorage.setItem('rw:tried',m[1]);
     const q=new URLSearchParams(location.search);q.set('v',m[1]);location.replace(location.pathname+'?'+q)}).catch(()=>{})}
 checkBuild();document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkBuild()});
+/* ---- smooth wheel scrolling ----
+   A mouse wheel moves a page in jumps. Here the page glides to where the wheel sent it.
+   Panels that scroll on their own, pinch zoom, sideways scrolling, touch and the keyboard are left to the browser. */
+(()=>{let target=0,cur=0,set=0,raf=0,lastT=0;
+  const inner=(el,dy)=>{for(;el&&el!==document.body&&el!==root;el=el.parentElement){const o=getComputedStyle(el).overflowY;if((o==='auto'||o==='scroll')&&el.scrollHeight>el.clientHeight+1&&(dy<0?el.scrollTop>0:el.scrollTop+el.clientHeight<el.scrollHeight-1))return true}return false};
+  const run=t=>{const dt=Math.max(0,Math.min(.05,(t-lastT)/1000));lastT=t;
+    if(Math.abs(scrollY-set)>3){raf=0;return}                 // something else moved the page (a link, the keyboard, the scrollbar): let go
+    cur+=(target-cur)*(1-Math.exp(-dt*9));if(Math.abs(target-cur)<.4)cur=target;
+    scrollTo(0,cur);set=scrollY;
+    if(Math.abs(set-cur)>2){cur=target=set;raf=0;return}       // the end of the page
+    raf=cur===target?0:requestAnimationFrame(run)};
+  addEventListener('wheel',e=>{if(e.ctrlKey||e.defaultPrevented||Math.abs(e.deltaX)>Math.abs(e.deltaY)||inner(e.target,e.deltaY)||getComputedStyle(root).overflowY==='hidden'||getComputedStyle(document.body).overflowY==='hidden')return;   // not while the page itself is held still
+    e.preventDefault();if(!raf){cur=target=set=scrollY;lastT=performance.now();raf=requestAnimationFrame(run)}
+    target=Math.max(0,target+e.deltaY*(e.deltaMode===1?40:e.deltaMode===2?innerHeight:1))},{passive:false})})();
 if(Q.has('sample')){history.replaceState(null,'',location.pathname);startDemo()}   // a reload then shows the app, not the sample again
 })();
 </script>
