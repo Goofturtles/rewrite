@@ -91,6 +91,13 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 .pill[data-state="away"] .led::after,.pill[data-state="paused"] .led::after,.pill[data-state="ready"] .led::after{animation:none;opacity:.6}
 .pill[data-state="away"] .trace,.pill[data-state="paused"] .trace,.pill[data-state="ready"] .trace{animation-play-state:paused;opacity:.3}
 .pill[data-state="writing"] .trace{animation-duration:.8s}
+/* floating window only (body.fl): quiet until the pointer is on it, and it can shrink to a dot */
+.fl .pill-label,.fl .pill-btn{overflow:hidden;transition:opacity .3s ease,max-width .5s var(--ease),min-width .5s var(--ease),margin .5s var(--ease)}
+.fl .pill-label{max-width:170px}
+.fl .pill-btn{max-width:34px}
+.fl:not(:hover) .pill:not(.mini) .pill-label,.fl:not(:hover) .pill:not(.mini) .pill-btn{max-width:0;min-width:0;opacity:0;margin:0 -6px;pointer-events:none}
+.fl .pill.mini{cursor:pointer;gap:9px}
+.fl .pill.mini .pen,.fl .pill.mini .pill-label,.fl .pill.mini .pill-btn{display:none}
 </style>
 <style>
 html,body{height:100%}
@@ -174,7 +181,41 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 .link{font:500 13px/1.4 var(--ui);color:var(--ink2);text-decoration:underline;text-underline-offset:3px;transition:color .25s}
 .link:hover{color:var(--ink)}
 
-/* home */
+/* home: a calm column. One sentence, a line that keeps being written, one button, the latest notes. */
+.calm{padding:52px 44px 34px}
+.mega{font:600 clamp(56px,6.4vw,96px)/1.04 var(--ui);letter-spacing:-.052em;margin:16px 0 0;max-width:14ch}
+.mega i{font-style:normal;color:var(--peri)}
+[data-theme="light"] .mega i{color:var(--blue)}
+.mega-sub{margin:20px 0 0;max-width:48ch;font-size:17.5px;line-height:1.5;color:var(--ink2)}
+.wave{margin:36px 0 34px}
+.wave svg{display:block;width:100%;height:40px;overflow:visible}
+.wave path{fill:none;stroke-width:2.6;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.wave .w-ghost{stroke:var(--line)}
+.wave .w-live{stroke:var(--blue);stroke-dasharray:8 92;animation:trace 5s linear infinite}
+.wave.busy .w-live{stroke-dasharray:22 78;animation-duration:2.2s}
+.calm-acts{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.startb{display:inline-flex;align-items:center;gap:15px;height:70px;padding:0 32px 0 11px;border-radius:99px;background:var(--hot);color:#fff;font:600 19.5px/1.2 var(--ui);letter-spacing:-.02em;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 26px 46px -22px rgba(var(--hot-rgb),.95);transition:transform .5s var(--spring),box-shadow .5s var(--ease)}
+.startb:hover{transform:translateY(-3px) scale(1.02);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 34px 54px -22px rgba(var(--hot-rgb),1)}
+.startb:active{transform:scale(.97);transition-duration:.12s}
+.go-dot{width:48px;height:48px;border-radius:50%;background:var(--night);display:grid;place-items:center;flex:none}
+.go-dot i{width:14px;height:14px;border-radius:50%;background:var(--hot-hi);animation:led 2.4s ease-in-out infinite}
+.sampleb{display:inline-flex;align-items:center;gap:11px;height:48px;padding:0 4px;font:500 15.5px/1.3 var(--ui);color:var(--ink2);transition:color .25s}
+.sampleb:hover{color:var(--ink)}
+.s-arr{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--wash2);box-shadow:inset 0 0 0 1px var(--line);transition:transform .45s var(--ease)}
+.s-arr svg{width:15px;height:15px}
+.sampleb:hover .s-arr{transform:translateX(5px)}
+.calm-meta{margin:28px 0 0;font-size:13.5px;line-height:1.5;color:var(--ink3)}
+.calm-meta b{font-weight:600;color:var(--ink2)}
+.recent2{margin:8px 24px 10px;padding:24px 20px 6px;border-top:1px solid var(--line2)}
+.recent-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.recent-h h2{font:600 15.5px/1.35 var(--ui);letter-spacing:-.015em;margin:0}
+.lrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:14px;align-items:center;width:100%;text-align:left;padding:16px 6px;border-top:1px solid var(--line2);transition:padding .45s var(--ease),background .3s}
+.lrow:first-child{border-top:0}
+.lrow:hover{padding-left:14px;background:var(--wash)}
+.lrow b{font:500 17.5px/1.35 var(--ui);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow small{font-size:13px;line-height:1.4;color:var(--ink3);white-space:nowrap}
+.lrow .tok{width:11px;height:11px}
+.lrow svg{width:16px;height:16px;color:var(--ink3)}
 .home{display:grid;grid-template-columns:1.55fr 1fr;grid-template-areas:"b a" "c g";gap:16px}
 .a{grid-area:a}.b{grid-area:b}.c{grid-area:c}.d{grid-area:d}.e{grid-area:e}.f{grid-area:f}.g{grid-area:g}
 .today{display:flex;flex-direction:column;min-height:240px}
@@ -443,19 +484,21 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
 
   <main class="main">
     <section class="view on" id="v-home">
-      <div class="p-head rise"><div><div class="eyebrow" id="today-date"></div><h1 class="title">You do the work. We <i>rewrite</i> it as notes.</h1></div><p class="lede">Quick glances at Discord or Spotify don't count.</p></div>
-      <div class="home">
-        <div class="card hot b start rise" style="--i:1" data-el="hero">
-          <h2 class="cap">New session</h2>
-          <button class="go" data-act="start" aria-label="Start a session"><span></span></button>
-          <h3>Start taking notes</h3>
-          <p>Share your screen, then carry on</p>
-          <button class="keep" data-act="start"><span>Start a session</span><span class="arr" id="start-arr"></span></button>
-          <div class="cells"><div><b id="c-glance"></b><small>Glance limit</small></div><div><b id="c-writer"></b><small>Writes the notes</small></div><button data-act="sample"><b>Sample</b><small>Play a demo</small></button></div>
+      <!-- one sentence, one line that keeps being written, one button, then the latest notes -->
+      <div class="calm" data-el="hero">
+        <div class="eyebrow rise" id="today-date"></div>
+        <h1 class="mega rise" style="--i:1" id="mega"></h1>
+        <p class="mega-sub rise" style="--i:2" id="mega-sub"></p>
+        <div class="wave rise" style="--i:3" id="wave" aria-hidden="true"></div>
+        <div class="calm-acts rise" style="--i:4">
+          <button class="startb" data-act="start"><span class="go-dot"><i></i></span><span id="start-label">Start a session</span></button>
+          <button class="sampleb" data-act="sample"><span>Play the 50 second sample</span><span class="s-arr" id="start-arr"></span></button>
         </div>
-        <div class="card a today rise" style="--i:2" id="h-today" data-el="today-card"></div>
-        <div class="card peri c latest rise" style="--i:3" id="h-notes" data-el="prompt-card"></div>
-        <div class="card peri2 g rise" style="--i:4" id="h-recent" data-el="recent-card"></div>
+        <p class="calm-meta rise" style="--i:5">Glance limit <b id="c-glance"></b> · Notes by <b id="c-writer"></b> · <button class="link" data-go="settings">Change</button></p>
+      </div>
+      <div class="recent2 rise" style="--i:6" data-el="recent-card">
+        <div class="recent-h"><h2>Latest notes</h2><button class="link" data-go="notes">See all</button></div>
+        <div id="h-notes"></div>
       </div>
     </section>
 
@@ -556,7 +599,7 @@ const ICON={
   float:'<rect x="3.5" y="5" width="17" height="13" rx="2.5"/><rect x="12" y="11" width="6" height="4.5" rx="1"/>',
   copy:'<rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',
   down:'<path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/>',check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
-  arrow:'<path d="M5 12h14m0 0-5-5m5 5-5 5"/>',plus:'<path d="M12 5v14M5 12h14"/>',x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  arrow:'<path d="M5 12h14m0 0-5-5m5 5-5 5"/>',plus:'<path d="M12 5v14M5 12h14"/>',x:'<path d="M6 6l12 12M18 6 6 18"/>',mini:'<path d="M6 12h12"/>',
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/>',
   moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'
 };
@@ -644,16 +687,18 @@ const barsHTML=w=>{const mx=Math.max(1,...w.map(d=>d.focus));return w.map((d,i)=
 
 /* ================= RENDER: HOME / NOTES / RECAP ================= */
 function renderHome(){
-  renderSide();const w=week(),t=w[6],s=sessions[0],p=Math.min(1,t.focus/GOAL);
+  renderSide();const t=week()[6],mins=Math.round(t.focus/6e4),live=S.running;
   $('#today-date').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
-  $('#h-today').innerHTML=`<div class="cap">Today's focus<span class="hint">${t.notes} notes · ${t.glances} glances ignored</span></div><div class="big"><span id="today-n"></span><small>/ ${Math.round(GOAL/6e4)} min</small></div><div class="meter" style="--p:${Math.max(.05,p)};--r:${Math.max(.05,1-p)}"><i class="fill"></i><i class="rest"></i></div>`;
-  countUp($('#today-n'),t.focus,v=>Math.round(v/6e4));
-  $('#c-glance').textContent=cfg.glance+' s';$('#c-writer').textContent=DEMO||engine()==='claude'?'Claude':engine()==='device'?'This laptop':'Not set yet';
-  const ln=sessions.flatMap(x=>[...x.notes].reverse().map(n=>({n,x}))).slice(0,3);
-  $('#h-notes').innerHTML=ln.length?`<div class="cap">Latest notes<span class="hint">${when(ln[0].x.at)}</span></div><button class="inner" data-open="${esc(ln[0].x.id)}"><b>${esc(ln[0].n.title)}</b><p>${esc(ln[0].n.bullets[0]||'')}</p></button>${ln.slice(1).map((o,i)=>`<button class="stackrow r${i}" data-open="${esc(o.x.id)}"><b>${esc(o.n.title)}</b><small>${esc(o.x.subject||'General')} · ${when(o.x.at)}</small></button>`).join('')}<button class="ask" data-open="${esc(s.id)}"><span class="dot">${ic('spark')}</span><span>${s.quiz&&s.quiz.length?'Check yourself: '+s.quiz.length+' questions':'Open the last session'}</span><span class="arr">${ic('arrow')}</span></button>`
-    :`<div class="cap">Latest notes</div><div class="inner"><b>No notes yet</b><p>Start a session and what Rewrite writes will land here.</p></div><button class="ask" data-act="sample"><span class="dot">${ic('play')}</span><span>Play the 50 second sample</span><span class="arr">${ic('arrow')}</span></button>`;
+  // the one sentence says where today stands
+  $('#mega').innerHTML=live?'Taking <i>notes</i>.':mins?`<i>${mins} min</i> focused today.`:'Ready when <i>you</i> are.';
+  $('#mega-sub').textContent=live?'Carry on with your work. Come back here whenever you want to read along.':mins?`${t.notes} ${t.notes===1?'note':'notes'} written, ${t.glances} ${t.glances===1?'glance':'glances'} left out. Start another session whenever you like.`:'Share your screen and carry on. Rewrite writes the notes, and quick looks at social, chat and music apps are left out.';
+  $('#start-label').textContent=live?'Show the live session':'Start a session';
+  // the line that keeps being written: the logo's wave, drawn across the whole width
+  const wv=$('#wave');wv.classList.toggle('busy',!!live);if(!wv.firstChild){const d='M0 20q25-22 50 0'+'t50 0'.repeat(23);wv.innerHTML=`<svg viewBox="0 0 1200 40" preserveAspectRatio="none"><path class="w-ghost" d="${d}"/><path class="w-live" pathLength="100" d="${d}"/></svg>`}
+  $('#c-glance').textContent=cfg.glance+' s';$('#c-writer').textContent=DEMO||engine()==='claude'?'Claude':engine()==='device'?'this laptop':'nobody yet';
+  const ln=sessions.flatMap(x=>[...x.notes].reverse().map(n=>({n,x}))).slice(0,4);
+  $('#h-notes').innerHTML=ln.length?ln.map(o=>`<button class="lrow" data-open="${esc(o.x.id)}" data-el="session-row"><span class="tok" style="--c:${colorOf(o.x.subject||'General')}"></span><b>${esc(o.n.title)}</b><small>${esc(o.x.subject||'General')} · ${when(o.x.at)}</small>${ic('arrow')}</button>`).join(''):'<p class="empty">Nothing yet. After your first session, your notes are listed here.</p>';
   $('#start-arr').innerHTML=ic('arrow');
-  $('#h-recent').innerHTML=`<div class="cap">Recent sessions<button class="link" data-go="notes">See all</button></div><div>${sessions.length?sessions.slice(0,3).map(miniRow).join(''):'<p class="empty">Your sessions show up here.</p>'}</div>`;
 }
 function renderNotes(){
   renderSide();renderBoard()}
@@ -673,7 +718,7 @@ function renderRecap(){
 }
 
 /* ================= RENDER: SESSION ================= */
-const pillHTML=float=>`<span class="led"></span><svg class="pen" viewBox="0 0 64 20" aria-hidden="true"><path class="ghost" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/><path class="trace" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/></svg><button class="pill-label" data-act="show" aria-label="Show the live session"></button><span class="pill-time"></span><button class="pill-btn" data-act="pause" aria-label="Pause or resume"></button>${float?`<button class="pill-btn" data-act="finish" aria-label="Finish">${ic('stop')}</button>`:`<button class="pill-btn" data-act="float" aria-label="Float on top of other windows">${ic('float')}</button>`}`;
+const pillHTML=float=>`<span class="led"></span><svg class="pen" viewBox="0 0 64 20" aria-hidden="true"><path class="ghost" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/><path class="trace" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/></svg><button class="pill-label" data-act="show" aria-label="Show the live session"></button><span class="pill-time"></span><button class="pill-btn" data-act="pause" aria-label="Pause or resume"></button>${float?`<button class="pill-btn" data-act="finish" aria-label="Finish">${ic('stop')}</button><button class="pill-btn" data-act="mini" aria-label="Shrink to a dot">${ic('mini')}</button>`:`<button class="pill-btn" data-act="float" aria-label="Float on top of other windows">${ic('float')}</button>`}`;
 function ribbon(el,segs,end){while(el.children.length>segs.length)el.lastChild.remove();segs.forEach((s,i)=>{let n=el.children[i];if(!n){n=document.createElement('i');n.className='seg';el.append(n);n.offsetWidth}const b=s.b??end;n.className='seg '+s.k+(s.b==null&&s.k==='focus'?' live':'');n.style.flexGrow=Math.max(.4,(b-s.a)/1000);n.title=SEG[s.k]+' · '+dur(b-s.a)})}
 const noteHTML=(n,sub)=>`<article class="card note" data-el="note"><div class="meta"><span class="tok" style="--c:${colorOf(sub)}"></span>${clock(n.t)} · ${esc(n.src||'Screen')}</div><h3>${esc(n.title)}</h3><ul>${n.bullets.map((b,i)=>`<li style="--i:${i}">${markup(b,n.terms)}</li>`).join('')}</ul></article>`;
 function sessionShell(live,r){
@@ -912,6 +957,7 @@ function paint(){if(!S.running)return;const st=pillState(),now=S.end||Date.now()
 function tick(){if(!S.running)return;const now=Date.now();
   if((S.demo||S.sim)&&!S.paused&&!S.finishing&&!S.shot){const script=S.sim?SIMSCRIPT:SAMPLE.script,sc=script[S.sceneI];if(now-S.sceneAt>=sc[1]){if(++S.sceneI>=script.length){finish();return}S.scene=script[S.sceneI][0];S.sceneAt=now}}
   if(!S.paused&&!S.finishing&&!S.shot)checkSelf(now);logic(now);paint()}
+function toggleMini(){const w=S.float;if(!w)return;const pl=w.document.querySelector('.pill'),on=pl.classList.toggle('mini'),[ow,oh]=S.floatSize||[340,100];try{w.resizeTo(on?150:ow,oh)}catch{}}
 async function openFloat(auto,pre){
   if(!('documentPictureInPicture' in window)){if(!auto)toast('The floating indicator needs Chrome or Edge on a computer.');return}
   if(S.float||(!pre&&!S.running))return;
@@ -919,7 +965,10 @@ async function openFloat(auto,pre){
     w.document.head.innerHTML=`<title>Rewrite</title><link rel="stylesheet" href="${$('#fonts').href}"><style>${$('#base-css').textContent}${$('#pill-css').textContent}html,body{height:100%;margin:0;background:var(--night);overflow:hidden}body{display:grid;place-items:center}.pill{box-shadow:none;width:100%;justify-content:center}</style>`;
     w.document.documentElement.dataset.palette=root.dataset.palette;
     w.document.body.innerHTML=`<div class="pill" data-state="noting">${pillHTML(true)}</div>`;
-    w.document.body.addEventListener('click',onAct);w.addEventListener('pagehide',()=>{S.float=null});S.float=w;
+    // In the floating window the pill stays quiet: just the dot, the pen line and the time. The label and buttons
+    // appear when the pointer is over it. The dash button shrinks the window to a dot; a click on the dot brings it back.
+    w.document.body.className='fl';S.floatSize=[w.outerWidth,w.outerHeight];
+    w.document.body.addEventListener('click',e=>{const pl=w.document.querySelector('.pill');if(pl.classList.contains('mini'))return toggleMini();onAct(e)});w.addEventListener('pagehide',()=>{S.float=null});S.float=w;
     const p=w.document.querySelector('.pill');p.dataset.state='ready';p.querySelector('.pill-label').textContent=STATE.ready;p.querySelector('.pill-time').textContent='0:00';p.querySelector('[data-act="pause"]').innerHTML=ic('pause');paint()
   }catch(e){if(!auto)toast('The floating indicator could not open: '+e.message)}}
 
@@ -964,6 +1013,7 @@ function onAct(e){const b=e.target.closest('[data-act]');if(!b)return;const a=b.
   if(a==='pal'){cfg.palette=b.dataset.pal;saveCfg();return applyPalette(cfg.palette)}
   if(a==='start')startReal();else if(a==='sample')startDemo();else if(a==='pause')togglePause();else if(a==='finish')finish();else if(a==='float')openFloat(false);
   else if(a==='show'){if(S.running)showLive()}
+  else if(a==='mini')toggleMini();
   else if(a==='dismiss')show($('#notif'),false);
   else if(a==='copy'&&opened){const md=toMD(opened);(navigator.clipboard?navigator.clipboard.writeText(md):Promise.reject()).then(()=>toast('Notes copied.'),()=>toast('Copy did not work here. Use Download.'))}
   else if(a==='download'&&opened){const u=URL.createObjectURL(new Blob([toMD(opened)],{type:'text/markdown'})),l=document.createElement('a');l.href=u;l.download=opened.title.replace(/[^\w -]/g,'').trim().replace(/\s+/g,'-').toLowerCase()+'.md';l.click();setTimeout(()=>URL.revokeObjectURL(u),2000)}}

@@ -565,7 +565,9 @@ function intro(){
 const links=$('.links'),ind=$('.ind',links);
 function slideTo(a){const fresh=ind.style.opacity!=='1';if(fresh)ind.style.transition='opacity .25s';ind.style.width=a.offsetWidth+'px';ind.style.transform=`translateX(${a.offsetLeft}px)`;ind.style.opacity=1;if(fresh)requestAnimationFrame(()=>requestAnimationFrame(()=>{ind.style.transition=''}))}
 $$('a',links).forEach(a=>{a.addEventListener('pointerenter',()=>slideTo(a));a.addEventListener('focus',()=>slideTo(a))});
-links.addEventListener('pointerleave',()=>{ind.style.opacity=0});
+// leaving with the pointer lets go completely, even right after a click (a clicked link would otherwise keep focus and hold the pill open)
+links.addEventListener('pointerleave',()=>{ind.style.opacity=0;if(links.contains(document.activeElement))document.activeElement.blur()});
+links.addEventListener('click',e=>{const a=e.target.closest('a');if(a&&e.detail>0)a.blur()});
 links.addEventListener('focusout',e=>{if(!links.contains(e.relatedTarget))ind.style.opacity=0});
 /* scrolling down folds the pill small and names the section in view; scrolling up, or the top of the page, opens it */
 const SPY=[['#features','Features'],['#steps','Steps'],['#swap','Steps'],['#board','Notes'],['#words','Notes'],['#ways','Notes'],['#faq','FAQ']],mkT=$('#mk-t');
