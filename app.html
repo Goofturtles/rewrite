@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1280">
-<meta name="build" content="1794768958">
+<meta name="build" content="1794769591">
 <title>Rewrite</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%23528200'/%3E%3Cpath d='M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18' fill='none' stroke='%23fff' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://api.fontshare.com">
@@ -855,7 +855,7 @@ function toMD(r){const L=[`# ${r.title}`,'',`${new Date(r.at).toLocaleString()} 
 const S={running:false,float:null};
 const last=document.createElement('canvas'),lx=last.getContext('2d');
 const sm=document.createElement('canvas');sm.width=192;sm.height=108;const sx=sm.getContext('2d',{willReadFrequently:true});sx.imageSmoothingQuality='high';
-const T=()=>S.demo?{glance:6000,first:3500,every:5000,settle:1000,maxWait:5000,lazy:20000}:{glance:cfg.glance*1000,first:10000,every:40000,settle:1500,maxWait:9000,lazy:30000};
+const T=()=>S.demo?{glance:6000,first:3500,every:5000,settle:1000,maxWait:5000,lazy:20000}:{glance:cfg.glance*1000,first:8000,every:cfg.engine==='device'?18000:40000,settle:1500,maxWait:9000,lazy:20000};
 function signature(src){sx.drawImage(src,0,0,192,108);const d=sx.getImageData(0,0,192,108).data,fine=new Uint8Array(20736),hist=new Float32Array(64),app=new Float32Array(324);
   for(let y=0,p=0;y<108;y++)for(let x=0;x<192;x++,p++){const i=p*4,r=d[i],g=d[i+1],b=d[i+2],l=(r*77+g*150+b*29)>>8;fine[p]=l;hist[(r>>6)*16+(g>>6)*4+(b>>6)]+=1/20736;if(y<9)app[(y/3|0)*64+(x/3|0)]+=l/2295;else if(x<12)app[192+((y-9)/3|0)*4+(x/3|0)]+=l/2295}
   return{fine,hist,app}}
@@ -1011,42 +1011,48 @@ function cleanLine(line){const t=line.split(/\s+/).filter(Boolean);
   if(!math&&!/^["“(]?[A-Z]/.test(out)&&!(/^\d/.test(out)&&(/^[A-Z]/.test(t[1]||'')||/[.!]$/.test(out))))return'';   // starts in the middle of something
   if(bad&&!/[.!:;)”"]$/.test(out))return'';                   // a scrap inside and no ending
   return/\?$/.test(out)||chatty.test(out)?'':out}
-async function deviceNotes(frames){
-  const w=await withTimeout(loadTess(),60000,'The on-device reader took too long to load.'),c=frames[frames.length-1].c,W=c.width,H=c.height;
-  const{data}=await withTimeout(w.recognize(c),60000,'Reading the screen took too long.');
+async function deviceNotes(frames,st={}){
+  const w=await withTimeout(loadTess(),60000,'The on-device reader took too long to load.'),top=frames[frames.length-1].c;
   // the top strip on its own, at twice the size: its text is small
   let here={app:'',topic:''};
-  try{const s=document.createElement('canvas'),hh=Math.round(H*.125);s.width=W*2;s.height=hh*2;const x=s.getContext('2d',{willReadFrequently:true});x.imageSmoothingQuality='high';x.drawImage(c,0,0,W,hh,0,0,s.width,s.height);lightUp(x,s);
+  try{const W=top.width,hh=Math.round(top.height*.125),s=document.createElement('canvas');s.width=W*2;s.height=hh*2;const x=s.getContext('2d',{willReadFrequently:true});x.imageSmoothingQuality='high';x.drawImage(top,0,0,W,hh,0,0,s.width,s.height);lightUp(x,s);
     here=whereAmI(String((await withTimeout(w.recognize(s),30000,'top strip')).data.text||''))}catch{}
   const own=new RegExp(location.hostname.split('.').filter(p=>p.length>2).join('\\W*')||'^$','i');   // this page's own name, as the browser's sharing bar shows it
-  const lines=(data.lines&&data.lines.length?data.lines.map(l=>({t:l.text.trim(),h:l.bbox.y1-l.bbox.y0,y:l.bbox.y0,x:l.bbox.x0,c:l.confidence})):String(data.text||'').split('\n').map((t,i)=>({t:t.trim(),h:20,y:H*.2+i*30,x:0,c:80})))
-    .filter(l=>l.c>=62&&l.t.length>3&&l.y>H*.125&&l.y<H*.93&&!FURNITURE.test(l.t)&&!own.test(l.t));
+  // The newest frame, and the one before it when the page changed twice since the last note, so nothing that came and went is missed.
+  const sents=[];let head=null;
+  for(const f of frames.slice(-2)){const c=f.c,W=c.width,H=c.height,{data}=await withTimeout(w.recognize(c),60000,'Reading the screen took too long.');
+    const lines=(data.lines&&data.lines.length?data.lines.map(l=>({t:l.text.trim(),h:l.bbox.y1-l.bbox.y0,y:l.bbox.y0,x:l.bbox.x0,c:l.confidence})):String(data.text||'').split('\n').map((t,i)=>({t:t.trim(),h:20,y:H*.2+i*30,x:0,c:80})))
+      .filter(l=>l.c>=62&&l.t.length>3&&l.y>H*.125&&l.y<H*.93&&!FURNITURE.test(l.t)&&!own.test(l.t));
+    if(!lines.length||lines.length>=8&&lines.filter(l=>codey(l.t)).length/lines.length>.3)continue;   // nothing to read, or an editor, a terminal, a page of code
+    const hs=lines.map(l=>l.h).sort((a,b)=>a-b),med=hs[hs.length>>1]||1;
+    head=lines.filter(l=>l.h>med*1.3&&l.t.split(/\s+/).length<=10&&/[A-Za-z]{3}/.test(l.t)).sort((a,b)=>b.h-a.h)[0]||head;
+    // lines join into one paragraph only when they sit under each other, are the same size and start at the same edge
+    const paras=[];let cur=null,prev=null;
+    for(const l of lines){if(l===head)continue;const bullet=/^[^A-Za-z0-9("']/.test(l.t),t=l.t.replace(/^[^A-Za-z0-9("']+\s*/,'');
+      if(cur&&!bullet&&!/[.!?]$/.test(cur.t)&&l.y-prev.y<prev.h*2.1&&Math.abs(l.h-prev.h)<prev.h*.35&&Math.abs(l.x-cur.x)<W*.04)cur.t+=' '+t;else{if(cur)paras.push(cur);cur={t,h:l.h,y:l.y,x:l.x}}prev=l}
+    if(cur)paras.push(cur);
+    paras.forEach(p=>p.t.split(/(?<=[.!?])\s+/).forEach(x=>{const k=cleanLine(x.trim());if(k&&!sents.some(o=>o.s===k))sents.push({s:k,h:p.h/med,top:p.y<H*.45})}))}
   const blank={on_task:true,app:here.app,topic:here.topic,notes:[]};
-  if(!lines.length)return blank;
-  if(lines.length>=8&&lines.filter(l=>codey(l.t)).length/lines.length>.3)return blank;   // an editor, a terminal, a page of code
-  const hs=lines.map(l=>l.h).sort((a,b)=>a-b),med=hs[hs.length>>1]||1;
-  const head=lines.filter(l=>l.h>med*1.3&&l.t.split(/\s+/).length<=10&&/[A-Za-z]{3}/.test(l.t)).sort((a,b)=>b.h-a.h)[0];
-  // lines join into one paragraph only when they sit under each other, are the same size and start at the same edge
-  const paras=[];let cur=null,prev=null;
-  for(const l of lines){if(l===head)continue;const bullet=/^[^A-Za-z0-9("']/.test(l.t),t=l.t.replace(/^[^A-Za-z0-9("']+\s*/,'');
-    if(cur&&!bullet&&!/[.!?]$/.test(cur.t)&&l.y-prev.y<prev.h*2.1&&Math.abs(l.h-prev.h)<prev.h*.35&&Math.abs(l.x-cur.x)<W*.04)cur.t+=' '+t;else{if(cur)paras.push(cur);cur={t,h:l.h,y:l.y,x:l.x}}prev=l}
-  if(cur)paras.push(cur);
-  const sents=paras.flatMap(p=>p.t.split(/(?<=[.!?])\s+/).map(x=>({s:cleanLine(x.trim()),h:p.h,y:p.y}))).filter(o=>o.s);
-  // the three best: statements, sums and figures, bigger type, nearer the top
-  const picked=sents.map((o,i)=>({...o,i,v:(cue.test(o.s)?2:0)+(/\d/.test(o.s)?.5:0)+(/=|\bequals\b/i.test(o.s)?1.5:0)+Math.min(2,Math.max(0,o.h/med-1)*2)+(o.y<H*.45?.5:0)}))
-    .filter(x=>!S.seen.has(x.s.toLowerCase().slice(0,40))).sort((a,b)=>b.v-a.v).slice(0,3).sort((a,b)=>a.i-b.i);
-  picked.forEach(x=>S.seen.add(x.s.toLowerCase().slice(0,40)));
+  if(!sents.length)return blank;
+  // What is new on the page since the last look comes first: an answer that just appeared, a section just scrolled to.
+  const key=x=>x.toLowerCase().slice(0,40),was=st.onScreen;st.onScreen=new Set(sents.map(o=>key(o.s)));
+  const picked=sents.map((o,i)=>({...o,i,v:(was&&!was.has(key(o.s))?3:0)+(cue.test(o.s)?2:0)+(/\d/.test(o.s)?.5:0)+(/=|\bequals\b/i.test(o.s)?1.5:0)+Math.min(2,Math.max(0,o.h-1)*2)+(o.top?.5:0)}))
+    .filter(x=>!S.seen.has(key(x.s))).sort((a,b)=>b.v-a.v).slice(0,3).sort((a,b)=>a.i-b.i);
+  picked.forEach(x=>S.seen.add(key(x.s)));
   const notes=picked.map(x=>x.s),terms=[...new Set(notes.join(' ').match(/\b[A-Za-z]{9,}\b/g)||[])].slice(0,3);
-  // the title: where you were if the top strip said so, else the page's own heading, else the start of the first line kept
+  // The title: where you were if the top strip said so, else the page's own heading, else the start of the first line kept.
+  // A later note from the same page is named by what is new in it, so two notes never carry the same title.
   const lead=notes[0]?notes[0].split(/\s+/).slice(0,7).join(' ').replace(/[.,;:]+$/,'')+(notes[0].split(/\s+/).length>7?'…':''):'';
-  return{...blank,topic:here.topic||(head?head.t.replace(/[^\w\s:'’+=?.,-]/g,'').trim():'')||(here.app?'On '+here.app:lead||'Screen notes'),notes,terms}}
+  let topic=here.topic||(head?head.t.replace(/[^\w\s:'’+=?.,-]/g,'').trim():'')||(here.app?'On '+here.app:lead||'Screen notes');
+  if(st.lastTopic===topic&&lead)topic=lead;else st.lastTopic=topic;
+  return{...blank,topic,notes,terms}}
 async function sampleNotes(frames){await sleep(900);const tag=frames[frames.length-1].tag,n=SAMPLE.notes[tag];if(!n||S.seen.has(tag))return{on_task:true,notes:[]};S.seen.add(tag);return{on_task:true,...n}}
 // The sample is scripted from start to finish, so it plays the same with no key and no connection. The test run reads its made-up screen for real.
 const writer=()=>S.sim?'device':S.demo?'sample':engine();
 async function writeNote(st,frames){
   S.busy=true;paint();
   if(!opened){$$('#stream .wait').forEach(e=>e.remove());$('#stream').insertAdjacentHTML('afterbegin','<div class="card wait writing" id="writing"><span>Writing a note</span><i style="width:78%"></i><i style="width:56%"></i></div>')}
-  try{const w=writer(),r=w==='claude'?await claudeNotes(frames):w==='device'?await deviceNotes(frames):w==='sample'?await sampleNotes(frames):null;
+  try{const w=writer(),r=w==='claude'?await claudeNotes(frames):w==='device'?await deviceNotes(frames,st):w==='sample'?await sampleNotes(frames):null;
     if(r){const ns=arr(r.notes);st.label=[r.topic,r.app].filter(Boolean).join(' · ')||st.label;
       if(r.on_task===false&&!ns.length){st.isBreak=true;S.segs.forEach(s=>{if(s.st===st.id&&s.k==='focus')s.k='break'})}
       else if(ns.length)addNote({t:Math.max(0,frames[frames.length-1].t-S.t0),title:String(r.topic||'Notes'),bullets:ns.slice(0,6).map(String),terms:arr(r.terms).map(String),src:String(r.app||'')})}
@@ -1100,7 +1106,7 @@ const SIMSCRIPT=[['doc1',16000],['ai',7000],['doc1',10000],['chat',6000],['doc2'
 function startSim(){if(S.running)return;reset(false);S.sim=true;
   const cv=document.createElement('canvas');cv.width=1280;cv.height=720;const cx=cv.getContext('2d');S.sceneI=0;S.scene=SIMSCRIPT[0][0];S.sceneAt=Date.now();
   drawScene(cx,S.scene,0);S.demoT=setInterval(()=>drawScene(cx,S.scene,Date.now()-S.sceneAt),250);
-  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},clean:cleanLine,codey,float(){const f=document.createElement('iframe');f.style.cssText='position:fixed;left:24px;top:90px;width:236px;height:44px;border:0;z-index:99';document.body.append(f);dressFloat(f.contentDocument);S.float={document:f.contentDocument,close(){f.remove()},resizeTo(){}};paint();return f},read:async id=>{const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);return deviceNotes([{c,t:Date.now(),tag:id}])}}}
+  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},clean:cleanLine,codey,float(){const f=document.createElement('iframe');f.style.cssText='position:fixed;left:24px;top:90px;width:236px;height:44px;border:0;z-index:99';document.body.append(f);dressFloat(f.contentDocument);S.float={document:f.contentDocument,close(){f.remove()},resizeTo(){}};paint();return f},read:async(ids,st={})=>{const out=[];for(const id of [].concat(ids)){const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);out.push(await deviceNotes([{c,t:Date.now(),tag:id}],st))}return out.length>1?out:out[0]}}}
 function togglePause(){if(!S.running||S.finishing)return;const now=Date.now();S.paused=!S.paused;if(S.paused){if(S.detour)endDetour();S.off=null;if(S.main)openSeg('pause',now,null)}else{S.prev=S.sig=null;if(S.demo)S.sceneAt+=now-(S.pausedAt||now)}S.pausedAt=now;paint()}
 async function finish(){
   if(!S.running||S.finishing)return;S.finishing=true;const now=Date.now();stopCapture();
@@ -1161,11 +1167,11 @@ function drawScene(c,id,t){
     [['Jordan','are we still meeting at 4?'],['Priya','yes, library second floor'],['Jordan','bring the chem worksheet pls'],['Priya','ok']].forEach((m,i)=>{const y=110+i*76;dot(352,y,20,i%2?'#3BA55D':'#5865F2');Tx(m[0],386,y-4,'600 15px system-ui','#F2F3F5');Tx(m[1],386,y+20,'15px system-ui','#DBDEE1')});R(336,H-76,W-360,48,'#383A40',10);Tx('Message #general'+(blink?' |':''),356,H-46,'15px system-ui','#949BA4')}
   else if(id==='ai'){R(0,0,W,H,'#FAF9F5');R(0,0,W,52,'#F0EEE6');Tx('Claude',28,33,'600 17px Georgia','#3D3929');Tx('Cell membrane question',W/2-90,33,'14px system-ui','#6B6A63');R(700,92,460,54,'#EDE9DD',14);Tx('Why can oxygen cross the membrane on its own?',724,125,'16px system-ui','#3D3929');
     let y=196;for(const p of ['Oxygen is a small nonpolar molecule, so it dissolves in the fatty middle of the bilayer and slips straight through.','Charged or large molecules cannot do that. They need a channel or carrier protein, and pumps spend ATP to move them against the gradient.'])y=wrap(p,160,y,820,30,'18px Georgia','#3D3929')+16;R(160,H-104,960,60,'#FFFFFF',16);Tx('Reply to Claude'+(blink?' |':''),184,H-67,'16px system-ui','#8A8778')}
-  else if(id==='search'){R(0,0,W,H,'#FFFFFF');R(0,0,W,44,'#DEE1E6');R(12,8,300,36,'#FFFFFF',10);Tx("what's 9+10 - Google Search",28,31,'500 13px system-ui','#3C4043');R(0,44,W,44,'#FFFFFF');R(96,52,820,28,'#F1F3F4',14);Tx('google.com/search?q=what%27s+9%2B10&sca_esv=5f1a',116,71,'13px system-ui','#5F6368');R(0,88,W,1,'#DADCE0');
+  else if(id==='search'||id==='search2'){R(0,0,W,H,'#FFFFFF');R(0,0,W,44,'#DEE1E6');R(12,8,300,36,'#FFFFFF',10);Tx("what's 9+10 - Google Search",28,31,'500 13px system-ui','#3C4043');R(0,44,W,44,'#FFFFFF');R(96,52,820,28,'#F1F3F4',14);Tx('google.com/search?q=what%27s+9%2B10&sca_esv=5f1a',116,71,'13px system-ui','#5F6368');R(0,88,W,1,'#DADCE0');
     Tx('Google',40,142,'500 26px system-ui','#4285F4');R(170,112,620,44,'#F1F3F4',22);Tx("what's 9+10",194,140,'16px system-ui','#202124');['AI Mode','All','Images','Videos','News'].forEach((n,i)=>Tx(n,174+i*84,190,'13px system-ui','#5F6368'));
     R(170,210,620,150,'#F8F9FA',12);Tx('9 + 10 =',194,250,'14px system-ui','#70757A');Tx('19',194,312,'44px system-ui','#202124');Tx('AI Overview',170,402,'600 14px system-ui','#202124');
     const y2=wrap('9 + 10 equals 19. However, if you are referencing the popular internet meme from a viral 2013 Vine video, the joke answer is 21.',170,436,640,26,'16px system-ui','#202124')+10;
-    wrap('Are you looking for more help with basic math, or would you like to know the origin story behind the viral meme?',170,y2,640,26,'16px system-ui','#202124');
+    wrap(id==='search2'?'A hackathon is an event where people build a working project in a short time. Teams usually have two to five people and present a demo at the end.':'Are you looking for more help with basic math, or would you like to know the origin story behind the viral meme?',170,y2,640,26,'16px system-ui','#202124');
     R(170,598,400,40,'#F1F3F4',20);Tx('Ask anything',194,624,'15px system-ui','#70757A');R(600,600,450,36,'#202124',8);Tx('goofturtles.github.io is sharing your screen.   Stop sharing   Hide',616,623,'13px system-ui','#FFFFFF')}
   else if(id==='music'){R(0,0,W,H,'#121212');R(0,0,240,H,'#000000');['Home','Search','Your Library'].forEach((n,i)=>Tx(n,28,52+i*40,'600 15px system-ui',i?'#B3B3B3':'#FFFFFF'));['Playlists','Liked Songs'].forEach((n,i)=>Tx(n,28,196+i*36,'14px system-ui','#B3B3B3'));Tx('Made for you',272,64,'700 28px system-ui','#FFFFFF');['#8D67AB','#1E3264','#E8115B','#148A08','#BC5900'].forEach((f,i)=>{R(272+i*196,96,176,176,f,8);Tx(['Focus mix','Lo-fi beats','Top hits','Chill','Throwback'][i],272+i*196,300,'600 15px system-ui','#FFFFFF')});R(0,H-84,W,84,'#181818');dot(W/2,H-52,18,'#1ED760');R(W/2-220,H-20,440,4,'#4D4D4D',2);R(W/2-220,H-20,60+(t/50)%300,4,'#FFFFFF',2)}
   else{R(0,0,W,H,'#0F0F0F');R(420,12,440,30,'#222222',15);Tx('Search',440,32,'14px system-ui','#AAAAAA');R(24,64,860,484,'#16324F',10);Tx(d.h,64,150,'600 36px system-ui','#FFFFFF');d.p.forEach((p,i)=>Tx('•  '+p,72,226+i*64,'24px system-ui','#DCE9F5'));R(24,542,860,6,'#3A3A3A',3);R(24,542,200+(t/40)%600,6,'#FF4E45',3);Tx('Biology 101, Lecture 7',24,592,'600 20px system-ui','#FFFFFF');for(let i=0;i<5;i++){R(908,64+i*104,160,92,'#272727',8);R(1080,72+i*104,170,12,'#3A3A3A',6);R(1080,96+i*104,110,10,'#2C2C2C',5)}}}
