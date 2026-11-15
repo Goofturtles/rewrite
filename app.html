@@ -221,7 +221,7 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 .world:not(.gl)::after{content:"";position:absolute;inset:auto 0 0;height:20%;background:linear-gradient(transparent,var(--page))}
 .w-in{position:absolute;inset:0;max-width:1168px;margin:0 auto;perspective:1300px}
 /* the cards sit at three depths: they slide and tilt a little against the pointer, the nearest one most */
-.w-card,.wk,.w-chip{position:absolute;pointer-events:auto;background:#fff;color:#14180F;--ink3:rgba(20,24,15,.6);--ink4:rgba(20,24,15,.22);box-shadow:0 26px 50px -28px rgba(10,30,5,.7);transform:translate3d(calc(var(--px,0)*var(--k)),calc(var(--py,0)*var(--k)*.5),0) rotateY(calc(var(--px,0)*7deg)) rotateX(calc(var(--py,0)*-6deg));animation:floaty 7s ease-in-out infinite}
+.w-card,.wk,.w-chip{position:absolute;pointer-events:auto;background:#fff;color:#14180F;--ink3:rgba(20,24,15,.6);--ink4:rgba(20,24,15,.22);box-shadow:0 26px 50px -28px rgba(10,30,5,.7);transform:translate3d(calc(var(--px,0)*var(--k)),calc(var(--py,0)*var(--k)*.5),0) rotateY(calc(var(--px,0)*4deg)) rotateX(calc(var(--py,0)*-3.2deg));animation:floaty 7s ease-in-out infinite}
 [data-theme="dark"] .w-card,[data-theme="dark"] .wk,[data-theme="dark"] .w-chip{background:#12160f;color:#F3F5EF;--ink3:rgba(243,245,239,.62);--ink4:rgba(243,245,239,.24);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 26px 50px -24px #000}
 .w-card,.wk{text-align:left;border-radius:20px;padding:17px 19px 18px;transition:scale .45s var(--ease)}
 .w-card:hover,.wk:hover{scale:1.025}
@@ -557,34 +557,34 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
         <div class="set-col">
         <div class="card rise" style="--i:1">
           <h3>Who writes the notes</h3>
-          <p>Rewrite reads a few still frames of your screen and turns them into notes. Pick where that reading happens.</p>
+          <p>Pick where your screen is read.</p>
           <div class="segc" id="engine" role="group" aria-label="Who writes the notes"><span class="thumb"></span><button data-engine="claude">Claude, with your key</button><button data-engine="device">On this laptop</button></div>
           <div class="pane" id="pane-claude">
             <div class="field"><label for="key">Anthropic API key</label><div class="inline"><input class="input" id="key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-..."><button class="btn line" id="test" style="height:46px">Test</button></div></div>
             <div class="field"><label for="model">Model</label><select class="input" id="model"></select></div>
-            <p class="status" id="key-status" role="status">The key is saved in this browser only and goes straight to Anthropic.</p>
+            <p class="status" id="key-status" role="status">Saved in this browser only. It goes straight to Anthropic.</p>
           </div>
           <div class="pane" id="pane-device">
-            <p class="status" id="dev-status">Reads the text on your screen inside this browser and pulls out the key lines. Nothing leaves the laptop. The notes are rougher than Claude's, and the reader downloads once (about 12 MB) the first time.</p>
+            <p class="status" id="dev-status">Read inside this browser. Nothing leaves the laptop. The notes are rougher than Claude's. A 12 MB reader downloads once.</p>
           </div>
         </div>
         <div class="card rise" style="--i:3">
           <h3>Your data</h3>
-          <p>Sessions and notes are saved in this browser on this laptop. Screen frames are never saved.</p>
+          <p>Saved in this browser, on this laptop. Screen frames are never saved.</p>
           <button class="btn line sm" id="wipe">Delete all saved sessions</button>
         </div>
         </div>
         <div class="set-col">
         <div class="card rise" style="--i:2">
           <h3>What counts as a glance</h3>
-          <p>A visit to a social, chat, music or video app that is shorter than this is a glance: it is left out of your notes. Anything else you switch to, like another doc or an AI assistant, is kept.</p>
+          <p>A short visit to a social, chat, music or video app. It is left out. Everything else you switch to is kept.</p>
           <div class="rng"><b id="glance-v"></b><span>5 to 60 seconds</span></div>
           <input type="range" id="glance" min="5" max="60" step="1" aria-label="Glance length in seconds">
           <div class="field" style="margin-top:18px"><label for="sens">How different a screen must look to count as leaving</label><input type="range" id="sens" min="1" max="10" step="1"></div>
         </div>
         <div class="card rise" style="--i:4">
           <h3>Left out by name</h3>
-          <p>A short visit to any of these is a glance. A long one is marked as a break. Either way it never reaches your notes.</p>
+          <p>Short visit: a glance. Long visit: a break. Neither reaches your notes.</p>
           <div class="apps" id="apps"></div>
         </div>
         </div>
@@ -1147,7 +1147,7 @@ void main(){
   float m=max(smoothstep(.84,1.,uv.y),1.-I);             // it rises out of the page: mist at the bottom, and all of it while loading
   gl_FragColor=vec4(mix(col,PG,m),1.);
 }`;
-  function size(){const r=host.getBoundingClientRect(),k=Math.min(devicePixelRatio||1,1.5)*q,w=Math.max(2,Math.round(r.width*k)),h=Math.max(2,Math.round(r.height*k));
+  function size(){const r=host.getBoundingClientRect(),k=Math.min(devicePixelRatio||1,1.25)*q,w=Math.max(2,Math.round(r.width*k)),h=Math.max(2,Math.round(r.height*k));
     if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;gl.viewport(0,0,w,h)}
     // the render is 16:9 and fills the width; the ridge is kept about a third of the way down
     const sv=Math.min(1,h/w*img.width/img.height),v0=Math.max(0,Math.min(1-sv,.345-.36*sv));gl.uniform4f(U.F,v0,sv,v0+.36*sv,0);gl.uniform2f(U.R,w,h)}
@@ -1157,8 +1157,8 @@ void main(){
     if(last&&q>.5){seen++;if(now-last>24)slow++;if(seen===50){if(slow>18){q*=.72;size()}seen=slow=0}}last=now;
     const dt=Math.min(.05,(now-(prevT||now))/1000);prevT=now;const k=r=>1-Math.exp(-dt*r),dx=aim[0]-ptr[0],dy=aim[1]-ptr[1];
     ptr[0]+=dx*k(4.5);ptr[1]+=dy*k(4.5);vel+=(Math.min(1,Math.hypot(dx,dy)*9)-vel)*k(5);night+=(tgt-night)*k(2.8);inn+=(1-inn)*k(1.9);if(inn>.6)gr+=(tgr-gr)*k(.8);
-    host.style.setProperty('--px',(ptr[0]-.5).toFixed(4));host.style.setProperty('--py',(ptr[1]-.5).toFixed(4));
-    draw(now/1000);raf=requestAnimationFrame(frame)}
+    const cl=v=>Math.max(-.5,Math.min(.5,v-.5)).toFixed(4);host.style.setProperty('--px',cl(ptr[0]));host.style.setProperty('--py',cl(ptr[1]));
+    if(host.getBoundingClientRect().bottom>0)draw(now/1000);raf=requestAnimationFrame(frame)}
   const play=()=>{if(ready&&!raf&&!STILL)raf=requestAnimationFrame(frame)};
   // colours follow the theme and the palette: the page colour is the sky, dark is night, ember is golden hour, blue is dusk
   function look(){if(!ready)return;const m=getComputedStyle($('.stage')).backgroundColor.match(/[\d.]+/g).map(Number),pal=root.dataset.palette;
