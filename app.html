@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1280">
-<meta name="build" content="1794768396">
+<meta name="build" content="1794768782">
 <title>Rewrite</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%23528200'/%3E%3Cpath d='M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18' fill='none' stroke='%23fff' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://api.fontshare.com">
@@ -73,13 +73,37 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 .pill[data-state="away"] .led::after,.pill[data-state="paused"] .led::after,.pill[data-state="ready"] .led::after{animation:none;opacity:.6}
 .pill[data-state="away"] .trace,.pill[data-state="paused"] .trace,.pill[data-state="ready"] .trace{animation-play-state:paused;opacity:.3}
 .pill[data-state="writing"] .trace{animation-duration:.8s}
-/* floating window only (body.fl): quiet until the pointer is on it, and it can shrink to a dot */
-.fl .pill-label,.fl .pill-btn{overflow:hidden;transition:opacity .3s ease,max-width .5s var(--ease),min-width .5s var(--ease),margin .5s var(--ease)}
-.fl .pill-label{max-width:170px}
-.fl .pill-btn{max-width:34px}
-.fl:not(:hover) .pill:not(.mini) .pill-label,.fl:not(:hover) .pill:not(.mini) .pill-btn{max-width:0;min-width:0;opacity:0;margin:0 -6px;pointer-events:none}
-.fl .pill.mini{cursor:pointer;gap:9px}
-.fl .pill.mini .pen,.fl .pill.mini .pill-label,.fl .pill.mini .pill-btn{display:none}
+/* The floating window (body.fl): small and quiet. A dot and one short line: Viewing, or the note being written.
+   The buttons take the line's place while the pointer is on it. The dash button shrinks it to the dot alone. */
+.fl .pill{height:100%;width:100%;min-width:0;padding:0 9px;gap:9px;border-radius:0;box-shadow:none;font-size:13px;justify-content:flex-start}
+.fl .led{width:22px;height:22px}
+.fl .led::after{width:6px;height:6px}
+.fl .pen{width:30px;height:14px;display:none}
+.fl .pill[data-state="writing"] .pen{display:block}
+.fl .pill-label{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-align:left}
+.pl-t{display:inline-block;white-space:nowrap;line-height:1.5}
+.pl-t.type{animation:pl-type .9s steps(24) both}
+.pl-t.type.slide{animation:pl-type .9s steps(24) both,pl-slide var(--dur,4s) linear 1.2s both}
+@keyframes pl-type{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes pl-slide{to{transform:translateX(var(--dx,0px))}}
+/* it is never still: a ring leaves the dot while it watches, and three small dots walk after the word */
+.fl .led{position:relative}
+.fl .pill[data-state="noting"] .led::before,.fl .pill[data-state="writing"] .led::before{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 1.5px var(--hot-hi);animation:pl-ring 2.4s cubic-bezier(.22,1,.36,1) infinite}
+@keyframes pl-ring{from{transform:scale(.8);opacity:.9}to{transform:scale(1.9);opacity:0}}
+.pl-d{display:none;gap:3px;margin-left:6px}
+.fl .pill[data-state="noting"] .pl-d{display:inline-flex}
+.pl-t.type+.pl-d{display:none!important}
+.pl-d i{width:3.5px;height:3.5px;border-radius:50%;background:currentColor;opacity:.3;animation:pl-dot 1.4s ease-in-out infinite}
+.pl-d i:nth-child(2){animation-delay:.18s}
+.pl-d i:nth-child(3){animation-delay:.36s}
+@keyframes pl-dot{0%,60%,100%{opacity:.3;translate:0 0}30%{opacity:1;translate:0 -3px}}
+.fl .pill-btn{width:26px;height:26px;display:none}
+.fl .pill-btn svg{width:12px;height:12px}
+.fl:hover .pill:not(.mini){justify-content:center}
+.fl:hover .pill:not(.mini) .pill-label,.fl:hover .pill:not(.mini) .pen{display:none}
+.fl:hover .pill:not(.mini) .pill-btn{display:grid}
+.fl .pill.mini{cursor:pointer;justify-content:center}
+.fl .pill.mini .pill-label,.fl .pill.mini .pen{display:none}
 </style>
 <style>
 html,body{height:100%}
@@ -639,7 +663,8 @@ if(Q.has('bare'))document.documentElement.classList.add('bare');
 const MODELS={'claude-opus-5-5':'Claude Opus 5.5','claude-sonnet-5-5':'Claude Sonnet 5.5','claude-haiku-5-5':'Claude Haiku 5.5'};
 const TOKENS=['#FFCB45','#8FB8FF','#FF9B80','#C4B0FF','#86DDBE','#FFB3C7'];
 const GLAPPS=['Discord','Spotify','Instagram','TikTok','YouTube','Reddit'];   // names for the glances in the demo data
-const STATE={ready:'Go to your work',noting:'Taking notes',away:'Glance, not counting',writing:'Writing a note',paused:'Paused',finishing:'Finishing up'};
+const STATE={ready:'Go to your work',noting:'Viewing',away:'Glance, not counting',writing:'Writing a note',paused:'Paused',finishing:'Finishing up'};
+const FL={ready:'Waiting for your work',noting:'Viewing',away:'Glance, not counted',writing:'Writing a note',paused:'Paused',finishing:'Finishing'};   // the floating window's one line
 const SEG={focus:'Focused',glance:'Glance, ignored',away:'Looking away',break:'Break',pause:'Paused'};
 const TH={app:.045,tab:.05,hist:.2,key:.02,lazy:.006,move:.008};
 const ICON={
@@ -799,7 +824,9 @@ function renderRecap(){
 }
 
 /* ================= RENDER: SESSION ================= */
-const pillHTML=float=>`<span class="led"></span><svg class="pen" viewBox="0 0 64 20" aria-hidden="true"><path class="ghost" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/><path class="trace" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/></svg><button class="pill-label" data-act="show" aria-label="Show the live session"></button><span class="pill-time"></span><button class="pill-btn" data-act="pause" aria-label="Pause or resume"></button>${float?`<button class="pill-btn" data-act="finish" aria-label="Finish">${ic('stop')}</button><button class="pill-btn" data-act="mini" aria-label="Shrink to a dot">${ic('mini')}</button>`:`<button class="pill-btn" data-act="float" aria-label="Float on top of other windows">${ic('float')}</button>`}`;
+const PEN='<svg class="pen" viewBox="0 0 64 20" aria-hidden="true"><path class="ghost" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/><path class="trace" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/></svg>';
+// In the page: dot, pen line, state, focus time, pause, float. In the floating window: dot and one line, no clock.
+const pillHTML=float=>float?`<span class="led"></span>${PEN}<span class="pill-label"><span class="pl-t"></span><span class="pl-d" aria-hidden="true"><i></i><i></i><i></i></span></span><button class="pill-btn" data-act="pause" aria-label="Pause or resume"></button><button class="pill-btn" data-act="finish" aria-label="Finish">${ic('stop')}</button><button class="pill-btn" data-act="mini" aria-label="Shrink to a dot">${ic('mini')}</button>`:`<span class="led"></span>${PEN}<button class="pill-label" data-act="show" aria-label="Show the live session"></button><span class="pill-time"></span><button class="pill-btn" data-act="pause" aria-label="Pause or resume"></button><button class="pill-btn" data-act="float" aria-label="Float on top of other windows">${ic('float')}</button>`;
 function ribbon(el,segs,end){while(el.children.length>segs.length)el.lastChild.remove();segs.forEach((s,i)=>{let n=el.children[i];if(!n){n=document.createElement('i');n.className='seg';el.append(n);n.offsetWidth}const b=s.b??end;n.className='seg '+s.k+(s.b==null&&s.k==='focus'?' live':'');n.style.flexGrow=Math.max(.4,(b-s.a)/1000);n.title=SEG[s.k]+(s.app?' · '+s.app:'')+' · '+dur(b-s.a)})}
 const outHTML=segs=>{const g=segs.filter(s=>s.k==='glance'&&s.b!=null);return g.length?'<b>Left out</b>'+g.map(x=>`<s>${glTxt(x)}</s>`).join(''):''};
 const noteHTML=(n,sub)=>`<article class="card note" data-el="note"><div class="meta"><span class="tok" style="--c:${colorOf(sub)}"></span>${clock(n.t)} · ${esc(n.src||'Screen')}</div><h3>${esc(n.title)}</h3><ul>${n.bullets.map((b,i)=>`<li style="--i:${i}">${markup(b,n.terms)}</li>`).join('')}</ul></article>`;
@@ -845,7 +872,7 @@ function openSeg(k,t,st){closeSeg(t);S.segs.push({k,a:t,b:null,st})}
 const focusMs=end=>S.segs.reduce((a,s)=>a+(s.k==='focus'?(s.b??end)-s.a:0),0);
 const glanceN=()=>S.segs.filter(s=>s.k==='glance').length;
 
-function reset(demo){Object.assign(S,{running:true,paused:false,finishing:false,shot:false,demo,t0:Date.now(),end:0,segs:[],notes:[],main:null,detour:null,prev:null,sig:null,off:null,queue:[],pending:[],busy:false,seen:new Set(),sid:0,selfAt:0,cool:0,motion:0,stream:null,reader:null,scene:null,errMsg:''})}
+function reset(demo){Object.assign(S,{running:true,paused:false,finishing:false,shot:false,demo,t0:Date.now(),end:0,segs:[],notes:[],main:null,detour:null,prev:null,sig:null,off:null,queue:[],pending:[],busy:false,seen:new Set(),sid:0,selfAt:0,cool:0,motion:0,flashing:false,stream:null,reader:null,scene:null,errMsg:''})}
 function touch(st,g,now,dl){if(dl>TH.move)st.lastChange=now;st.dirty=!st.keyFine||mad(g.fine,st.keyFine)/255>TH.key}
 function step(g,now){
   const dl=S.prev?mad(g.fine,S.prev.fine)/255:0;S.motion=S.motion*.8+(dl>TH.move*2?.2:0);
@@ -1023,7 +1050,13 @@ async function writeNote(st,frames){
       else if(ns.length)addNote({t:Math.max(0,frames[frames.length-1].t-S.t0),title:String(r.topic||'Notes'),bullets:ns.slice(0,6).map(String),terms:arr(r.terms).map(String),src:String(r.app||'')})}
   }catch(e){console.error(e);const m=String(e.message||e);if(m!==S.errMsg){S.errMsg=m;toast(m)}st.frames.unshift(...frames.slice(-2));S.cool=Date.now()+45000}
   const wr=$('#writing');if(wr)wr.remove();S.busy=false;paint()}
-function addNote(n){S.notes.push(n);if(!opened)$('#stream').insertAdjacentHTML('afterbegin',noteHTML(n,SAMPLE.subject))}
+// In the floating window a new note is shown being written: its title, then its first line (sliding if it is long), then back to the state.
+// The writing is a CSS animation, so it stays smooth while this tab is in the background and its timers are slowed down.
+function flashNote(n){const w=S.float,el=w&&w.document.querySelector('.pl-t');if(!el)return;clearTimeout(S.flashT);S.flashing=true;
+  const put=(txt,cls)=>{el.className='pl-t';el.textContent=txt;void el.offsetWidth;const over=el.scrollWidth-el.parentElement.clientWidth;el.style.setProperty('--dx',(over>0?-over-8:0)+'px');el.style.setProperty('--dur',Math.max(2.5,txt.length*.075)+'s');el.className='pl-t '+cls};
+  const line=String(n.bullets[0]||'');put(n.title,'type');
+  S.flashT=setTimeout(()=>{if(line)put(line,'type slide');S.flashT=setTimeout(()=>{S.flashing=false;el.className='pl-t';el.style.removeProperty('--dx');paint()},line?Math.max(4500,line.length*80+1500):600)},2800)}
+function addNote(n){flashNote(n);S.notes.push(n);if(!opened)$('#stream').insertAdjacentHTML('afterbegin',noteHTML(n,SAMPLE.subject))}
 async function summarize(){
   const titles=[...new Set(S.notes.map(n=>n.title))],fall={title:titles.length?titles[0]+(titles.length>1?` and ${titles.length-1} more`:''):'Session notes',subject:S.demo?SAMPLE.subject:'General',takeaways:S.notes.slice(0,4).map(n=>n.bullets[0]),quiz:[]};
   if(!S.notes.length)return fall;const w=writer();if(w==='sample')return SAMPLE.summary;
@@ -1065,7 +1098,7 @@ const SIMSCRIPT=[['doc1',16000],['ai',7000],['doc1',10000],['chat',6000],['doc2'
 function startSim(){if(S.running)return;reset(false);S.sim=true;
   const cv=document.createElement('canvas');cv.width=1280;cv.height=720;const cx=cv.getContext('2d');S.sceneI=0;S.scene=SIMSCRIPT[0][0];S.sceneAt=Date.now();
   drawScene(cx,S.scene,0);S.demoT=setInterval(()=>drawScene(cx,S.scene,Date.now()-S.sceneAt),250);
-  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},clean:cleanLine,codey,read:async id=>{const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);return deviceNotes([{c,t:Date.now(),tag:id}])}}}
+  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},clean:cleanLine,codey,float(){const f=document.createElement('iframe');f.style.cssText='position:fixed;left:24px;top:90px;width:236px;height:44px;border:0;z-index:99';document.body.append(f);dressFloat(f.contentDocument);S.float={document:f.contentDocument,close(){f.remove()},resizeTo(){}};paint();return f},read:async id=>{const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);return deviceNotes([{c,t:Date.now(),tag:id}])}}}
 function togglePause(){if(!S.running||S.finishing)return;const now=Date.now();S.paused=!S.paused;if(S.paused){if(S.detour)endDetour();S.off=null;if(S.main)openSeg('pause',now,null)}else{S.prev=S.sig=null;if(S.demo)S.sceneAt+=now-(S.pausedAt||now)}S.pausedAt=now;paint()}
 async function finish(){
   if(!S.running||S.finishing)return;S.finishing=true;const now=Date.now();stopCapture();
@@ -1086,7 +1119,9 @@ function notify(r){const n=$('#notif'),k=r.notes.length,g=r.glances;clearTimeout
 /* ---- live paint ---- */
 const pillState=()=>S.finishing?'finishing':S.paused?'paused':!S.demo&&(S.selfAt||!S.main)?'ready':S.detour?'away':S.busy?'writing':'noting';
 function paint(){if(!S.running)return;const st=pillState(),now=S.end||Date.now(),f=clock(focusMs(now));
-  [$('#pill'),S.float&&S.float.document.querySelector('.pill')].forEach(p=>{if(!p)return;p.dataset.state=st==='finishing'?'writing':st;$('.pill-label',p).textContent=STATE[st];$('.pill-time',p).textContent=f;$('[data-act="pause"]',p).innerHTML=ic(S.paused?'play':'pause')});
+  [$('#pill'),S.float&&S.float.document.querySelector('.pill')].forEach((p,fl)=>{if(!p)return;p.dataset.state=st==='finishing'?'writing':st;
+    if(fl){if(!S.flashing)$('.pl-t',p).textContent=FL[st]}else{$('.pill-label',p).textContent=STATE[st];$('.pill-time',p).textContent=f}
+    $('[data-act="pause"]',p).innerHTML=ic(S.paused?'play':'pause')});
   document.title=(st==='noting'||st==='writing'?'● ':'')+f+' · Rewrite';
   if(view!=='session'||opened)return;
   ribbon($('#ribbon'),S.segs,now);$('#axis-end').textContent=clock(now-S.t0);$('#k-focus').textContent=f;$('#k-notes').textContent=S.notes.length;const gn=glanceN();$('#k-gl').textContent=gn;if(gn!==S.outN){S.outN=gn;$('#s-out').innerHTML=outHTML(S.segs)}
@@ -1097,19 +1132,20 @@ function paint(){if(!S.running)return;const st=pillState(),now=S.end||Date.now()
 function tick(){if(!S.running)return;const now=Date.now();
   if((S.demo||S.sim)&&!S.paused&&!S.finishing&&!S.shot){const script=S.sim?SIMSCRIPT:SAMPLE.script,sc=script[S.sceneI];if(now-S.sceneAt>=sc[1]){if(++S.sceneI>=script.length){finish();return}S.scene=script[S.sceneI][0];S.sceneAt=now}}
   if(!S.paused&&!S.finishing&&!S.shot)checkSelf(now);logic(now);paint()}
-function toggleMini(){const w=S.float;if(!w)return;const pl=w.document.querySelector('.pill'),on=pl.classList.toggle('mini'),[ow,oh]=S.floatSize||[340,100];try{w.resizeTo(on?150:ow,oh)}catch{}}
+function toggleMini(){const w=S.float;if(!w)return;const pl=w.document.querySelector('.pill'),on=pl.classList.toggle('mini'),[ow,oh]=S.floatSize||[236,80];try{w.resizeTo(on?120:ow,oh)}catch{}}
+// what goes inside the floating window (also used by the test run, which shows it in a frame)
+function dressFloat(doc){
+  doc.head.innerHTML=`<title>Rewrite</title><link rel="stylesheet" href="${$('#fonts').href}"><style>${$('#base-css').textContent}${$('#pill-css').textContent}html,body{height:100%;margin:0;background:var(--night);overflow:hidden}body{display:flex;align-items:center}</style>`;
+  doc.documentElement.dataset.palette=root.dataset.palette;doc.body.className='fl';
+  doc.body.innerHTML=`<div class="pill" data-state="ready">${pillHTML(true)}</div>`;
+  doc.querySelector('.pl-t').textContent=FL.ready;doc.querySelector('[data-act="pause"]').innerHTML=ic('pause')}
 async function openFloat(auto,pre){
   if(!('documentPictureInPicture' in window)){if(!auto)toast('The floating indicator needs Chrome or Edge on a computer.');return}
   if(S.float||(!pre&&!S.running))return;
-  try{const w=await documentPictureInPicture.requestWindow({width:340,height:66});
-    w.document.head.innerHTML=`<title>Rewrite</title><link rel="stylesheet" href="${$('#fonts').href}"><style>${$('#base-css').textContent}${$('#pill-css').textContent}html,body{height:100%;margin:0;background:var(--night);overflow:hidden}body{display:grid;place-items:center}.pill{box-shadow:none;width:100%;justify-content:center}</style>`;
-    w.document.documentElement.dataset.palette=root.dataset.palette;
-    w.document.body.innerHTML=`<div class="pill" data-state="noting">${pillHTML(true)}</div>`;
-    // In the floating window the pill stays quiet: just the dot, the pen line and the time. The label and buttons
-    // appear when the pointer is over it. The dash button shrinks the window to a dot; a click on the dot brings it back.
-    w.document.body.className='fl';S.floatSize=[w.outerWidth,w.outerHeight];
-    w.document.body.addEventListener('click',e=>{const pl=w.document.querySelector('.pill');if(pl.classList.contains('mini'))return toggleMini();onAct(e)});w.addEventListener('pagehide',()=>{S.float=null});S.float=w;
-    const p=w.document.querySelector('.pill');p.dataset.state='ready';p.querySelector('.pill-label').textContent=STATE.ready;p.querySelector('.pill-time').textContent='0:00';p.querySelector('[data-act="pause"]').innerHTML=ic('pause');paint()
+  // as small as the browser allows: it enforces its own minimum size and adds the title bar
+  try{const w=await documentPictureInPicture.requestWindow({width:236,height:44});
+    dressFloat(w.document);S.floatSize=[w.outerWidth,w.outerHeight];
+    w.document.body.addEventListener('click',e=>{const pl=w.document.querySelector('.pill');if(pl.classList.contains('mini'))return toggleMini();onAct(e)});w.addEventListener('pagehide',()=>{S.float=null});S.float=w;paint()
   }catch(e){if(!auto)toast('The floating indicator could not open: '+e.message)}}
 
 /* ---- sample screen ---- */
