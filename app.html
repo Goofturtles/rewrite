@@ -84,7 +84,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 html,body{height:100%}
 body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-width:1240px;background:var(--page)}
 /* a flat page with the content straight on it: no outer glass frame (reference: learnwithzero.com) */
-.stage{min-height:100vh;padding:0 0 150px;background:var(--page)}
+.stage{min-height:100vh;padding:0 0 150px;background:var(--page);overflow-x:clip}
 .frame{max-width:1240px;margin:0 auto;padding:18px 30px 0}
 [data-theme="light"] .card:not(.ink):not(.peri2):not(.cream){box-shadow:inset 0 0 0 1px var(--card-b),0 14px 30px -26px rgba(var(--deep-rgb),.35)}
 
@@ -161,7 +161,7 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 /* home. References: learnwithzero.com (a flat page, a centred regular-weight sentence, a thin rail with nodes, a rounded
    world tile with a white card on it, the main action in a dock), Otter and Voicenotes (home is the feed of your notes),
    Aboard (small widgets that each hold one number). */
-.zh{text-align:center;padding:34px 0 0}
+.zh{position:relative;z-index:1;text-align:center;padding:34px 0 0}
 .zh .eyebrow{justify-content:center}
 .mega{display:flex;align-items:center;justify-content:center;gap:18px;font:500 clamp(40px,4.2vw,56px)/1.08 var(--ui);letter-spacing:-.048em;margin:12px 0 0}
 .mega i{font-style:normal;color:var(--peri)}
@@ -171,7 +171,7 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 .m-pill .led{width:30px;height:30px}
 .m-pill .led::after{width:8px;height:8px}
 .mega-sub{margin:16px auto 0;max-width:50ch;font-size:16.5px;line-height:1.5;color:var(--ink2)}
-.zgrid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 470px;gap:72px;align-items:start;margin-top:76px;padding:0 6px}
+.zgrid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) 470px;gap:72px;align-items:start;margin-top:26px;padding:0 6px}
 .zline{position:absolute;left:11px;top:-62px;width:calc(50% - 11px);height:72px;overflow:visible;clip-path:inset(0 0 0 0);animation:wipe 1.5s var(--ease) .3s backwards}
 .zline path{fill:none;stroke:var(--ink4);stroke-width:1.2;vector-effect:non-scaling-stroke}
 @keyframes wipe{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
@@ -182,51 +182,63 @@ body{margin:0;color:var(--ink);font:400 15px/1.5 var(--ui);-webkit-font-smoothin
 .fdot{position:absolute;left:-36px;top:3px;width:11px;height:11px;border-radius:50%;background:var(--page);box-shadow:inset 0 0 0 1.5px var(--ink3)}
 .fs.live .fdot{background:var(--hot);box-shadow:0 0 0 4px rgba(var(--hot-rgb),.2)}
 .fhead{display:flex;align-items:center;gap:9px;font:500 12px/1.5 var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
-.fhead em{font-style:normal;padding:0 9px;border-radius:99px;box-shadow:inset 0 0 0 1px var(--line);color:var(--ink2)}
 .ftitle{display:block;max-width:100%;text-align:left;font:500 27px/1.22 var(--ui);letter-spacing:-.036em;margin-top:8px;transition:color .25s}
 .ftitle:hover,.fn:hover b{color:var(--peri)}
 [data-theme="light"] .ftitle:hover,[data-theme="light"] .fn:hover b{color:var(--blue)}
 .fmeta{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-top:7px;font-size:13.5px;line-height:1.5;color:var(--ink3)}
 .fmeta .tok{width:9px;height:9px}
 .fitems{margin-top:16px;border-bottom:1px solid var(--line2)}
-.fn{position:relative;display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px;width:100%;text-align:left;padding:14px 0 15px;border-top:1px solid var(--line2)}
-.fn::before{content:"";position:absolute;left:-31px;top:25px;width:13px;height:1.2px;background:var(--ink4)}
-.fn time{font:500 12.5px/1.7 var(--ui);font-variant-numeric:tabular-nums;color:var(--ink3);white-space:nowrap}
-.fn b{display:block;font:500 16.5px/1.35 var(--ui);letter-spacing:-.02em;transition:color .25s}
-.fn ul{margin:7px 0 0;padding:0;list-style:none;display:grid;gap:5px}
-.fn li{position:relative;padding-left:15px;font-size:14px;line-height:1.5;color:var(--ink2)}
-.fn li::before{content:"";position:absolute;left:0;top:.72em;width:7px;height:1.5px;background:var(--hot)}
-.fgl{position:relative;display:flex;align-items:center;flex-wrap:wrap;gap:3px 12px;padding:9px 0 9px 68px;border-top:1px dashed var(--line);font-size:12.5px;line-height:1.5;color:var(--ink3)}
+.fn{position:relative;display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:baseline;width:100%;text-align:left;padding:10px 0 11px;border-top:1px solid var(--line2)}
+.fn::before{content:"";position:absolute;left:-31px;top:21px;width:13px;height:1.2px;background:var(--ink4)}
+.fn time{font:500 12.5px/1.6 var(--ui);font-variant-numeric:tabular-nums;color:var(--ink3);white-space:nowrap}
+.fn b{font:500 16px/1.4 var(--ui);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .25s}
+.fgl{position:relative;display:flex;align-items:center;flex-wrap:wrap;gap:3px 12px;padding:7px 0 7px 72px;border-top:1px dashed var(--line);font-size:12.5px;line-height:1.5;color:var(--ink3)}
 .fgl::before{content:"";position:absolute;left:-34px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:var(--page);box-shadow:inset 0 0 0 1.2px var(--ink4)}
-.fgl em{font-style:normal;font-weight:500;color:var(--ink2)}
 .fmore{display:flex;gap:8px}
-.ftitles{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
-.ftitles li{font-size:13px;line-height:1.5;padding:2px 11px;border-radius:99px;box-shadow:inset 0 0 0 1px var(--line);color:var(--ink2)}
+.fs .rib-s{height:10px;margin-top:14px;max-width:520px}
+.fs .rib-s i{border-radius:3px}
 /* before the first session: the three steps sit on the rail as numbered nodes */
 .how{display:grid;gap:24px}
-.hstep{position:relative}
-.hstep>i{position:absolute;left:-46px;top:-3px;width:31px;height:31px;border-radius:50%;background:var(--page);box-shadow:inset 0 0 0 1.2px var(--ink3);display:grid;place-items:center;font:500 13px/1 var(--ui);font-style:normal;color:var(--ink2)}
+.hstep{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;max-width:430px}
+.hstep>i{position:absolute;left:-46px;top:50%;margin-top:-15.5px;width:31px;height:31px;border-radius:50%;background:var(--page);box-shadow:inset 0 0 0 1.2px var(--ink3);display:grid;place-items:center;font:500 13px/1 var(--ui);font-style:normal;color:var(--ink2)}
 .hstep b{display:block;font:500 21px/1.3 var(--ui);letter-spacing:-.03em}
-.hstep span{display:block;margin-top:4px;max-width:48ch;font-size:14.5px;line-height:1.55;color:var(--ink2)}
+.hstep small{display:block;margin-top:2px;font-size:14px;line-height:1.5;color:var(--ink3)}
+.hpic{width:64px;height:44px;color:var(--ink3);flex:none}
+.hrib{display:grid;gap:8px;max-width:430px}
+.hrib .rib-s{height:10px}
+.hrib .rib-s i{border-radius:3px}
+.hrib small{font-size:13px;line-height:1.5;color:var(--ink3)}
+.hrib b{font-weight:500;color:var(--ink2)}
 .hbtns{display:flex;flex-wrap:wrap;gap:8px}
 /* beside the feed: the two choices and the shortcuts */
 .side{display:grid;gap:14px;min-width:0}
-/* the world: the landing page's grass as a wide band under the sentence. The latest note and this week float on it. */
-.world{position:relative;height:372px;margin:42px 6px 0;border-radius:28px;overflow:hidden;background:url(assets/hills.webp) 50% -92px/100% auto no-repeat,linear-gradient(180deg,#DCE5EA,#EEF0E8 62%);box-shadow:0 30px 60px -44px rgba(var(--deep-rgb),.7)}
-.w-card,.wk{position:absolute;text-align:left;border-radius:20px;padding:17px 19px 18px;background:#fff;color:#14180F;--ink3:rgba(20,24,15,.6);--ink4:rgba(20,24,15,.22);box-shadow:0 22px 44px -26px rgba(10,30,5,.6);transition:scale .45s var(--ease)}
-.w-card:hover,.wk:hover{scale:1.02}
-.w-card{left:46px;top:46px;width:412px;display:block;animation:floaty 7s ease-in-out infinite}
-.w-card small{display:block;font:500 11.5px/1.4 var(--ui);letter-spacing:.07em;text-transform:uppercase;color:rgba(20,24,15,.6)}
+/* The world: the landing page's grass, edge to edge under the sentence, rising out of the flat page. A shader draws it
+   (see World in the script); without WebGL the same render sits there as a still picture. The latest note and this week float on it. */
+.world{position:relative;z-index:0;width:100vw;height:clamp(440px,58vh,600px);margin:-58px 0 0 calc(50% - 50vw);background:url(assets/hills.webp) 50% 30%/cover no-repeat;pointer-events:none}
+.world.gl{background:none}
+.world canvas{position:absolute;inset:0;width:100%;height:100%;display:none}
+.world.gl canvas{display:block}
+.world:not(.gl)::after{content:"";position:absolute;inset:auto 0 0;height:20%;background:linear-gradient(transparent,var(--page))}
+.w-in{position:absolute;inset:0;max-width:1168px;margin:0 auto;perspective:1300px}
+/* the cards sit at three depths: they slide and tilt a little against the pointer, the nearest one most */
+.w-card,.wk,.w-chip{position:absolute;pointer-events:auto;background:#fff;color:#14180F;--ink3:rgba(20,24,15,.6);--ink4:rgba(20,24,15,.22);box-shadow:0 26px 50px -28px rgba(10,30,5,.7);transform:translate3d(calc(var(--px,0)*var(--k)),calc(var(--py,0)*var(--k)*.5),0) rotateY(calc(var(--px,0)*7deg)) rotateX(calc(var(--py,0)*-6deg));animation:floaty 7s ease-in-out infinite}
+[data-theme="dark"] .w-card,[data-theme="dark"] .wk,[data-theme="dark"] .w-chip{background:#12160f;color:#F3F5EF;--ink3:rgba(243,245,239,.62);--ink4:rgba(243,245,239,.24);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 26px 50px -24px #000}
+.w-card,.wk{text-align:left;border-radius:20px;padding:17px 19px 18px;transition:scale .45s var(--ease)}
+.w-card:hover,.wk:hover{scale:1.025}
+.w-card{--k:-26px;left:0;top:37%;width:412px;display:block}
+.w-note{position:absolute;left:0;right:0;bottom:11.5%;margin:0;text-align:center;font-size:13px;line-height:1.5;color:var(--ink3)}
+.w-card small{display:block;font:500 11.5px/1.4 var(--ui);letter-spacing:.07em;text-transform:uppercase;color:var(--ink3)}
 .w-card b{display:block;font:500 19px/1.3 var(--ui);letter-spacing:-.025em;margin:6px 0 8px}
 .w-card ul{margin:0;padding:0;list-style:none;display:grid;gap:6px}
-.w-card li{position:relative;padding-left:16px;font-size:13.5px;line-height:1.45;color:rgba(20,24,15,.82)}
+.w-card li{position:relative;padding-left:16px;font-size:13.5px;line-height:1.45;opacity:.84}
 .w-card li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:1.5px;background:var(--hot)}
-.w-chip{position:absolute;left:500px;bottom:56px;display:flex;align-items:center;gap:9px;height:40px;padding:0 15px;border-radius:99px;background:#fff;color:#14180F;font:500 13px/1.3 var(--ui);box-shadow:0 18px 36px -20px rgba(10,30,5,.6);animation:floaty 7s ease-in-out -3.5s infinite}
-.w-chip s{color:rgba(20,24,15,.55)}
+.w-chip{--k:-54px;left:47%;bottom:21%;display:flex;align-items:center;gap:9px;height:40px;padding:0 15px;border-radius:99px;font:500 13px/1.3 var(--ui);animation-delay:-3.5s}
+.w-chip s{color:var(--ink3)}
 .w-chip b{font-weight:500;color:#3F7000}
-@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+[data-theme="dark"] .w-chip b{color:var(--peri)}
+@keyframes floaty{0%,100%{translate:0 0}50%{translate:0 -7px}}
 .lab{display:block;font:500 12px/1.4 var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
-.wk{right:46px;top:58px;width:336px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;animation:floaty 7s ease-in-out -2.2s infinite}
+.wk{--k:-38px;right:0;top:30%;width:336px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;animation-delay:-2.2s}
 .wk b{display:block;font:500 27px/1.15 var(--ui);letter-spacing:-.04em;margin-top:8px;font-variant-numeric:tabular-nums}
 .wk .s{display:block;margin-top:5px;font-size:13px;line-height:1.45;color:var(--ink3)}
 .wbars{display:flex;align-items:flex-end;gap:6px;height:92px;padding-bottom:22px;flex:none}
@@ -480,14 +492,15 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
 
   <main class="main">
     <section class="view on" id="v-home">
-      <!-- Home is the feed. A centred sentence, the grass world as a wide band carrying the latest note and this week, then the latest sessions
+      <!-- Home is the feed. A centred sentence, then the living field (the landing page's grass, drawn by a shader: wind, cloud shadows, the pointer, night)
+           carrying the latest note and this week, then the latest sessions
            as a timeline on a thin rail (notes in order, glances crossed out) with the two set-up choices and the shortcuts beside it. The start button lives in the dock. -->
       <div class="zh">
         <div class="eyebrow rise" id="today-date"></div>
         <h1 class="mega rise" style="--i:1"><span id="mega"></span><span class="m-pill" aria-hidden="true"><span class="led"></span><svg class="pen" viewBox="0 0 64 20"><path class="ghost" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/><path class="trace" pathLength="100" d="M2 12C8 2 12 18 18 10S28 2 34 10 44 18 50 9s8-3 12 2"/></svg></span></h1>
         <p class="mega-sub rise" style="--i:2" id="mega-sub"></p>
       </div>
-      <div class="world rise" style="--i:3" data-el="hero"><button class="w-card" id="w-card"></button><button class="wk" id="wk" data-go="recap" data-el="week"></button><div class="w-chip" id="w-chip"></div></div>
+      <div class="world rise" style="--i:2" data-el="hero"><canvas id="world-gl" aria-hidden="true"></canvas><div class="w-in"><button class="w-card" id="w-card"></button><button class="wk" id="wk" data-go="recap" data-el="week"></button><div class="w-chip" id="w-chip"></div></div><p class="w-note" id="w-note"></p></div>
       <div class="zgrid">
         <svg class="zline" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M100 0C100 62 0 30 0 100" pathLength="100"/></svg>
         <div class="feed" id="feed" data-el="feed"></div>
@@ -678,7 +691,7 @@ function streak(){const days=new Set(sessions.map(s=>day0(s.at)));let t=day0(Dat
 /* ================= RENDER: SHELL ================= */
 let view='home';
 const show=(el,on)=>{el.classList.toggle('on',on);el.inert=!on};
-function go(v,instant){view=v;const run=()=>{$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));const nav=v==='session'?'notes':v,ind=$('#nav-ind');let on=null;$$('#navs .nav').forEach(n=>{const y=n.dataset.go===nav;n.classList.toggle('on',y);if(y){on=n;n.setAttribute('aria-current','page')}else n.removeAttribute('aria-current')});ind.style.opacity=on?1:0;if(on){ind.style.width=on.offsetWidth+'px';ind.style.transform=`translateX(${on.offsetLeft}px)`}({home:renderHome,notes:renderNotes,recap:renderRecap,settings:renderSettings}[v]||(()=>{}))();scrollTo(0,0)};if(!instant&&!STILL&&document.startViewTransition)document.startViewTransition(run);else run()}
+function go(v,instant){view=v;const run=()=>{$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));const nav=v==='session'?'notes':v,ind=$('#nav-ind');let on=null;$$('#navs .nav').forEach(n=>{const y=n.dataset.go===nav;n.classList.toggle('on',y);if(y){on=n;n.setAttribute('aria-current','page')}else n.removeAttribute('aria-current')});ind.style.opacity=on?1:0;if(on){ind.style.width=on.offsetWidth+'px';ind.style.transform=`translateX(${on.offsetLeft}px)`}({home:renderHome,notes:renderNotes,recap:renderRecap,settings:renderSettings}[v]||(()=>{}))();scrollTo(0,0);World.play()};if(!instant&&!STILL&&document.startViewTransition)document.startViewTransition(run);else run()}
 function renderSide(){$('#engine-txt').textContent=DEMO||engine()==='claude'?MODELS[cfg.model]:engine()==='device'?'On this laptop':'Set up notes';$('#n-count').textContent=sessions.reduce((a,s)=>a+s.notes.length,0);if(DEMO){$('#user').hidden=false;$('#ava').textContent='RP';$('#u-name').textContent='Riley Park';$('#u-sub').textContent='Demo data'}}
 function tiles(el,w,base){const cur=w[6],sum=k=>w.reduce((a,d)=>a+d[k],0);const T=[
   {l:'Focus time',v:sum('focus'),f:durHTML,k:'focus',s:'last 7 days'},
@@ -696,35 +709,37 @@ const barsHTML=w=>{const mx=Math.max(1,...w.map(d=>d.focus));return w.map((d,i)=
 const hm=t=>{const d=new Date(t),h=d.getHours();return((h+11)%12+1)+':'+String(d.getMinutes()).padStart(2,'0')+(h<12?' am':' pm')};
 const plural=(n,w)=>n+' '+w+(n===1?'':'s');
 const glTxt=g=>esc(g.app||'Glance')+' · '+dur(g.b-g.a);
-const HOW=[['Press Start and pick your screen','Your browser asks what to share. Pick the entire screen, so quick looks at other apps can be told apart from your work.'],['Carry on with what you were doing','A small pill floats on top while notes are taken. It stays out of the way until you point at it.'],['Read your notes','Finish whenever you like. The notes, a short summary and everything that was left out are saved on this laptop.']];
-// One session on the home timeline. Open: its notes in the order they were written, with the glances that were left out
-// crossed out between them. Closed: just the note titles. The example (shown before the first session) plays the sample.
-function fsHTML(s,open,i,ex){
-  const sub=s.subject||'General',act=ex?'data-act="sample"':`data-open="${esc(s.id)}"`;let body='';
+const HOW=[['Share your screen','Your browser asks which one.','<rect x="6" y="6" width="52" height="30" rx="5"/><path d="M24 42h16"/><path d="m39 18 9 4.2-3.8 1.4-1.4 3.8z" fill="var(--hot)" stroke="none"/>'],['Carry on','A small pill shows it is taking notes.','<rect x="6" y="13" width="52" height="18" rx="9" fill="var(--night)" stroke="none"/><circle cx="16" cy="22" r="4.5" fill="var(--hot)" stroke="none"/><path d="M26 23c3-6 5 5 8-1s5-5 8 0 5 3 8-1" stroke="var(--peri)"/>'],['Read your notes','Quick looks at Discord, Spotify and the like are left out.','<rect x="14" y="4" width="36" height="36" rx="6"/><path d="M21 14h22M21 21h22M21 28h10"/><path d="m36 30 3.2 3.2L46 26" stroke="var(--hot)" stroke-width="2"/>']];
+// One session on the home timeline: the title, its ribbon (solid is focus, striped is a glance), three numbers.
+// Open, it lists the notes one line each in the order they were written, with the glances crossed out between them.
+function fsHTML(s,open,i){
+  const sub=s.subject||'General',act=`data-open="${esc(s.id)}"`;let body='';
   if(open){const its=[...s.notes.map(n=>({t:n.t,n})),...s.segs.filter(g=>g.k==='glance').map(g=>({t:g.a,g}))].sort((a,b)=>a.t-b.t);let run=[],shown=0;
-    const flush=()=>{if(run.length)body+=`<div class="fgl">${run.map(g=>`<s>${glTxt(g)}</s>`).join('')}<em>left out</em></div>`;run=[]};
-    for(const o of its){if(o.g){run.push(o.g);continue}if(shown===4)break;flush();shown++;body+=`<button class="fn" ${act} data-el="session-row"><time>${hm(s.at+o.n.t)}</time><span><b>${esc(o.n.title)}</b><ul>${o.n.bullets.slice(0,2).map(b=>`<li>${markup(b,o.n.terms)}</li>`).join('')}</ul></span></button>`}
+    const flush=()=>{if(run.length)body+=`<div class="fgl">${run.map(g=>`<s>${glTxt(g)}</s>`).join('')}</div>`;run=[]};
+    for(const o of its){if(o.g){run.push(o.g);continue}if(shown===5)break;flush();shown++;body+=`<button class="fn" ${act} data-el="session-row"><time>${hm(s.at+o.n.t)}</time><b>${esc(o.n.title)}</b></button>`}
     flush();body=`<div class="fitems">${body}</div>`;if(s.notes.length>shown)body+=`<div class="fmeta"><button class="link" ${act}>${plural(s.notes.length-shown,'more note')}</button></div>`}
-  else body=`<ul class="ftitles">${s.notes.slice(0,4).map(n=>`<li>${esc(n.title)}</li>`).join('')}</ul>`;
-  return `<article class="fs rise" style="--i:${3+i}"><i class="fdot"></i><div class="fhead">${ex?'<em>Example</em>What a finished session looks like':when(s.at)+' · '+hm(s.at)}</div><button class="ftitle" ${act}>${esc(s.title)}</button><div class="fmeta"><span class="tok" style="--c:${colorOf(sub)}"></span>${esc(sub)} · ${dur(s.focusMs)} focused · ${plural(s.notes.length,'note')} · ${plural(s.glances,'glance')} left out</div>${body}</article>`}
-const howHTML=()=>`<div class="how"><div class="fhead rise" style="--i:3">How it works</div>${HOW.map((h,i)=>`<div class="hstep rise" style="--i:${3+i}"><i>${i+1}</i><b>${h[0]}</b><span>${h[1]}</span></div>`).join('')}<div class="hbtns rise" style="--i:6"><button class="btn dark sm" data-act="start"><span class="rec"></span>Start a session</button><button class="btn line sm" data-act="sample">${ic('play')}Play the 50 second sample</button></div></div>`;
+  return `<article class="fs rise" style="--i:${3+i}"><i class="fdot"></i><div class="fhead">${when(s.at)} · ${hm(s.at)}</div><button class="ftitle" ${act}>${esc(s.title)}</button>${ribS(s)}<div class="fmeta"><span class="tok" style="--c:${colorOf(sub)}"></span>${esc(sub)} · ${dur(s.focusMs)} focused · ${plural(s.notes.length,'note')} · ${s.glances} left out</div>${body}</article>`}
+const howHTML=()=>`<div class="how"><div class="fhead rise" style="--i:3">How it works</div>${HOW.map((h,i)=>`<div class="hstep rise" style="--i:${3+i}"><i>${i+1}</i><span><b>${h[0]}</b><small>${h[1]}</small></span><svg class="hpic" viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${h[2]}</svg></div>`).join('')}<div class="hrib rise" style="--i:6"><div class="rib-s"><i style="--w:30"></i><i class="glance"></i><i style="--w:22"></i><i class="glance"></i><i style="--w:16"></i></div><small><b>Solid</b> is kept. <b>Striped</b> is a glance, left out.</small></div><div class="hbtns rise" style="--i:7"><button class="btn dark sm" data-act="start"><span class="rec"></span>Start a session</button><button class="btn line sm" data-act="sample">${ic('play')}Play the 50 second sample</button></div></div>`;
 // the two choices that matter, changed right on the home page
 function renderSetup(){const e=cfg.engine,on=(a,b)=>`class="${a===b?'on':''}" aria-pressed="${a===b}"`;
-  $('#setup').innerHTML=`<span class="lab">Set up</span><div class="srow"><span>A glance is anything under</span><span class="segs" role="group" aria-label="Glance limit">${[5,10,20,30].map(v=>`<button data-glance="${v}" ${on(cfg.glance,v)}>${v} s</button>`).join('')}</span></div><div class="srow"><span>Notes are written by</span><span class="segs" role="group" aria-label="Who writes the notes"><button data-engine="device" ${on(e,'device')}>This laptop</button><button data-engine="claude" ${on(e,'claude')}>Claude</button></span></div><p class="snote">${e==='device'?'Private: the screen is read inside this tab and nothing is uploaded.':cfg.key||DEMO?'Screens go to Anthropic with your own key. These are the best notes.':'Claude needs your API key. <button class="link" data-go="settings">Add it in Settings</button>'} <br>Left out: ${APPS.slice(0,6).join(', ')} and ${APPS.length-6} more social, chat, music, video and game apps. Everything else is kept.</p>`}
+  $('#setup').innerHTML=`<span class="lab">Set up</span><div class="srow"><span>A glance is under</span><span class="segs" role="group" aria-label="Glance limit">${[5,10,20,30].map(v=>`<button data-glance="${v}" ${on(cfg.glance,v)}>${v} s</button>`).join('')}</span></div><div class="srow"><span>Notes written by</span><span class="segs" role="group" aria-label="Who writes the notes"><button data-engine="device" ${on(e,'device')}>This laptop</button><button data-engine="claude" ${on(e,'claude')}>Claude</button></span></div><p class="snote">${e==='device'?'Nothing leaves this laptop.':cfg.key||DEMO?'Read by Claude, with your own key.':'Claude needs your key. <button class="link" data-go="settings">Add it</button>'} <button class="link" data-go="settings">See what is left out</button></p>`}
 function renderHome(){
   renderSide();const w=week(),t=w[6],mins=Math.round(t.focus/6e4),live=S.running;
   $('#today-date').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
   // the one sentence says where today stands
   $('#mega').innerHTML=live?'Taking <i>notes</i>.':mins?`<i>${mins} min</i> focused today.`:'Ready when <i>you</i> are.';
-  $('#mega-sub').textContent=live?'Carry on with your work. Come back here whenever you want to read along.':mins?`${plural(t.notes,'note')} written, ${plural(t.glances,'glance')} left out. Start another session whenever you like.`:'Share your screen and carry on. Rewrite writes the notes, and quick looks at social, chat and music apps are left out.';
+  $('#mega-sub').textContent=live?'Carry on with your work.':mins?`${plural(t.notes,'note')} written, ${plural(t.glances,'glance')} left out.`:'Share your screen and carry on. Your notes write themselves.';
   $('#start-label').textContent=live?'Show the live session':'Start a session';
   // the feed: the live session if there is one, then the latest sessions; before the first one, how it works and an example
-  $('#feed').innerHTML=sessions.length||live?(live?`<article class="fs live rise" style="--i:3"><i class="fdot"></i><div class="fhead">Now</div><button class="ftitle" data-act="show">Taking notes now</button><div class="fmeta">Carry on with your work. Open the live session to read along.</div></article>`:'')+sessions.slice(0,4).map((s,i)=>fsHTML(s,i===0,i)).join('')+(sessions.length?`<div class="fmore rise" style="--i:7"><button class="btn line sm" data-go="notes">All notes${ic('arrow')}</button><button class="btn line sm" data-go="recap">This week${ic('arrow')}</button></div>`:''):howHTML()+fsHTML(seed()[0],true,4,true);
+  $('#feed').innerHTML=sessions.length||live?(live?`<article class="fs live rise" style="--i:3"><i class="fdot"></i><div class="fhead">Now</div><button class="ftitle" data-act="show">Taking notes now</button><div class="fmeta">Carry on with your work. Open the live session to read along.</div></article>`:'')+sessions.slice(0,4).map((s,i)=>fsHTML(s,i===0,i)).join('')+(sessions.length?`<div class="fmore rise" style="--i:7"><button class="btn line sm" data-go="notes">All notes${ic('arrow')}</button><button class="btn line sm" data-go="recap">This week${ic('arrow')}</button></div>`:''):howHTML();
   // on the world: the newest note, or an example before there is one
   const s0=sessions[0],n0=s0&&s0.notes[s0.notes.length-1],g0=s0&&[...s0.segs].reverse().find(g=>g.k==='glance'),ex=SAMPLE.notes.doc1,wc=$('#w-card');
   wc.innerHTML=`<small>${n0?'Latest note · '+esc(s0.subject||'General'):'Example note'}</small><b>${esc(n0?n0.title:ex.topic)}</b><ul>${(n0?n0.bullets:ex.notes).slice(0,2).map(b=>`<li>${esc(b)}</li>`).join('')}</ul>`;
   if(n0){wc.dataset.open=s0.id;delete wc.dataset.act}else{wc.dataset.act='sample';delete wc.dataset.open}
   $('#w-chip').innerHTML=`<s>${g0?glTxt(g0):'Discord · 8 s'}</s><b>left out</b>`;
+  // the field is as grown as today's focus: bare at none, first shoots after any session, nearly full at an hour
+  const fm=t.focus/6e4;World.grow(fm>0?Math.max(.12,1-Math.exp(-fm/22)):0);
+  $('#w-note').textContent=fm>0?`Your field after ${dur(t.focus)} of focus today.`:'Bare for now. Your field grows as you focus.';
   // this week: one number and seven bars
   const sum=k=>w.reduce((a,d)=>a+d[k],0),mx=Math.max(1,...w.map(d=>d.focus)),f=sum('focus');
   $('#wk').innerHTML=`<span><span class="lab">This week</span><b>${f?dur(f):'0 min'}</b><span class="s">${f?`${plural(sum('notes'),'note')} · ${plural(sum('n'),'session')}`:'No sessions yet'}</span></span><span class="wbars" aria-hidden="true">${w.map((d,i)=>`<i class="${d.today?'t':''}" style="--h:${d.focus?Math.max(8,d.focus/mx*100):0};--i:${i}"><em>${esc(d.label[0])}</em></i>`).join('')}</span>`;
@@ -821,15 +836,14 @@ const HINTS=[[/direct messages/i,'Chat app'],[/add friend/i,'Chat app'],[/\bnitr
 // The name of the social, chat, music, video or game app on this screen, or '' when the screen is anything else.
 const whichApp=text=>{const m=text.match(DISTRACT);if(m){const k=m[0].toLowerCase();return k==='x.com'?'X':k==='threads.net'?'Threads':APPS.find(a=>appKey(a)===k)||m[0]}const hit=HINTS.filter(h=>h[0].test(text));return hit.length>=2?hit[0][1]:''};
 function peek(){const k=1,c=document.createElement('canvas');c.width=Math.max(1,Math.round(last.width*k));c.height=Math.max(1,Math.round(last.height*k));c.getContext('2d').drawImage(last,0,0,c.width,c.height);return{c,tag:S.scene}}
+// dark screens read far better as dark text on a light page
+const lightUp=(x,cv)=>{const d=x.getImageData(0,0,cv.width,cv.height).data;let s=0,n=0;for(let i=0;i<d.length;i+=388){s+=d[i]*.3+d[i+1]*.59+d[i+2]*.11;n++}if(s/n<115){x.globalCompositeOperation='difference';x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.globalCompositeOperation='source-over'}};
 // Resolves to the app's name when every look was at such an app, and to '' when it was anything else.
 async function isDistraction(peeks){
   if(!peeks||!peeks.length)return'';
   if(S.demo)return peeks.every(p=>p.tag==='chat'||p.tag==='music')?(peeks[0].tag==='chat'?'Discord':'Spotify'):'';
   try{const w=await withTimeout(loadTess(),45000,'reader');let name='';
-    for(const p of peeks){const x=p.c.getContext('2d',{willReadFrequently:true}),d=x.getImageData(0,0,p.c.width,p.c.height).data;let s=0,n=0;
-      for(let i=0;i<d.length;i+=388){s+=d[i]*.3+d[i+1]*.59+d[i+2]*.11;n++}
-      // dark apps read far better as dark text on a light page
-      if(s/n<115){x.globalCompositeOperation='difference';x.fillStyle='#fff';x.fillRect(0,0,p.c.width,p.c.height);x.globalCompositeOperation='source-over'}
+    for(const p of peeks){lightUp(p.c.getContext('2d',{willReadFrequently:true}),p.c);
       const{data}=await withTimeout(w.recognize(p.c),30000,'reader'),app=whichApp(String(data.text||''));if(!app)return'';name=name||app}
     return name}catch{return''}}
 // The detour is over. Until the check answers it shows as "away"; then it becomes a glance (dropped) or kept work (its frames go to the note writer).
@@ -887,27 +901,63 @@ Write the next notes. Reply with one JSON object and nothing else:
 
 - on_task: false when the screen is chat, music, social media, games, shopping or entertainment, not something they are learning from.
 - app: the app or site in view, 1 to 3 words.
-- topic: what the person is working on, 6 words at most.
+- topic: what the person is doing on this screen, as a label they would recognise later, 7 words at most. For example "Google search: what's 9+10", "Reading: causes of the First World War", "Writing: lab report introduction".
 - notes: 2 to 5 short bullets a careful note taker would write down from this screen: facts, definitions, decisions, steps, figures. State the content itself. Never describe the screen or the app. Leave out anything already in the notes above. Use [] when off task or when nothing is new.
 - terms: up to 4 key terms copied exactly from your bullets.`}]))}
 let tessP=null;
 const loadTess=()=>tessP||(tessP=new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';s.onload=()=>window.Tesseract.createWorker('eng').then(res,rej);s.onerror=()=>rej(new Error('The on-device reader could not load. It needs the internet the first time.'));document.head.append(s)}).catch(e=>{tessP=null;throw e}));
+/* ---- reading on this laptop ----
+   Two readings of the newest frame. The top strip of the screen (the browser's tabs and address bar) says where you are:
+   that becomes the note's title, so a note tells you what you were doing. The rest of the screen gives the lines worth keeping. */
+const PLACES=[['docs.google','Google Docs'],['slides.google','Google Slides'],['sheets.google','Google Sheets'],['mail.google','Gmail'],['classroom.google','Google Classroom'],['youtube','YouTube'],['wikipedia','Wikipedia'],['github','GitHub'],['claude','Claude'],['chatgpt','ChatGPT'],['notion','Notion'],['canva','Canva'],['quizlet','Quizlet'],['khanacademy','Khan Academy'],['desmos','Desmos'],['stackoverflow','Stack Overflow'],['duckduckgo','DuckDuckGo'],['bing','Bing'],['google','Google']];
+const TABS='Google Search|Google Docs|Google Slides|Google Sheets|YouTube|Wikipedia|Gmail|GitHub|Claude|ChatGPT|Notion|Canva|Quizlet|Khan Academy|Desmos|Stack Overflow|Word|PowerPoint|Excel|Visual Studio Code|Adobe Acrobat';
+const DOING={YouTube:'Watching','Google Docs':'Writing',Word:'Writing','Google Slides':'Slides',PowerPoint:'Slides',Wikipedia:'Reading',Claude:'Asking Claude',ChatGPT:'Asking ChatGPT'};
+function whereAmI(top){
+  const t=top.replace(/\s+/g,' '),u=t.match(/\b((?:[a-z0-9-]+\.)+(?:com|org|net|edu|gov|io|ai|ca|co|uk|so|app|dev|me|tv))(\/\S*)?/i),host=u?u[1].toLowerCase().replace(/^www\./,''):'';
+  let app=(PLACES.find(p=>host.includes(p[0]))||[])[1]||'';
+  // a search: the words are in the address itself
+  const q=u&&u[2]&&u[2].match(/[?&](?:q|search_query|query)=([^&\s]+)/);
+  if(q){const words=q[1].replace(/\+/g,' ').replace(/%[0-9A-Fa-f]{2}/g,m=>{try{return decodeURIComponent(m)}catch{return''}}).trim();if(words)return{app:(app||'Web')+' search',topic:(app||'Web')+' search: '+words}}
+  // otherwise the tab's own title, which ends with the name of the site or app
+  const tabs=[...t.matchAll(new RegExp('(.{3,90}?) [-–—|] ('+TABS+')\\b','gi'))],tab=tabs.find(m=>app&&m[2].toLowerCase().startsWith(app.toLowerCase()))||tabs[0];
+  if(!tab)return{app:app||host,topic:''};
+  const name=tab[1].split(new RegExp(' [-–—|] (?:'+TABS+')\\b| [x×] ','i')).pop().trim();app=app||tab[2].replace(/ Search$/i,'');
+  return/search$/i.test(tab[2])?{app:app+' search',topic:app+' search: '+name}:{app,topic:(DOING[app]?DOING[app]+': ':'')+name}}
+// lines that belong to the screen's furniture, not to what you are reading
+const FURNITURE=/sharing your screen|stop sharing|^\W*(ask anything|type here to search|search google or type|sign in|sign up|log in|accept all|reject all|learn more|show more|see more|send feedback|people also ask)\b/i;
 async function deviceNotes(frames){
-  const w=await withTimeout(loadTess(),60000,'The on-device reader took too long to load.'),{data}=await withTimeout(w.recognize(frames[frames.length-1].c),60000,'Reading the screen took too long.');
-  const H=frames[frames.length-1].c.height;
-  const lines=(data.lines&&data.lines.length?data.lines.map(l=>({t:l.text.trim(),h:l.bbox.y1-l.bbox.y0,y:l.bbox.y0,c:l.confidence})):String(data.text||'').split('\n').map((t,i)=>({t:t.trim(),h:20,y:H*.2+i*30,c:80}))).filter(l=>l.c>=55&&l.t.length>3&&l.y>H*.13&&l.y<H*.94);
-  if(!lines.length)return{on_task:true,notes:[]};
+  const w=await withTimeout(loadTess(),60000,'The on-device reader took too long to load.'),c=frames[frames.length-1].c,W=c.width,H=c.height;
+  const{data}=await withTimeout(w.recognize(c),60000,'Reading the screen took too long.');
+  // the top strip on its own, at twice the size: its text is small
+  let here={app:'',topic:''};
+  try{const s=document.createElement('canvas'),hh=Math.round(H*.125);s.width=W*2;s.height=hh*2;const x=s.getContext('2d',{willReadFrequently:true});x.imageSmoothingQuality='high';x.drawImage(c,0,0,W,hh,0,0,s.width,s.height);lightUp(x,s);
+    here=whereAmI(String((await withTimeout(w.recognize(s),30000,'top strip')).data.text||''))}catch{}
+  const own=new RegExp(location.hostname.split('.').filter(p=>p.length>2).join('\\W*')||'^$','i');   // this page's own name, as the browser's sharing bar shows it
+  const lines=(data.lines&&data.lines.length?data.lines.map(l=>({t:l.text.trim(),h:l.bbox.y1-l.bbox.y0,y:l.bbox.y0,x:l.bbox.x0,c:l.confidence})):String(data.text||'').split('\n').map((t,i)=>({t:t.trim(),h:20,y:H*.2+i*30,x:0,c:80})))
+    .filter(l=>l.c>=55&&l.t.length>3&&l.y>H*.125&&l.y<H*.93&&!FURNITURE.test(l.t)&&!own.test(l.t));
+  const blank={on_task:true,app:here.app,topic:here.topic,notes:[]};
+  if(!lines.length)return blank;
   const hs=lines.map(l=>l.h).sort((a,b)=>a-b),med=hs[hs.length>>1]||1;
-  const head=lines.filter(l=>l.h>med*1.3&&l.t.split(/\s+/).length<=10).sort((a,b)=>b.h-a.h)[0];
-  const paras=[];let cur='',prev=null;
-  for(const l of lines){if(l===head)continue;const bullet=/^[^A-Za-z0-9("']/.test(l.t),t=l.t.replace(/^[^A-Za-z0-9("']+\s*/,''),gap=prev&&l.y-prev.y>prev.h*2.1;if(cur&&(bullet||gap||/[.!?]$/.test(cur))){paras.push(cur);cur=''}cur=cur?cur+' '+t:t;prev=l}
+  const head=lines.filter(l=>l.h>med*1.3&&l.t.split(/\s+/).length<=10&&/[A-Za-z]{3}/.test(l.t)).sort((a,b)=>b.h-a.h)[0];
+  // lines join into one paragraph only when they sit under each other, are the same size and start at the same edge
+  const paras=[];let cur=null,prev=null;
+  for(const l of lines){if(l===head)continue;const bullet=/^[^A-Za-z0-9("']/.test(l.t),t=l.t.replace(/^[^A-Za-z0-9("']+\s*/,'');
+    if(cur&&!bullet&&!/[.!?]$/.test(cur.t)&&l.y-prev.y<prev.h*2.1&&Math.abs(l.h-prev.h)<prev.h*.35&&Math.abs(l.x-cur.x)<W*.04)cur.t+=' '+t;else{if(cur)paras.push(cur);cur={t,h:l.h,y:l.y,x:l.x}}prev=l}
   if(cur)paras.push(cur);
-  const cue=/\b(is|are|means|called|defined|because|therefore|causes?|produces?|makes?|uses?|needs?|allows?)\b/i;
-  const sents=paras.flatMap(p=>p.split(/(?<=[.!?])\s+/)).map(s=>s.trim()).filter(s=>{const n=s.split(/\s+/).length;return n>=5&&n<=34&&(s.match(/[A-Za-z]/g)||[]).length/s.length>.7});
-  const picked=sents.map((s,i)=>({s,i,v:(cue.test(s)?2:0)+(/\d/.test(s)?.5:0)})).filter(x=>!S.seen.has(x.s.toLowerCase().slice(0,40))).sort((a,b)=>b.v-a.v).slice(0,3).sort((a,b)=>a.i-b.i);
+  const cue=/\b(is|are|was|were|means|called|defined|because|therefore|causes?|produces?|makes?|uses?|needs?|allows?|equals?)\b/i,chatty=/^(are you|would you|do you|did you|want to|try |click|tap |sign |log in|subscribe|follow |download|get the app|learn more|see more|show more|ask |looking for)/i;
+  // a line worth keeping states something: questions to the reader, prompts and scraps are left; a sum with its answer stays even though it is short
+  const sents=paras.flatMap(p=>p.t.split(/(?<=[.!?])\s+/).map(x=>({s:x.trim(),h:p.h,y:p.y}))).filter(({s})=>{
+    if(/^[\d\s+\-×x*÷\/().^=,]{3,}$/.test(s)&&/\d\s*=\s*\d/.test(s))return true;
+    const n=s.split(/\s+/).length,math=/\d\s*[=+×*÷]\s*\d|=\s*\d|\bequals\b/i.test(s);
+    return n>=(math?3:5)&&n<=40&&(s.match(/[A-Za-z0-9]/g)||[]).length/s.length>.6&&/[A-Za-z]{2}/.test(s)&&!/\?$/.test(s)&&!chatty.test(s)});
+  // the three best: statements, sums and figures, bigger type, nearer the top
+  const picked=sents.map((o,i)=>({...o,i,v:(cue.test(o.s)?2:0)+(/\d/.test(o.s)?.5:0)+(/=|\bequals\b/i.test(o.s)?1.5:0)+Math.min(2,Math.max(0,o.h/med-1)*2)+(o.y<H*.45?.5:0)}))
+    .filter(x=>!S.seen.has(x.s.toLowerCase().slice(0,40))).sort((a,b)=>b.v-a.v).slice(0,3).sort((a,b)=>a.i-b.i);
   picked.forEach(x=>S.seen.add(x.s.toLowerCase().slice(0,40)));
   const notes=picked.map(x=>x.s),terms=[...new Set(notes.join(' ').match(/\b[A-Za-z]{9,}\b/g)||[])].slice(0,3);
-  return{on_task:true,app:'',topic:head?head.t.replace(/[^\w\s:'-]/g,'').trim():'Screen notes',notes,terms}}
+  // the title: where you were if the top strip said so, else the page's own heading, else the start of the first line kept
+  const lead=notes[0]?notes[0].split(/\s+/).slice(0,7).join(' ').replace(/[.,;:]+$/,'')+(notes[0].split(/\s+/).length>7?'…':''):'';
+  return{...blank,topic:here.topic||(head?head.t.replace(/[^\w\s:'’+=?.,-]/g,'').trim():'')||(here.app?'On '+here.app:lead||'Screen notes'),notes,terms}}
 async function sampleNotes(frames){await sleep(900);const tag=frames[frames.length-1].tag,n=SAMPLE.notes[tag];if(!n||S.seen.has(tag))return{on_task:true,notes:[]};S.seen.add(tag);return{on_task:true,...n}}
 // The sample is scripted from start to finish, so it plays the same with no key and no connection. The test run reads its made-up screen for real.
 const writer=()=>S.sim?'device':S.demo?'sample':engine();
@@ -922,7 +972,7 @@ async function writeNote(st,frames){
   const wr=$('#writing');if(wr)wr.remove();S.busy=false;paint()}
 function addNote(n){S.notes.push(n);if(!opened)$('#stream').insertAdjacentHTML('afterbegin',noteHTML(n,SAMPLE.subject))}
 async function summarize(){
-  const first=S.notes[0],fall={title:first?first.title:'Session notes',subject:S.demo?SAMPLE.subject:'General',takeaways:S.notes.slice(0,4).map(n=>n.bullets[0]),quiz:[]};
+  const titles=[...new Set(S.notes.map(n=>n.title))],fall={title:titles.length?titles[0]+(titles.length>1?` and ${titles.length-1} more`:''):'Session notes',subject:S.demo?SAMPLE.subject:'General',takeaways:S.notes.slice(0,4).map(n=>n.bullets[0]),quiz:[]};
   if(!S.notes.length)return fall;const w=writer();if(w==='sample')return SAMPLE.summary;
   if(w==='claude')try{return{...fall,...parseJSON(await claude([{type:'text',text:`Here are the notes from one session:
 
@@ -931,8 +981,8 @@ ${S.notes.map(n=>'## '+n.title+'\n'+n.bullets.map(b=>'- '+b).join('\n')).join('\
 Reply with one JSON object and nothing else:
 {"title": "", "subject": "", "takeaways": [""], "quiz": [{"q": "", "a": ""}]}
 
-- title: names what the session was about, 6 words at most.
-- subject: the school subject in one word, such as Biology, Math, History.
+- title: says what the session was spent on, 7 words at most.
+- subject: the area in one or two words, such as Biology, Math, Coding, Design, Research.
 - takeaways: the 3 to 5 most important things learned, one sentence each.
 - quiz: 3 short questions that test these notes, each with a one-sentence answer.`}]))}}catch(e){toast(String(e.message||e))}
   return fall}
@@ -962,7 +1012,7 @@ const SIMSCRIPT=[['doc1',16000],['ai',7000],['doc1',10000],['chat',6000],['doc2'
 function startSim(){if(S.running)return;reset(false);S.sim=true;
   const cv=document.createElement('canvas');cv.width=1280;cv.height=720;const cx=cv.getContext('2d');S.sceneI=0;S.scene=SIMSCRIPT[0][0];S.sceneAt=Date.now();
   drawScene(cx,S.scene,0);S.demoT=setInterval(()=>drawScene(cx,S.scene,Date.now()-S.sceneAt),250);
-  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions}}}
+  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},read:async id=>{const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);return deviceNotes([{c,t:Date.now(),tag:id}])}}}
 function togglePause(){if(!S.running||S.finishing)return;const now=Date.now();S.paused=!S.paused;if(S.paused){if(S.detour)endDetour();S.off=null;if(S.main)openSeg('pause',now,null)}else{S.prev=S.sig=null;if(S.demo)S.sceneAt+=now-(S.pausedAt||now)}S.pausedAt=now;paint()}
 async function finish(){
   if(!S.running||S.finishing)return;S.finishing=true;const now=Date.now();stopCapture();
@@ -1020,8 +1070,123 @@ function drawScene(c,id,t){
     [['Jordan','are we still meeting at 4?'],['Priya','yes, library second floor'],['Jordan','bring the chem worksheet pls'],['Priya','ok']].forEach((m,i)=>{const y=110+i*76;dot(352,y,20,i%2?'#3BA55D':'#5865F2');Tx(m[0],386,y-4,'600 15px system-ui','#F2F3F5');Tx(m[1],386,y+20,'15px system-ui','#DBDEE1')});R(336,H-76,W-360,48,'#383A40',10);Tx('Message #general'+(blink?' |':''),356,H-46,'15px system-ui','#949BA4')}
   else if(id==='ai'){R(0,0,W,H,'#FAF9F5');R(0,0,W,52,'#F0EEE6');Tx('Claude',28,33,'600 17px Georgia','#3D3929');Tx('Cell membrane question',W/2-90,33,'14px system-ui','#6B6A63');R(700,92,460,54,'#EDE9DD',14);Tx('Why can oxygen cross the membrane on its own?',724,125,'16px system-ui','#3D3929');
     let y=196;for(const p of ['Oxygen is a small nonpolar molecule, so it dissolves in the fatty middle of the bilayer and slips straight through.','Charged or large molecules cannot do that. They need a channel or carrier protein, and pumps spend ATP to move them against the gradient.'])y=wrap(p,160,y,820,30,'18px Georgia','#3D3929')+16;R(160,H-104,960,60,'#FFFFFF',16);Tx('Reply to Claude'+(blink?' |':''),184,H-67,'16px system-ui','#8A8778')}
+  else if(id==='search'){R(0,0,W,H,'#FFFFFF');R(0,0,W,44,'#DEE1E6');R(12,8,300,36,'#FFFFFF',10);Tx("what's 9+10 - Google Search",28,31,'500 13px system-ui','#3C4043');R(0,44,W,44,'#FFFFFF');R(96,52,820,28,'#F1F3F4',14);Tx('google.com/search?q=what%27s+9%2B10&sca_esv=5f1a',116,71,'13px system-ui','#5F6368');R(0,88,W,1,'#DADCE0');
+    Tx('Google',40,142,'500 26px system-ui','#4285F4');R(170,112,620,44,'#F1F3F4',22);Tx("what's 9+10",194,140,'16px system-ui','#202124');['AI Mode','All','Images','Videos','News'].forEach((n,i)=>Tx(n,174+i*84,190,'13px system-ui','#5F6368'));
+    R(170,210,620,150,'#F8F9FA',12);Tx('9 + 10 =',194,250,'14px system-ui','#70757A');Tx('19',194,312,'44px system-ui','#202124');Tx('AI Overview',170,402,'600 14px system-ui','#202124');
+    const y2=wrap('9 + 10 equals 19. However, if you are referencing the popular internet meme from a viral 2013 Vine video, the joke answer is 21.',170,436,640,26,'16px system-ui','#202124')+10;
+    wrap('Are you looking for more help with basic math, or would you like to know the origin story behind the viral meme?',170,y2,640,26,'16px system-ui','#202124');
+    R(170,598,400,40,'#F1F3F4',20);Tx('Ask anything',194,624,'15px system-ui','#70757A');R(600,600,450,36,'#202124',8);Tx('goofturtles.github.io is sharing your screen.   Stop sharing   Hide',616,623,'13px system-ui','#FFFFFF')}
   else if(id==='music'){R(0,0,W,H,'#121212');R(0,0,240,H,'#000000');['Home','Search','Your Library'].forEach((n,i)=>Tx(n,28,52+i*40,'600 15px system-ui',i?'#B3B3B3':'#FFFFFF'));['Playlists','Liked Songs'].forEach((n,i)=>Tx(n,28,196+i*36,'14px system-ui','#B3B3B3'));Tx('Made for you',272,64,'700 28px system-ui','#FFFFFF');['#8D67AB','#1E3264','#E8115B','#148A08','#BC5900'].forEach((f,i)=>{R(272+i*196,96,176,176,f,8);Tx(['Focus mix','Lo-fi beats','Top hits','Chill','Throwback'][i],272+i*196,300,'600 15px system-ui','#FFFFFF')});R(0,H-84,W,84,'#181818');dot(W/2,H-52,18,'#1ED760');R(W/2-220,H-20,440,4,'#4D4D4D',2);R(W/2-220,H-20,60+(t/50)%300,4,'#FFFFFF',2)}
   else{R(0,0,W,H,'#0F0F0F');R(420,12,440,30,'#222222',15);Tx('Search',440,32,'14px system-ui','#AAAAAA');R(24,64,860,484,'#16324F',10);Tx(d.h,64,150,'600 36px system-ui','#FFFFFF');d.p.forEach((p,i)=>Tx('•  '+p,72,226+i*64,'24px system-ui','#DCE9F5'));R(24,542,860,6,'#3A3A3A',3);R(24,542,200+(t/40)%600,6,'#FF4E45',3);Tx('Biology 101, Lecture 7',24,592,'600 20px system-ui','#FFFFFF');for(let i=0;i<5;i++){R(908,64+i*104,160,92,'#272727',8);R(1080,72+i*104,170,12,'#3A3A3A',6);R(1080,96+i*104,110,10,'#2C2C2C',5)}}}
+
+/* ================= THE WORLD =================
+   The grass on the home page is the same render the landing page uses, drawn through a small shader:
+   gusts of wind travel across it, cloud shadows lie on the ground, the view shifts with the pointer and the grass
+   leans away from it, and with the dark theme it becomes night with stars and fireflies. Each palette is a time of day.
+   The field is yours: with no focus today it is bare, sandy ground; grass takes in patches as the minutes add up, and flowers follow.
+   Without WebGL the render stays as a still picture (the CSS background of .world). */
+const World=(()=>{
+  const cv=$('#world-gl'),host=cv.parentElement,U={};let gl,img,ready=false,raf=0,ptr=[.5,.5],aim=[.5,.5],vel=0,night=0,tgt=0,inn=0,q=1,last=0,slow=0,seen=0,gr=0,tgr=0,prevT=0;
+  const VS='attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+  const FS=`#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+uniform vec2 R,P;uniform float T,N,I,V,S,G;uniform vec3 PG,TI,HZ;uniform vec4 F;uniform sampler2D M,D;
+float h(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}
+float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<4;i++){s+=a*n(p);p=p*2.03+7.1;a*=.5;}return s;}
+void main(){
+  vec2 uv=vec2(gl_FragCoord.x/R.x,1.-gl_FragCoord.y/R.y);float asp=R.x/R.y;
+  float d=smoothstep(.26,1.,uv.y);                       // 0 far away, 1 at your feet
+  float z=.34/max(uv.y-.28,.035);                        // distance along the ground
+  vec2 g=vec2((uv.x-.5)*z*asp*.55,z);                    // position on the ground
+  float gust=n(vec2(g.x*1.25-T*.36,g.y*1.05+T*.05));     // broad gusts, travelling
+  float fine=n(vec2(g.x*20.-T*1.8,g.y*15.));             // a fine shimmer on top
+  vec2 q=vec2(uv.x,F.x+uv.y*F.y);                        // where this pixel is in the render
+  float zoom=1.045+.07*(1.-I);
+  q=(q-vec2(.5,F.z))/zoom+vec2(.5,F.z);
+  q+=(P-.5)*vec2(.016,.007)*mix(.3,1.,d);                // the view shifts with the pointer, near things more
+  q.y+=S;
+  vec2 dp=(uv-P)*vec2(asp,1.);
+  float push=exp(-dot(dp,dp)/.012)*V;                    // the grass leans away from a moving pointer
+  vec2 qs=q;                                             // bare ground does not sway
+  q.x+=((gust-.5)*.0040+(fine-.5)*.0010)*d;
+  q+=dp/(length(dp)+.02)*push*.0040/vec2(asp,1.);
+  vec4 c=texture2D(M,q),b=texture2D(D,qs);
+  // How much of the field has grown (G: 0 bare, 1 full). Grass takes in patches, the same places every day, with ragged edges.
+  float pn=fbm(g*vec2(.85,.65)+3.7),th=.80-G*.66;
+  float grow=smoothstep(th-.07,th+.07,pn+(n(g*vec2(26.,18.)+9.)-.5)*.15)*smoothstep(0.,.03,G);
+  vec3 grass=c.rgb*(1.+(gust-.5)*.22*d+push*.14);
+  grass*=mix(vec3(1.17,1.05,.64),vec3(1.),smoothstep(0.,.28,pn-th));     // young grass at the edge of a patch is paler
+  // Bare ground: the same hills with the blades smoothed away, in the colours of sand and dry earth, rippled by wind.
+  float as=smoothstep(.3,.7,b.a),lum=dot(b.rgb,vec3(.3,.59,.11))/max(b.a,.06),t=smoothstep(.02,.46,lum);
+  vec3 sand=mix(mix(vec3(.63,.50,.36),vec3(.83,.71,.53),smoothstep(0.,.55,t)),vec3(.95,.88,.73),smoothstep(.5,1.,t));
+  sand*=.98+.035*n(g*vec2(140.,100.))-.045*d*(sin(g.y*70.+n(g*2.)*9.)*.5+.5);
+  float al=mix(as,c.a,grow);
+  vec3 ground=mix(sand*as,grass,grow);
+  // flowers come once the field is established: small dots in the near grass
+  vec2 fg=g*vec2(210.,300.),fc=floor(fg);float fl=step(.972,h(fc))*smoothstep(.62,.95,G)*grow*d*smoothstep(.34,.14,length(fract(fg)-.5));
+  ground=mix(ground,mix(vec3(1.,.97,.86),vec3(1.,.80,.22),step(.5,h(fc+7.)))*c.a,fl);
+  float sh=smoothstep(.40,.70,fbm(vec2(g.x*.5+T*.02,g.y*.4-T*.009)));   // cloud shadows on the ground
+  ground*=(1.-.30*sh*(1.-.7*N))*TI;
+  ground=mix(ground,ground*vec3(.20,.31,.46)+al*vec3(.004,.010,.020),N);  // moonlight
+  float hz=smoothstep(.08,.36,uv.y)*(1.-smoothstep(.36,.62,uv.y));
+  vec3 sky=mix(PG,HZ,hz*.42*(1.-N));                      // the sky is the page itself, with a little haze over the ridge
+  vec2 sp=floor(gl_FragCoord.xy/2.);
+  float st=step(.9975,h(sp))*(.55+.45*sin(T*2.2+h(sp+3.1)*40.));
+  sky+=N*st*vec3(.85,.9,1.)*(1.-smoothstep(.12,.42,uv.y));
+  vec3 col=ground+sky*(1.-al);
+  if(N>.01)for(int i=0;i<12;i++){float fi=float(i);       // fireflies, at night, over the grass
+    vec2 fp=vec2(fract(.11+fi*.618)+sin(T*.09+fi*1.7)*.035,.50+.40*fract(fi*.371)+sin(T*.13+fi*2.3)*.028);
+    vec2 dd=(uv-fp)*vec2(asp,1.);float r2=dot(dd,dd);
+    col+=N*grow*c.a*vec3(.80,1.,.42)*(.5+.5*sin(T*1.6+fi*5.1))*(exp(-r2/.00005)+.16*exp(-r2/.0009));}
+  float m=max(smoothstep(.84,1.,uv.y),1.-I);             // it rises out of the page: mist at the bottom, and all of it while loading
+  gl_FragColor=vec4(mix(col,PG,m),1.);
+}`;
+  function size(){const r=host.getBoundingClientRect(),k=Math.min(devicePixelRatio||1,1.5)*q,w=Math.max(2,Math.round(r.width*k)),h=Math.max(2,Math.round(r.height*k));
+    if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;gl.viewport(0,0,w,h)}
+    // the render is 16:9 and fills the width; the ridge is kept about a third of the way down
+    const sv=Math.min(1,h/w*img.width/img.height),v0=Math.max(0,Math.min(1-sv,.345-.36*sv));gl.uniform4f(U.F,v0,sv,v0+.36*sv,0);gl.uniform2f(U.R,w,h)}
+  function draw(t){gl.uniform1f(U.T,t);gl.uniform2f(U.P,ptr[0],ptr[1]);gl.uniform1f(U.V,vel);gl.uniform1f(U.N,night);gl.uniform1f(U.I,inn);gl.uniform1f(U.G,gr);gl.uniform1f(U.S,Math.min(.06,scrollY*.00005));gl.drawArrays(gl.TRIANGLES,0,3)}
+  function frame(now){raf=0;if(!ready||view!=='home'||document.hidden){last=prevT=0;return}
+    // if the first second of frames is slow, draw fewer pixels (once or twice) rather than stutter
+    if(last&&q>.5){seen++;if(now-last>24)slow++;if(seen===50){if(slow>18){q*=.72;size()}seen=slow=0}}last=now;
+    const dt=Math.min(.05,(now-(prevT||now))/1000);prevT=now;const k=r=>1-Math.exp(-dt*r),dx=aim[0]-ptr[0],dy=aim[1]-ptr[1];
+    ptr[0]+=dx*k(4.5);ptr[1]+=dy*k(4.5);vel+=(Math.min(1,Math.hypot(dx,dy)*9)-vel)*k(5);night+=(tgt-night)*k(2.8);inn+=(1-inn)*k(1.9);if(inn>.6)gr+=(tgr-gr)*k(.8);
+    host.style.setProperty('--px',(ptr[0]-.5).toFixed(4));host.style.setProperty('--py',(ptr[1]-.5).toFixed(4));
+    draw(now/1000);raf=requestAnimationFrame(frame)}
+  const play=()=>{if(ready&&!raf&&!STILL)raf=requestAnimationFrame(frame)};
+  // colours follow the theme and the palette: the page colour is the sky, dark is night, ember is golden hour, blue is dusk
+  function look(){if(!ready)return;const m=getComputedStyle($('.stage')).backgroundColor.match(/[\d.]+/g).map(Number),pal=root.dataset.palette;
+    gl.uniform3f(U.PG,m[0]/255,m[1]/255,m[2]/255);tgt=root.dataset.theme==='dark'?1:0;
+    gl.uniform3f(U.TI,...(pal==='ember'?[1.13,.95,.72]:pal==='blue'?[.80,.92,1.12]:[1,1,1]));gl.uniform3f(U.HZ,...(pal==='ember'?[.99,.86,.72]:pal==='blue'?[.78,.85,.97]:[.83,.89,.93]));
+    if(STILL){night=tgt;gr=tgr;draw(8)}}
+  // how grown the field is, 0 to 1; it eases there, so new focus is seen arriving
+  function grow(v){tgr=v;if(ready&&STILL){gr=v;draw(8)}}
+  function init(){
+    try{gl=cv.getContext('webgl',{alpha:false,antialias:false,powerPreference:'low-power'})}catch{}
+    if(!gl)return;
+    const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(o));return o};
+    try{const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(pr));
+      gl.useProgram(pr);gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);const a=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,2,gl.FLOAT,false,0,0);
+      'R P T N I V S G PG TI HZ F M D'.split(' ').forEach(k=>U[k]=gl.getUniformLocation(pr,k))}catch(e){console.error(e);gl=null;return}
+    img=new Image();img.onload=()=>{
+      // the render is drawn down to a size the laptop needs, so the grass stays smooth when it moves
+      const w=Math.min(img.width,2048),h=Math.round(w*img.height/img.width),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+      const tex=(unit,from)=>{gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,gl.createTexture());gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,from);
+        [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]].forEach(([k,v])=>gl.texParameteri(gl.TEXTURE_2D,k,v))};
+      // a second, blurred copy: the hills without their blades, which is what bare ground is drawn from
+      const b=document.createElement('canvas');b.width=w>>1;b.height=h>>1;const bx=b.getContext('2d');bx.filter='blur(11px)';bx.drawImage(c,0,0,b.width,b.height);
+      tex(0,c);tex(1,b);gl.uniform1i(U.M,0);gl.uniform1i(U.D,1);
+      ready=true;host.classList.add('gl');size();if(STILL)inn=1;look();play()};
+    img.src='assets/hills.webp';
+    cv.addEventListener('webglcontextlost',()=>{ready=false;host.classList.remove('gl')});
+    addEventListener('resize',()=>{if(ready){size();if(STILL)draw(8)}});
+    addEventListener('pointermove',e=>{const r=host.getBoundingClientRect();aim=[Math.max(-.3,Math.min(1.3,(e.clientX-r.left)/r.width)),Math.max(-.3,Math.min(1.3,(e.clientY-r.top)/r.height))]},{passive:true});
+    document.addEventListener('visibilitychange',play)}
+  return{init,play,look,grow}})();
 
 /* ================= SETTINGS ================= */
 function renderSettings(){renderSide();
@@ -1034,9 +1199,9 @@ async function testKey(){const st=$('#key-status');if(!cfg.key){st.className='st
 
 /* ================= THEME ================= */
 const root=document.documentElement;
-function applyTheme(t){root.dataset.theme=t;$('#theme').innerHTML=ic(t==='dark'?'sun':'moon')}
+function applyTheme(t){root.dataset.theme=t;$('#theme').innerHTML=ic(t==='dark'?'sun':'moon');World.look()}
 const PALS=['green','blue','ember'];
-function applyPalette(p){if(!PALS.includes(p))p='green';root.dataset.palette=p;$$('#pals button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.pal===p));if(S.float)try{S.float.document.documentElement.dataset.palette=p}catch{}}
+function applyPalette(p){if(!PALS.includes(p))p='green';root.dataset.palette=p;$$('#pals button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.pal===p));World.look();if(S.float)try{S.float.document.documentElement.dataset.palette=p}catch{}}
 function toggleTheme(e){const next=root.dataset.theme==='dark'?'light':'dark';cfg.theme=next;saveCfg();
   if(STILL||!document.startViewTransition)return applyTheme(next);
   const x=e.clientX||innerWidth/2,y=e.clientY||innerHeight/2,r=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
@@ -1092,7 +1257,7 @@ $('#pill').innerHTML=pillHTML(false);
 function shotLive(){reset(true);S.shot=true;const now=Date.now(),t0=S.t0=now-1294e3;let t=t0;[[370,'focus'],[9,'glance'],[482,'focus'],[6,'glance'],[427,'focus']].forEach(([s,k],i,a)=>{S.segs.push({k,a:t,b:i===a.length-1?null:(t+=s*1e3),st:1})});
   S.main={id:1,start:t0,label:'Mitochondria and ATP · Class notes',frames:[],ref:null};S.sid=1;last.width=1280;last.height=720;drawScene(lx,'doc2',0);begin();$('#stream').innerHTML='';
   ['doc1','doc2'].forEach((k,i)=>addNote({t:[134e3,58e4][i],title:SAMPLE.notes[k].topic,bullets:SAMPLE.notes[k].notes,terms:SAMPLE.notes[k].terms,src:SAMPLE.notes[k].app}));$('#pv').getContext('2d').drawImage(last,0,0,640,360);paint()}
-applyTheme(root.dataset.theme||'light');applyPalette(root.dataset.palette);renderSide();
+World.init();applyTheme(root.dataset.theme||'light');applyPalette(root.dataset.palette);renderSide();
 $('#dock-sample').innerHTML=ic('play');$('#dock-set').innerHTML=ic('sliders');if(!Q.has('bare'))show($('#dock'),true);
 const v0=Q.get('view');
 if(v0==='live')shotLive();else if(v0==='session'&&sessions[0])openSession(sessions[0]);else go(['notes','recap','settings'].includes(v0)?v0:'home',true);
