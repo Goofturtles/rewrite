@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1280">
-<meta name="build" content="1794772670">
+<meta name="build" content="1794773423">
 <title>Rewrite</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%23528200'/%3E%3Cpath d='M7 19c3-9 5.5 6 8.5-1.5S20.5 10 25 18' fill='none' stroke='%23fff' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://api.fontshare.com">
@@ -486,6 +486,10 @@ mark{color:var(--ink);padding:0 3px;margin:0 -3px;border-radius:5px;background:l
 .set{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:14px;align-items:start}
 .set-col{display:grid;gap:14px;min-width:0}
 .apps{display:flex;flex-wrap:wrap;gap:6px}
+.apps .mine{display:inline-flex;align-items:center;gap:6px;padding-right:5px;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink3)}
+.apps .mine button{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:var(--ink3);transition:background .2s,color .2s}
+.apps .mine button:hover{background:var(--wash2);color:var(--ink)}
+.apps .mine svg{width:10px;height:10px}
 .apps span{font-size:13px;line-height:1.5;padding:3px 11px;border-radius:99px;box-shadow:inset 0 0 0 1px var(--line);color:var(--ink2)}
 .set h3{font:500 19px/1.3 var(--ui);letter-spacing:-.025em;margin:0 0 4px}
 .set .card>p{margin:0 0 16px;color:var(--ink2);font-size:14px;line-height:1.55;max-width:62ch}
@@ -664,6 +668,10 @@ input[type=range]{accent-color:var(--hot);width:100%;height:28px}
           <h3>Left out by name</h3>
           <p>Short visit: a glance. Long visit: a break. Neither reaches your notes.</p>
           <div class="apps" id="apps"></div>
+          <h3 style="margin-top:20px">Your own list</h3>
+          <p>Add a site or an app. It is not counted and never reaches your notes.</p>
+          <div class="apps" id="skips"></div>
+          <form class="inline" id="skip-add" style="margin-top:12px"><input class="input" id="skip-in" placeholder="loom.com, or an app's name" aria-label="A site or app that should not be counted" autocomplete="off" spellcheck="false" maxlength="40"><button class="btn line" style="height:46px">Add</button></form>
         </div>
         </div>
       </div>
@@ -762,7 +770,7 @@ function mkSegs(min,g,sd){const r=rng(sd*7919+11),parts=Array.from({length:g+1},
 const LS={cfg:'rewrite:cfg',ses:'rewrite:sessions'};
 const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
-const cfg=Object.assign({engine:'device',key:'',model:'claude-opus-5-5',glance:20,sens:5},load(LS.cfg,{}));   // works out of the box on the laptop; a Claude key is an upgrade
+const cfg=Object.assign({engine:'device',key:'',model:'claude-opus-5-5',glance:20,sens:5,skip:['Loom']},load(LS.cfg,{}));if(!Array.isArray(cfg.skip))cfg.skip=['Loom'];   // works out of the box on the laptop; a Claude key is an upgrade
 const saveCfg=()=>save(LS.cfg,cfg);
 function seed(){const now=Date.now();return SEED.map(s=>{const x=new Date(now-s.d*864e5);x.setHours(s.h,s.m,0,0);const segs=mkSegs(s.focus,s.glances,s.d+3);return{id:'seed'+s.d,at:+x,dur:segs[segs.length-1].b,focusMs:s.focus*60e3,glances:s.glances,title:s.title,subject:s.subject,takeaways:s.takeaways,quiz:s.quiz||[],segs,sample:true,engine:'claude',notes:s.notes.map((n,i)=>({t:(i+1)*s.focus*60e3/(s.notes.length+1),...n}))}})}
 let sessions=DEMO?seed():arr(load(LS.ses,[])).filter(x=>x&&Array.isArray(x.notes)&&Array.isArray(x.segs)).map(x=>({takeaways:[],quiz:[],glances:0,focusMs:0,title:'Session notes',...x}));
@@ -930,10 +938,15 @@ function step(g,now){
    The check runs on this laptop: the screen is read for the names and tell-tale words of those apps. */
 const APPS=['Discord','Spotify','Instagram','TikTok','Snapchat','WhatsApp','Messenger','Telegram','Netflix','Twitch','Reddit','Facebook','Twitter','Pinterest','Tumblr','Hulu','Disney+','Prime Video','Crunchyroll','SoundCloud','Apple Music','YouTube Music','YouTube Shorts','Steam','Roblox','Fortnite','Valorant','Minecraft','iMessage','BeReal'];
 const appKey=a=>a.toLowerCase().replace('+','');
-const DISTRACT=new RegExp('\\b('+[...APPS.map(appKey),'threads\\.net','x\\.com'].join('|')+')\\b','i');
+const reSafe=x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),skipKey=x=>x.toLowerCase().trim().replace(/^https?:\/\//,'').replace(/^www\./,'').replace(/\/+$/,'');
+let DISTRACT;
+function buildSkip(){DISTRACT=new RegExp('\\b('+[...APPS.map(appKey),...cfg.skip.map(skipKey).filter(Boolean).map(reSafe),'threads\\.net','x\\.com'].join('|')+')\\b','i')}
+buildSkip();
+// the address in the address bar belongs to one of them (the built-in single-word names, or anything on your list)
+const skipHost=h=>[...APPS.map(appKey).filter(k=>!k.includes(' ')&&k.length>3),...cfg.skip.map(x=>skipKey(x).split('/')[0].replace(/\s+/g,''))].some(k=>k&&h.includes(k));
 const HINTS=[[/direct messages/i,'Chat app'],[/add friend/i,'Chat app'],[/\bnitro\b/i,'Chat app'],[/message [#@]/i,'Chat app'],[/your library/i,'Music app'],[/liked songs/i,'Music app'],[/now playing/i,'Music app'],[/\bplaylists?\b/i,'Music app'],[/\bfor you\b/i,'Social app'],[/\breels\b/i,'Social app'],[/\bstories\b/i,'Social app'],[/what.?s happening/i,'Social app'],[/\btrending\b/i,'Social app'],[/\bretweet|\brepost\b/i,'Social app'],[/\bfollowers\b/i,'Social app'],[/\bupvote/i,'Social app']];
 // The name of the social, chat, music, video or game app on this screen, or '' when the screen is anything else.
-const whichApp=text=>{const m=text.match(DISTRACT);if(m){const k=m[0].toLowerCase();return k==='x.com'?'X':k==='threads.net'?'Threads':APPS.find(a=>appKey(a)===k)||m[0]}const hit=HINTS.filter(h=>h[0].test(text));return hit.length>=2?hit[0][1]:''};
+const whichApp=text=>{const m=text.match(DISTRACT);if(m){const k=m[0].toLowerCase();return k==='x.com'?'X':k==='threads.net'?'Threads':APPS.find(a=>appKey(a)===k)||cfg.skip.find(x=>skipKey(x)===k)||m[0]}const hit=HINTS.filter(h=>h[0].test(text));return hit.length>=2?hit[0][1]:''};
 function peek(){const k=1,c=document.createElement('canvas');c.width=Math.max(1,Math.round(last.width*k));c.height=Math.max(1,Math.round(last.height*k));c.getContext('2d').drawImage(last,0,0,c.width,c.height);return{c,tag:S.scene}}
 // dark screens read far better as dark text on a light page
 const lightUp=(x,cv)=>{const d=x.getImageData(0,0,cv.width,cv.height).data;let s=0,n=0;for(let i=0;i<d.length;i+=388){s+=d[i]*.3+d[i+1]*.59+d[i+2]*.11;n++}if(s/n<115){x.globalCompositeOperation='difference';x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.globalCompositeOperation='source-over'}};
@@ -1001,7 +1014,7 @@ ${[...S.pages.values()].map((p,i)=>`${i+1}. ${p.title} (${p.url})`).join('\n')||
 Write the next notes. Reply with one JSON object and nothing else:
 {"on_task": true, "app": "", "url": "", "topic": "", "notes": [""], "terms": [""], "cite": null}
 
-- on_task: false when the screen is chat, music, social media, games, shopping or entertainment, not something they are learning from.
+- on_task: false when the screen is chat, music, social media, games, shopping or entertainment, not something they are learning from${cfg.skip.length?', and always false for these, which the person asked not to count: '+cfg.skip.join(', '):''}.
 - app: the app or site in view, 1 to 3 words.
 - url: the address shown in the browser's address bar, without https://, or "" when none is visible.
 - cite: when the screen is a document the person is writing (Google Docs, Word, Notion) and what they wrote restates information from one of the pages listed above, the number of that page. Otherwise null.
@@ -1076,6 +1089,7 @@ async function deviceNotes(frames,st={}){
   let here={app:'',topic:''};
   try{const W=top.width,hh=Math.round(top.height*.125),s=document.createElement('canvas');s.width=W*2;s.height=hh*2;const x=s.getContext('2d',{willReadFrequently:true});x.imageSmoothingQuality='high';x.drawImage(top,0,0,W,hh,0,0,s.width,s.height);lightUp(x,s);
     const tt=String((await withTimeout(w.recognize(s),30000,'top strip')).data.text||'');here=whereAmI(tt);here.url=pageUrl(tt)}catch{}
+  if(here.url&&skipHost(here.url.split('/')[0]))return{on_task:false,app:here.app,topic:here.topic,notes:[]};
   const own=new RegExp(location.hostname.split('.').filter(p=>p.length>2).join('\\W*')||'^$','i');   // this page's own name, as the browser's sharing bar shows it
   // The newest frame, and the one before it when the page changed twice since the last note, so nothing that came and went is missed.
   const sents=[];let head=null;
@@ -1170,7 +1184,7 @@ const SIMSCRIPT=[['doc1',16000],['ai',7000],['doc1',10000],['chat',6000],['doc2'
 function startSim(){if(S.running)return;reset(false);S.sim=true;
   const cv=document.createElement('canvas');cv.width=1280;cv.height=720;const cx=cv.getContext('2d');S.sceneI=0;S.scene=SIMSCRIPT[0][0];S.sceneAt=Date.now();
   drawScene(cx,S.scene,0);S.demoT=setInterval(()=>drawScene(cx,S.scene,Date.now()-S.sceneAt),250);
-  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},clean:cleanLine,codey,float(){const f=document.createElement('iframe');f.style.cssText='position:fixed;left:24px;top:90px;width:236px;height:44px;border:0;z-index:99';document.body.append(f);dressFloat(f.contentDocument);S.float={document:f.contentDocument,close(){f.remove()},resizeTo(){}};paint();return f},read:async(ids,st={})=>{const out=[];for(const id of [].concat(ids)){const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);out.push(await deviceNotes([{c,t:Date.now(),tag:id}],st))}return out.length>1?out:out[0]}}}
+  S.stream=cv.captureStream(5);pump(S.stream.getVideoTracks()[0]);begin();window.__rw={S,get sessions(){return sessions},clean:cleanLine,codey,which:whichApp,skipHost,float(){const f=document.createElement('iframe');f.style.cssText='position:fixed;left:24px;top:90px;width:236px;height:44px;border:0;z-index:99';document.body.append(f);dressFloat(f.contentDocument);S.float={document:f.contentDocument,close(){f.remove()},resizeTo(){}};paint();return f},read:async(ids,st={})=>{const out=[];for(const id of [].concat(ids)){const c=document.createElement('canvas');c.width=1280;c.height=720;drawScene(c.getContext('2d'),id,0);out.push(await deviceNotes([{c,t:Date.now(),tag:id}],st))}return out.length>1?out:out[0]}}}
 function togglePause(){if(!S.running||S.finishing)return;const now=Date.now();S.paused=!S.paused;if(S.paused){if(S.detour)endDetour();S.off=null;if(S.main)openSeg('pause',now,null)}else{S.prev=S.sig=null;if(S.demo)S.sceneAt+=now-(S.pausedAt||now)}S.pausedAt=now;paint()}
 async function finish(){
   if(!S.running||S.finishing)return;S.finishing=true;const now=Date.now();stopCapture();
@@ -1274,6 +1288,8 @@ function askDo(q){const ql=q.toLowerCase(),has=re=>re.test(ql),cur=opened||sessi
   if(m=q.match(/\b(?:rename|retitle|call)\b\s*(.*?)\s*\b(?:to|as)\b\s+["“']?(.+?)["”']?\s*$/i)){const name=m[2].trim().slice(0,90),what=m[1].toLowerCase();
     if(/\bnote\b/.test(what)){const h=find(what.replace(/.*\bnote\b/,''))||lastNote();if(!h)return{text:'I could not find that note.'};keepUndo();h.n.title=name;persist();redraw();return{text:`The note is now called "${name}".`,undo:true}}
     if(!cur)return{text:'There is no session to rename yet.'};keepUndo();cur.title=name;persist();redraw();return{text:`The session is now called "${name}".`,undo:true}}
+  if(m=q.match(/\bcount\s+(.+?)\s+again\b/i)){const i=cfg.skip.findIndex(y=>skipKey(y)===skipKey(m[1]));if(i<0)return{text:`"${m[1]}" is not on your list.`};dropSkip(i);return{text:`"${m[1]}" is counted again.`}}
+  if(m=q.match(/\b(?:don'?t|do not|stop|never)\s+count(?:ing)?\s+(.+?)\s*$/i)||q.match(/\b(?:ignore|block|skip)\s+(.+?)\s*$/i)){const x=addSkip(m[1]);return{text:x?`"${x}" is not counted from now on. It is on your list in Settings.`:'Tell me the site or app by name.'}}
   const look=has(/\b(mode|theme|switch|make|turn|go|use|it|set|change)\b/);
   if(look&&has(/\b(dark|night)\b/)){cfg.theme='dark';saveCfg();applyTheme('dark');return{text:'The dark theme is on.'}}
   if(look&&has(/\b(light|bright|day)\b/)){cfg.theme='light';saveCfg();applyTheme('light');return{text:'The light theme is on.'}}
@@ -1422,7 +1438,8 @@ function renderSettings(){renderSide();
   const seg=$('#engine'),on=$(`[data-engine="${cfg.engine}"]`,seg);$$('button',seg).forEach(b=>{b.classList.toggle('on',b===on);b.setAttribute('aria-pressed',b===on)});const th=$('.thumb',seg);th.style.width=on.offsetWidth+'px';th.style.transform=`translateX(${on.offsetLeft}px)`;
   $('#pane-claude').classList.toggle('on',cfg.engine==='claude');$('#pane-device').classList.toggle('on',cfg.engine==='device');
   $('#key').value=cfg.key;$('#model').innerHTML=Object.entries(MODELS).map(([k,v])=>`<option value="${k}"${k===cfg.model?' selected':''}>${v}</option>`).join('');
-  $$('#keys-sw button').forEach(b=>{const on=(cfg.keys!==false)===(b.dataset.keys==='1');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});$('#glance').value=cfg.glance;$('#glance-v').textContent=cfg.glance+' s';$('#sens').value=cfg.sens;$('#apps').innerHTML=APPS.map(a=>`<span>${a}</span>`).join('')}
+  $$('#keys-sw button').forEach(b=>{const on=(cfg.keys!==false)===(b.dataset.keys==='1');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});$('#glance').value=cfg.glance;$('#glance-v').textContent=cfg.glance+' s';$('#sens').value=cfg.sens;$('#apps').innerHTML=APPS.map(a=>`<span>${a}</span>`).join('');
+  $('#skips').innerHTML=cfg.skip.map((x,i)=>`<span class="mine">${esc(x)}<button data-unskip="${i}" aria-label="Count ${esc(x)} again">${ic('x')}</button></span>`).join('')||'<span>Nothing added yet</span>'}
 async function testKey(){const st=$('#key-status');if(!cfg.key){st.className='status err';st.textContent='Paste a key first.';return}st.className='status';st.textContent='Checking the key...';
   try{await claude([{type:'text',text:'Reply with the single word: ready'}],256);st.className='status ok';st.textContent='The key works. Notes will be written by '+MODELS[cfg.model]+'.'}catch(e){st.className='status err';st.textContent=String(e.message||e)}}
 
@@ -1477,6 +1494,7 @@ document.addEventListener('click',e=>{
   const ci=e.target.closest('[data-cite]');if(ci&&opened){copyCite(arr(opened.sources)[+ci.dataset.cite]);return}
   const aq=e.target.closest('[data-ask]');if(aq){$('#ask-q').value=aq.dataset.ask;ask(aq.dataset.ask);return}
   const en=e.target.closest('[data-engine]');if(en){cfg.engine=en.dataset.engine;saveCfg();renderSettings();renderSetup();renderSide();if(view==='home'&&engine()==='none'){go('settings');toast('Paste your Claude key here, or switch back to "On this laptop".')}return}
+  const us=e.target.closest('[data-unskip]');if(us){dropSkip(+us.dataset.unskip);return}
   const ks=e.target.closest('[data-keys]');if(ks){cfg.keys=ks.dataset.keys==='1';saveCfg();renderSettings();return}
   const gl=e.target.closest('[data-glance]');if(gl){cfg.glance=+gl.dataset.glance;saveCfg();renderSetup();return}
   onAct(e)});
@@ -1484,6 +1502,10 @@ document.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{if(cfg.keys===false||e.ctrlKey||e.metaKey||e.altKey||e.repeat||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;const k=e.key.toLowerCase(),v={h:'home',n:'notes',r:'recap',',':'settings'}[k];
   if(v){opened=null;show($('#askp'),false);go(v)}else if(k==='/'){e.preventDefault();opened=null;go('notes',true);$('#find').focus()}else if(k==='a'){e.preventDefault();onAct({target:$('#dock-ask')})}else if(k==='s')startReal();else if(k==='p')startDemo();else if(k==='d')toggleTheme(e)});
 $('#find').addEventListener('input',filterNotes);
+// your own not-counted list: add from Settings or by asking, remove with the small cross
+function addSkip(x){x=String(x||'').trim().replace(/^["“']|["”'.]$/g,'').slice(0,40);if(x.length<3)return'';if(!cfg.skip.some(y=>skipKey(y)===skipKey(x))){cfg.skip.push(x);saveCfg();buildSkip();renderSettings()}return x}
+function dropSkip(i){cfg.skip.splice(i,1);saveCfg();buildSkip();renderSettings()}
+$('#skip-add').addEventListener('submit',e=>{e.preventDefault();const x=addSkip($('#skip-in').value);if(x){$('#skip-in').value='';toast(`"${x}" is not counted from now on.`)}else toast('Type at least three letters.')});
 $('#ask').addEventListener('submit',e=>{e.preventDefault();ask($('#ask-q').value)});
 $('#ask-q').addEventListener('keydown',e=>{if(e.key==='Escape'){show($('#askp'),false);$('#dock-ask').setAttribute('aria-expanded',false);$('#dock-ask').focus()}});
 $('#key').addEventListener('input',e=>{cfg.key=e.target.value.trim();saveCfg();renderSide()});
